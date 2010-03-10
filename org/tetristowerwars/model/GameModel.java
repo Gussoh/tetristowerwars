@@ -9,6 +9,6 @@ package org.tetristowerwars.model;
  *
  * @author Andreas
  */
-public class DataModel {
+public class GameModel {
 
 }
