@@ -55,9 +55,9 @@ public class GameModel {
     public void update() {
         long currentTimeMs = System.currentTimeMillis();
 
-        float stepTimeMs = lastStepTime - currentTimeMs;
+        float stepTimeMs = currentTimeMs - lastStepTime;
         lastStepTime = currentTimeMs;
-        world.step(1 / 60f, ITERATIONS_PER_STEP);
+        world.step(stepTimeMs / 1000, ITERATIONS_PER_STEP);
     }
 
     public Body getGroundBody() {
