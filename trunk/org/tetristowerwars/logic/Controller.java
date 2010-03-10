@@ -3,23 +3,18 @@
  * and open the template in the editor.
  */
 
-package org.tetristowerwars.ui;
+package org.tetristowerwars.logic;
 
-import org.tetristowerwars.logic.Controller;
 import org.tetristowerwars.model.GameModel;
 
 /**
  *
  * @author Andreas
  */
-public class Renderer {
+public class Controller {
     private final GameModel dataModel;
-    private final Controller controller;
 
-    public Renderer(GameModel dataModel, Controller controller) {
+    public Controller(GameModel dataModel) {
         this.dataModel = dataModel;
-        this.controller = controller;
     }
-
-
 }
