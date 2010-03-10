@@ -11,4 +11,6 @@ package org.tetristowerwars.model;
  */
 public class BuildingBlock extends Block {
 
+    public BuildingBlock() {
+    }
 }
