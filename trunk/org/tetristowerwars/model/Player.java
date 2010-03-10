@@ -5,10 +5,14 @@
 
 package org.tetristowerwars.model;
 
+import java.util.LinkedHashSet;
+
 /**
  *
  * @author magnus
  */
 public class Player {
+    private LinkedHashSet<BuildingBlock> ownedBuildingBlocks;
+    private LinkedHashSet<CannonBlock> ownedCannons;
 
 }

@@ -9,6 +9,6 @@ package org.tetristowerwars.model;
  *
  * @author magnus
  */
-public class BuildingBlock extends Block {
+public class CannonBlock extends Block{
 
 }
