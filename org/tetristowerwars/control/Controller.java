@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tetristowerwars.logic;
+package org.tetristowerwars.control;
 
 import org.tetristowerwars.model.GameModel;
 

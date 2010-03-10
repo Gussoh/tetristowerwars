@@ -3,9 +3,9 @@
  * and open the template in the editor.
  */
 
-package org.tetristowerwars.ui;
+package org.tetristowerwars.gui;
 
-import org.tetristowerwars.logic.Controller;
+import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
 
 /**
