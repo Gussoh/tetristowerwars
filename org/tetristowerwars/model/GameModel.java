@@ -5,10 +5,14 @@
 
 package org.tetristowerwars.model;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+
 /**
  *
  * @author Andreas
  */
 public class GameModel {
-
+    private LinkedHashSet<BuildingBlock> blockPool;
+    private ArrayList<Player> players;
 }
