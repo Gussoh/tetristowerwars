@@ -3,7 +3,9 @@
  * and open the template in the editor.
  */
 
-package org.tetristowerwars.model;
+package org.tetristowerwars.model.blocktypes;
+
+import org.tetristowerwars.model.BuildingBlock;
 
 /**
  *
