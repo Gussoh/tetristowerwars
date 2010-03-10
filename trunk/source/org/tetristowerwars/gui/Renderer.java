@@ -12,14 +12,14 @@ import org.tetristowerwars.model.GameModel;
  *
  * @author Andreas
  */
-public class Renderer {
-    private final GameModel gameModel;
-    private final Controller controller;
+public abstract class Renderer {
+    protected final GameModel gameModel;
+    protected final Controller controller;
 
     public Renderer(GameModel dataModel, Controller controller) {
         this.gameModel = dataModel;
         this.controller = controller;
     }
 
-
+    public abstract void renderFrame();
 }
