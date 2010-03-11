@@ -69,12 +69,13 @@ public class SwingRenderer extends Renderer {
 
                 Vec2[] vertices = shape.getVertices();
                 AffineTransform currentTransform = g.getTransform();
+
                 g.translate(body.getPosition().x, getHeight() - body.getPosition().y);
                 g.rotate(-body.getAngle());
                 for (int i = 0; i < vertices.length - 1; i++) {
-                    g.drawLine((int) vertices[i].x, (int) vertices[i].y, (int) vertices[i + 1].x, (int) vertices[i + 1].y);
+                    g.drawLine((int) vertices[i].x, (int) -vertices[i].y, (int) vertices[i + 1].x, (int) -vertices[i + 1].y);
                 }
-                g.drawLine((int) vertices[0].x, (int) vertices[0].y, (int) vertices[vertices.length - 1].x, (int) vertices[vertices.length - 1].y);
+                g.drawLine((int) vertices[0].x, (int) -vertices[0].y, (int) vertices[vertices.length - 1].x, (int) -vertices[vertices.length - 1].y);
                 g.setTransform(currentTransform);
             }
         }
