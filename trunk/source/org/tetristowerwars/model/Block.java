@@ -5,10 +5,23 @@
 
 package org.tetristowerwars.model;
 
+import org.jbox2d.dynamics.Body;
+
 /**
  *
  * @author magnus
  */
-public class Block {
+public abstract class Block {
+
+    private final Body[] bodies;
+
+    public Body[] getBodies() {
+        return bodies;
+    }
+
+    public Block(Body[] body) {
+        this.bodies = body;
+    }
+
 
 }

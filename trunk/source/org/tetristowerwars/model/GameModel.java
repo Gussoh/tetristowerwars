@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.model;
 
+import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -18,26 +19,27 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.tetristowerwars.model.building.BuildingBlockFactory;
 
 /**
  *
  * @author Andreas
  */
 public class GameModel {
-
-    private LinkedHashSet<BuildingBlock> blockPool;
-    private ArrayList<Player> players;
-    private World world;
+    
+    private final LinkedHashSet<BuildingBlock> blockPool = new LinkedHashSet<BuildingBlock>();
+    private final ArrayList<Player> players = new ArrayList<Player>();
+    private final World world;
     private static final int ITERATIONS_PER_STEP = 10; // Lower value means less accurate but faster
     private long lastStepTime = System.currentTimeMillis();
     private final float width, height;
-    private Body groundBody;
+    private final Body groundBody;
+    private final BuildingBlockFactory blockFactory;
 
-    private Map<Body, Object> bodies = new ConcurrentHashMap<Body, Object>();
-
-    public GameModel(float width, float height, float groundLevel) {
+    public GameModel(float width, float height, float groundLevel, float blockSize) {
         this.width = width;
         this.height = height;
+
         // TODO: How is screen coordinates mapped to physics coordiantes?
         AABB worldBoundries = new AABB(new Vec2(0, 0), new Vec2(width, height));
         Vec2 gravity = new Vec2(0, -9.82f);
@@ -50,6 +52,8 @@ public class GameModel {
         PolygonDef groundShapeDef = new PolygonDef();
         groundShapeDef.setAsBox(width, height);
         groundBody.createShape(groundShapeDef);
+
+        blockFactory = new BuildingBlockFactory(world, blockSize);
     }
 
     public void update() {
@@ -64,25 +68,25 @@ public class GameModel {
         return groundBody;
     }
 
-    // TODO: JUST A TEST, REMOVE LATER
-    public void addBody() {
-        BodyDef boxBodyDef = new BodyDef();
-        boxBodyDef.allowSleep = true;
-        boxBodyDef.position.set(width / 2, height - 10);
-        Body boxBody = world.createBody(boxBodyDef);
-
-        PolygonDef boxShape = new PolygonDef();
-        boxShape.setAsBox(10, 10);
-        boxShape.density = 1.0f;
-        boxBody.createShape(boxShape);
-
-        boxBody.setMassFromShapes();
-        bodies.put(boxBody, new Object());
+    public LinkedHashSet<BuildingBlock> getBlockPool() {
+        return blockPool;
     }
 
-    public Set<Body> getBodies() {
-        return bodies.keySet();
+    public ArrayList<Player> getPlayers() {
+        return players;
     }
+
+    public void addToBlockPool(BuildingBlock block) {
+
+        blockPool.add(block);
+    }
+
+    public BuildingBlockFactory getBlockFactory() {
+        return blockFactory;
+    }
+
+
+
 
     
 }

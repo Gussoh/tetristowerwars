@@ -4,9 +4,13 @@
  */
 package org.tetristowerwars;
 
+import javax.swing.SwingUtilities;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.material.ConcreteMaterial;
 
 /**
  *
@@ -14,22 +18,42 @@ import org.tetristowerwars.model.GameModel;
  */
 public class Main {
 
+    static int kalle = 0;
+
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Hello tetris tower wars!");
-        GameModel gameModel = new GameModel(640, 480, 30);
-        Renderer renderer = new SwingRenderer(gameModel, null);
-        int kalle = 0;
+        float blockSize = 5;
+        final GameModel gameModel = new GameModel(640, 480, 30, blockSize);
+        final Renderer renderer = new SwingRenderer(gameModel, null);
+
         for (;;) {
             kalle++;
-            Thread.sleep(10);
-            renderer.renderFrame();
+            Thread.sleep(20);
+            SwingUtilities.invokeLater(new Runnable() {
 
-            if (kalle % 50 == 0) {
+                @Override
+                public void run() {
+                    renderer.renderFrame();
 
-                gameModel.addBody();
-            }
+                    if (kalle % 500 == 0) {
 
-            gameModel.update();
+                        BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(320, 400),
+                                new ConcreteMaterial());
+                        gameModel.addToBlockPool(b);
+                    }
+
+                    if (kalle % 50 == 25) {
+
+                        BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(300, 400),
+                                new ConcreteMaterial());
+                        gameModel.addToBlockPool(b);
+                    }
+
+                    gameModel.update();
+                }
+            });
+           
+
         }
     }
 }
