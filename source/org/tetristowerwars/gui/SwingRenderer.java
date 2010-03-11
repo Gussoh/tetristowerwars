@@ -15,6 +15,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.building.BuildingBlock;
 
 /**
  *
@@ -50,31 +51,32 @@ public class SwingRenderer extends Renderer {
             Graphics2D g2 = (Graphics2D) g;
             drawBody(g2, gameModel.getGroundBody());
 
-            for (Body body : gameModel.getBodies()) {
-                drawBody(g2, body);
+            for (BuildingBlock block : gameModel.getBlockPool()) {
+                drawBlock(g2, block);
+            }
+        }
+
+        private void drawBlock(Graphics2D g, BuildingBlock block)
+        {
+
+            for (Body body : block.getBodies()) {
+                drawBody(g, body);
             }
         }
 
         private void drawBody(Graphics2D g, Body body) {
-            PolygonShape groundShape = (PolygonShape) body.getShapeList();
+            for(PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
 
-            Vec2[] vertices = groundShape.getVertices();
-            AffineTransform currentTransform = g.getTransform();
-            g.translate(body.getPosition().x, getHeight() - body.getPosition().y);
-            g.rotate(-body.getAngle());
-            for (int i = 0; i < vertices.length - 1; i++) {
-                g.drawLine((int) vertices[i].x,
-                        ((int) vertices[i].y),
-                        (int) vertices[i + 1].x,
-                        ((int) vertices[i + 1].y));
+                Vec2[] vertices = shape.getVertices();
+                AffineTransform currentTransform = g.getTransform();
+                g.translate(body.getPosition().x, getHeight() - body.getPosition().y);
+                g.rotate(-body.getAngle());
+                for (int i = 0; i < vertices.length - 1; i++) {
+                    g.drawLine((int) vertices[i].x, (int) vertices[i].y, (int) vertices[i + 1].x, (int) vertices[i + 1].y);
+                }
+                g.drawLine((int) vertices[0].x, (int) vertices[0].y, (int) vertices[vertices.length - 1].x, (int) vertices[vertices.length - 1].y);
+                g.setTransform(currentTransform);
             }
-            
-            g.drawLine((int) vertices[0].x,
-                        ((int) vertices[0].y),
-                        (int) vertices[vertices.length - 1].x,
-                        ((int) vertices[vertices.length - 1].y));
-
-            g.setTransform(currentTransform);
         }
     }
 }

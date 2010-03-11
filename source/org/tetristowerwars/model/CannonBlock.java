@@ -5,10 +5,16 @@
 
 package org.tetristowerwars.model;
 
+import org.jbox2d.dynamics.Body;
+
 /**
  *
  * @author magnus
  */
 public class CannonBlock extends Block{
+
+    public CannonBlock(Body[] body) {
+        super(body);
+    }
 
 }

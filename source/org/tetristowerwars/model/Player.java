@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.model;
 
+import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.LinkedHashSet;
 
 /**
