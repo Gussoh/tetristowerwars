@@ -35,14 +35,14 @@ public class Main {
                 public void run() {
                     renderer.renderFrame();
 
-                    if (kalle % 500 == 0) {
+                    if (kalle % 50 == 0) {
 
                         BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(320, 400),
                                 new ConcreteMaterial());
                         gameModel.addToBlockPool(b);
                     }
 
-                    if (kalle % 50 == 25) {
+                    if (kalle % 200 == 25) {
 
                         BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(300, 400),
                                 new ConcreteMaterial());

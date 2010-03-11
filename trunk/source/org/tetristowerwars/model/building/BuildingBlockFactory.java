@@ -69,8 +69,8 @@ public class BuildingBlockFactory {
         vertices.add(new Vec2(-blockSize*1.5f, blockSize*(1f/3f)));
 
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
-        vertices2.add(new Vec2(-blockSize*0.5f, blockSize*(1f/3f)));
-        vertices2.add(new Vec2(blockSize*0.5f, blockSize*(1f/3f)));
+        vertices2.add(new Vec2(-blockSize*0.5f, -blockSize*(2f/3f)));
+        vertices2.add(new Vec2(blockSize*0.5f, -blockSize*(2f/3f)));
         vertices2.add(new Vec2(blockSize*0.5f, blockSize*(4f/3f)));
         vertices2.add(new Vec2(-blockSize*0.5f, blockSize*(4f/3f)));
 
@@ -93,6 +93,7 @@ public class BuildingBlockFactory {
         PolygonDef shapeDef = new PolygonDef();
         shapeDef.density = mat.getDensity();
         shapeDef.vertices = vertices;
+        shapeDef.isSensor = false;
         body.createShape(shapeDef);
         body.setMassFromShapes();
     }
