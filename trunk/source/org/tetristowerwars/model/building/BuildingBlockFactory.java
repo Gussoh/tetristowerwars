@@ -62,11 +62,11 @@ public class BuildingBlockFactory {
 
         Body body = createBody(pos);
         
-        List<Vec2> vertices = new ArrayList<Vec2>(4);
-        vertices.add(new Vec2(-blockSize*1.5f, -blockSize*(2f/3f)));
-        vertices.add(new Vec2(blockSize*1.5f, -blockSize*(2f/3f)));
-        vertices.add(new Vec2(blockSize*1.5f, blockSize*(1f/3f)));
-        vertices.add(new Vec2(-blockSize*1.5f, blockSize*(1f/3f)));
+        List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        vertices1.add(new Vec2(-blockSize*1.5f, -blockSize*(2f/3f)));
+        vertices1.add(new Vec2(blockSize*1.5f, -blockSize*(2f/3f)));
+        vertices1.add(new Vec2(blockSize*1.5f, blockSize*(1f/3f)));
+        vertices1.add(new Vec2(-blockSize*1.5f, blockSize*(1f/3f)));
 
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
         vertices2.add(new Vec2(-blockSize*0.5f, -blockSize*(2f/3f)));
@@ -74,8 +74,59 @@ public class BuildingBlockFactory {
         vertices2.add(new Vec2(blockSize*0.5f, blockSize*(4f/3f)));
         vertices2.add(new Vec2(-blockSize*0.5f, blockSize*(4f/3f)));
 
-        addShape(vertices, mat, body);
+        addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
+
+        return new BuildingBlock(new Body[] {body}, mat);
+    }
+    
+    public BuildingBlock createLBlock(Vec2 pos, Material mat) {
+
+        Body body = createBody(pos);
+
+        List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        vertices1.add(new Vec2(-blockSize*2.5f, -blockSize*(2f/3f)));
+        vertices1.add(new Vec2(blockSize*0.5f, -blockSize*(2f/3f)));
+        vertices1.add(new Vec2(blockSize*0.5f, blockSize*(1f/3f)));
+        vertices1.add(new Vec2(-blockSize*2.5f, blockSize*(1f/3f)));
+
+        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        vertices2.add(new Vec2(-blockSize*0.5f, -blockSize*(2f/3f)));
+        vertices2.add(new Vec2(blockSize*0.5f, -blockSize*(2f/3f)));
+        vertices2.add(new Vec2(blockSize*0.5f, blockSize*(4f/3f)));
+        vertices2.add(new Vec2(-blockSize*0.5f, blockSize*(4f/3f)));
+
+        addShape(vertices1, mat, body);
+        addShape(vertices2, mat, body);
+
+        return new BuildingBlock(new Body[] {body}, mat);
+    }
+    public BuildingBlock createSBlock(Vec2 pos, Material mat) {
+
+        Body body = createBody(pos);
+        
+        List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        vertices1.add(new Vec2(-blockSize*1.5f, -blockSize));
+        vertices1.add(new Vec2(blockSize*0.5f, -blockSize));
+        vertices1.add(new Vec2(blockSize*0.5f, 0));
+        vertices1.add(new Vec2(-blockSize*1.5f, 0));
+
+        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        vertices2.add(new Vec2(-blockSize*0.5f, 0));
+        vertices2.add(new Vec2(blockSize*1.5f, 0));
+        vertices2.add(new Vec2(blockSize*1.5f, blockSize));
+        vertices2.add(new Vec2(-blockSize*0.5f, blockSize));
+
+        //Not sure this solves the problem with intersecting and interlocking pieces...
+        List<Vec2> vertices3 = new ArrayList<Vec2>(4);
+        vertices3.add(new Vec2(-blockSize*0.5f, -blockSize));
+        vertices3.add(new Vec2(blockSize*0.5f, -blockSize));
+        vertices3.add(new Vec2(blockSize*0.5f, blockSize));
+        vertices3.add(new Vec2(-blockSize*0.5f, blockSize));
+
+        addShape(vertices1, mat, body);
+        addShape(vertices2, mat, body);
+        addShape(vertices3, mat, body);
 
         return new BuildingBlock(new Body[] {body}, mat);
     }
