@@ -72,6 +72,19 @@ public class GameModel {
         return blockPool;
     }
 
+    public BuildingBlock getBlockFromCoordinates(int x, int y) {
+        for (BuildingBlock bb : blockPool) {
+            float tempx = x - bb.getBodies()[0].getPosition().x;
+            float tempy = y - (500 - bb.getBodies()[0].getPosition().y);
+
+            // System.out.println("Check x: " + tempx + ", y: " + tempy);
+            if (tempx > 0.0f && tempx < 10.0f && tempy > 0.0f && tempy < 10.0f)
+                return bb;
+        }
+
+        return null;
+    }
+
     public ArrayList<Player> getPlayers() {
         return players;
     }
