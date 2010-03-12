@@ -11,16 +11,17 @@ import java.awt.Color;
  *
  * @author Reeen
  */
-public class ConcreteMaterial extends Material{
+public class WoodMaterial extends Material{
 
     @Override
     public float getDensity() {
-        return 3f;
+        return 0.85f; //Oak
     }
 
     @Override
     public Color getColor() {
-        return Color.GRAY;
+        return Color.GREEN;
+
     }
 
 }

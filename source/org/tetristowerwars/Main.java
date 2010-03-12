@@ -11,7 +11,10 @@ import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.material.AluminiumMaterial;
 import org.tetristowerwars.model.material.ConcreteMaterial;
+import org.tetristowerwars.model.material.SteelMaterial;
+import org.tetristowerwars.model.material.WoodMaterial;
 
 /**
  *
@@ -46,21 +49,21 @@ public class Main {
                     if (kalle % 50 == 0) {
 
                         BuildingBlock b = gameModel.getBlockFactory().createSBlock(new Vec2(280, 400),
-                                new ConcreteMaterial());
+                                new AluminiumMaterial());
                         gameModel.addToBlockPool(b);
                     }
 
                     if (kalle % 50 == 0) {
 
                         BuildingBlock b = gameModel.getBlockFactory().createSquareBlock(new Vec2(320, 400),
-                                new ConcreteMaterial());
+                                new SteelMaterial());
                         gameModel.addToBlockPool(b);
                     }
 
                     if (kalle % 50 == 0) {
 
                         BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(360, 400),
-                                new ConcreteMaterial());
+                                new WoodMaterial());
                         gameModel.addToBlockPool(b);
                     }
 

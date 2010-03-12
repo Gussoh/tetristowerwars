@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,6 +18,9 @@ import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.MouseEventController;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.material.ConcreteMaterial;
+import org.tetristowerwars.model.material.GroundMaterial;
+import org.tetristowerwars.model.material.Material;
 
 /**
  *
@@ -57,7 +61,7 @@ public class SwingRenderer extends Renderer {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
-            drawBody(g2, gameModel.getGroundBody());
+            drawBody(g2, gameModel.getGroundBody(), new GroundMaterial());
 
             for (BuildingBlock block : gameModel.getBlockPool()) {
                 drawBlock(g2, block);
@@ -68,11 +72,11 @@ public class SwingRenderer extends Renderer {
         {
 
             for (Body body : block.getBodies()) {
-                drawBody(g, body);
+                drawBody(g, body, block.getMaterial());
             }
         }
 
-        private void drawBody(Graphics2D g, Body body) {
+        private void drawBody(Graphics2D g, Body body, Material mat) {
             for(PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
 
                 Vec2[] vertices = shape.getVertices();
@@ -80,10 +84,21 @@ public class SwingRenderer extends Renderer {
 
                 g.translate(body.getPosition().x, getHeight() - body.getPosition().y);
                 g.rotate(-body.getAngle());
-                for (int i = 0; i < vertices.length - 1; i++) {
-                    g.drawLine((int) vertices[i].x, (int) -vertices[i].y, (int) vertices[i + 1].x, (int) -vertices[i + 1].y);
+          
+                //fillPolygon implementation
+                //draws every shape as a rectangles
+                int nPoints = 4;
+                int[] xpoints = new int[nPoints];
+                int[] ypoints = new int[nPoints];
+                
+                for (int i = 0; i < vertices.length; i++) {
+                    xpoints[i] = (int)vertices[i].x;
+                    ypoints[i] = -(int)vertices[i].y;
                 }
-                g.drawLine((int) vertices[0].x, (int) -vertices[0].y, (int) vertices[vertices.length - 1].x, (int) -vertices[vertices.length - 1].y);
+
+                g.setColor(mat.getColor()); //color defined by material
+                g.fillPolygon(xpoints, ypoints, nPoints);
+
                 g.setTransform(currentTransform);
             }
         }

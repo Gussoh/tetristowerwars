@@ -11,9 +11,16 @@ import java.awt.Color;
  *
  * @author Reeen
  */
-public abstract class Material {
-    
-    public abstract float getDensity(); //defined in g/cm^3
-    public abstract Color getColor();
+public class SteelMaterial extends Material {
+
+    @Override
+    public float getDensity() {
+        return 7.8f;
+    }
+
+    @Override
+    public Color getColor() {
+        return Color.ORANGE;
+    }
 
 }

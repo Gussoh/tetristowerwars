@@ -11,16 +11,16 @@ import java.awt.Color;
  *
  * @author Reeen
  */
-public class ConcreteMaterial extends Material{
+public class AluminiumMaterial extends Material {
 
     @Override
     public float getDensity() {
-        return 3f;
+        return 2.7f;
     }
 
     @Override
     public Color getColor() {
-        return Color.GRAY;
+        return Color.LIGHT_GRAY;
     }
 
 }

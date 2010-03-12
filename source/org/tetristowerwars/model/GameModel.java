@@ -7,18 +7,12 @@ package org.tetristowerwars.model;
 import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
-import org.jbox2d.collision.PolygonShape;
-import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
 
 /**
@@ -46,7 +40,7 @@ public class GameModel {
         world = new World(worldBoundries, gravity, true);
 
         BodyDef groundDef = new BodyDef();
-        groundDef.position.set(width / 2, groundLevel - height / 2);
+        groundDef.position.set(width / 2, groundLevel - height);
         groundBody = world.createBody(groundDef);
 
         PolygonDef groundShapeDef = new PolygonDef();
