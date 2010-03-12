@@ -98,6 +98,10 @@ public class GameModel {
         return blockFactory;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
 
 
 

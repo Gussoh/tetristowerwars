@@ -38,20 +38,46 @@ public class Main {
 
                     if (kalle % 50 == 0) {
 
-                        BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(320, 400),
+                        BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(240, 400),
                                 new ConcreteMaterial());
                         gameModel.addToBlockPool(b);
                     }
 
-                    if (kalle % 200 == 25) {
+                    if (kalle % 50 == 0) {
 
-                        BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(300, 400),
+                        BuildingBlock b = gameModel.getBlockFactory().createSBlock(new Vec2(280, 400),
                                 new ConcreteMaterial());
                         gameModel.addToBlockPool(b);
+                    }
+
+                    if (kalle % 50 == 0) {
+
+                        BuildingBlock b = gameModel.getBlockFactory().createSquareBlock(new Vec2(320, 400),
+                                new ConcreteMaterial());
+                        gameModel.addToBlockPool(b);
+                    }
+
+                    if (kalle % 50 == 0) {
+
+                        BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(360, 400),
+                                new ConcreteMaterial());
+                        gameModel.addToBlockPool(b);
+                    }
+
+                    if (kalle % 50 == 0) {
+
+                        BuildingBlock b = gameModel.getBlockFactory().createLBlock(new Vec2(400, 400),
+                                new ConcreteMaterial());
+                        gameModel.addToBlockPool(b);
+                    }
+
+                    if (kalle % 400 == 0) {
+                        System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
                     }
 
                     gameModel.update();
                 }
+                
             });
            
 
