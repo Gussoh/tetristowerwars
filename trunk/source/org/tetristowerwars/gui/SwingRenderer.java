@@ -14,6 +14,7 @@ import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.control.Controller;
+import org.tetristowerwars.control.MouseEventController;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
 
@@ -24,14 +25,21 @@ import org.tetristowerwars.model.building.BuildingBlock;
 public class SwingRenderer extends Renderer {
 
     private final JFrame frame;
+    private final MouseEventController mouseEvent;
 
-    public SwingRenderer(GameModel dataModel, Controller controller) {
+    public SwingRenderer(GameModel dataModel, Controller controller, GameModel gameModel) {
         super(dataModel, controller);
         frame = new JFrame("Awesomeness");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(new RenderPanel());
         frame.pack();
         frame.setVisible(true);
+
+        // Jättefulhaxx för gameModel för referens till MouseEventController.
+
+        // Add mouse listener to the frame
+        mouseEvent = new MouseEventController(gameModel);
+        frame.addMouseListener(mouseEvent);
     }
 
     @Override
