@@ -11,6 +11,7 @@ import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.building.BuildingBlock;
 
 /**
  *
@@ -31,16 +32,14 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
-		//System.out.println("Controller, onInputDevicePressed: " + event.toString());
+		BuildingBlock collisionBlock;
 
-		Block collisionBlock;
-
-		if ((collisionBlock = gameModel.getBlockFromCoordinates(event.getPosition().x, event.getPosition().y)) == null)
+		if ((collisionBlock = (BuildingBlock)gameModel.getBlockFromCoordinates(event.getPosition().x, event.getPosition().y)) == null)
 		{
 			return;
 		}
 
-		ownerToBuildingBlockMap.put(event.getActionId(), gameModel.getBuildingBlockJoints(collisionBlock, renderer.convertScreenToWorldCoordinates(event.getPosition())));
+		ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint(collisionBlock, renderer.convertScreenToWorldCoordinates(event.getPosition())));
     }
 
     @Override
