@@ -47,6 +47,7 @@ public class BuildingBlockJoint {
         DistanceJointDef distanceJointDef = new DistanceJointDef();
         distanceJointDef.body1 = blockBody;
         distanceJointDef.body2 = mouseBody;
+        distanceJointDef.length = 3;
         distanceJointDef.localAnchor1.set(localCoordinates);
         distanceJointDef.localAnchor2.set(0, 0);
 

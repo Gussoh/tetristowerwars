@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.gui;
 
 import java.awt.Component;
@@ -16,12 +15,11 @@ import org.tetristowerwars.model.GameModel;
  * @author Andreas
  */
 public abstract class Renderer {
-    protected final GameModel gameModel;
-    protected final Controller controller;
 
-    public Renderer(GameModel dataModel, Controller controller) {
+    protected final GameModel gameModel;
+
+    public Renderer(GameModel dataModel) {
         this.gameModel = dataModel;
-        this.controller = controller;
     }
 
     public abstract void renderFrame();

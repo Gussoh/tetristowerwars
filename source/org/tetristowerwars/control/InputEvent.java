@@ -34,4 +34,11 @@ public class InputEvent {
     public Point getPosition() {
         return position;
     }
+
+    @Override
+    public String toString() {
+        return "Id: " + actionId + ", position: " + position;
+    }
+
+
 }

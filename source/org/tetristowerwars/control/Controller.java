@@ -32,9 +32,10 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
+        writeEvent(event);
         Block collisionBlock;
 
-	if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertScreenToWorldCoordinates(event.getPosition())) == null)
+	if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertScreenToWorldCoordinates(event.getPosition()))) == null)
 	{
             return;
         }
@@ -57,6 +58,7 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDeviceReleased(InputEvent event) {
+        writeEvent(event);
         // If a building block joint exists for this very id
         if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
             gameModel.removeBuldingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()));
@@ -66,9 +68,15 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDeviceDragged(InputEvent event) {
+        writeEvent(event);
         // If a building block joint exists for this very id
         if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
             gameModel.moveBuildingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()), renderer.convertScreenToWorldCoordinates(event.getPosition()));
         }
+    }
+
+    public void writeEvent(InputEvent event) {
+        System.out.print(event.toString());
+        System.out.println(", world: " + renderer.convertScreenToWorldCoordinates(event.getPosition()));
     }
 }
