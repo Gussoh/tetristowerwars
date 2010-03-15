@@ -36,13 +36,12 @@ public class BuildingBlockJoint {
         MouseJointDef mouseJointDef = new MouseJointDef();
         mouseJointDef.body1 = blockBody;
         mouseJointDef.body2 = blockBody;
-        mouseJointDef.maxForce = 1000000;
+        mouseJointDef.maxForce = 1000000; // TODO: Is this a good value?
         mouseJointDef.dampingRatio = 1f;
         
         mouseJointDef.target.set(position.x, position.y);
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
-
     }
 
     public BuildingBlock getBuildingBlock() {
@@ -64,5 +63,11 @@ public class BuildingBlockJoint {
 
     public void destroy() {
         world.destroyJoint(joint);
+    }
+
+    protected void dampAngularVelocity(float factor) {
+        Body b = buildingBlock.getBodies()[0];
+
+        b.setAngularVelocity(b.getAngularVelocity() * factor);
     }
 }

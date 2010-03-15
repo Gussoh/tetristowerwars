@@ -61,6 +61,11 @@ public class GameModel {
 
         float stepTimeMs = currentTimeMs - lastStepTime;
         lastStepTime = currentTimeMs;
+
+        for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+            buildingBlockJoint.dampAngularVelocity(0.95f);
+        }
+
         world.step(stepTimeMs / 1000, ITERATIONS_PER_STEP);
     }
 
