@@ -48,7 +48,8 @@ public class Main {
         final InputManager mouseInputManager = new MouseInputManager(renderer.getMouseInputComponent());
         final InputManager touchInputManager = new TouchInputManager(tuioClient, screenDimensions, renderer.getMouseInputComponent());
 
-        final Controller controller = new Controller(gameModel, mouseInputManager, renderer);
+        final Controller mouseController = new Controller(gameModel, mouseInputManager, renderer);
+        final Controller touchController = new Controller(gameModel, touchInputManager, renderer);
 
         tuioClient.connect();
 
