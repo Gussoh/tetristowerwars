@@ -23,7 +23,6 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
 		// System.out.println("MouseInputManager, clicked at " + e.toString());
     }
 
@@ -53,13 +52,11 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mouseEntered(java.awt.event.MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
 		// System.out.println("MouseInputManager, entered at " + e.toString());
     }
 
     @Override
     public void mouseExited(java.awt.event.MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
 		// System.out.println("MouseInputManager, exited at " + e.toString());
     }
 
@@ -71,7 +68,6 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
 		// System.out.println("MouseInputManager, moved at " + e.toString());
     }
 

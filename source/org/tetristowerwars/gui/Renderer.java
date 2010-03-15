@@ -6,6 +6,8 @@
 package org.tetristowerwars.gui;
 
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
 
@@ -25,4 +27,6 @@ public abstract class Renderer {
     public abstract void renderFrame();
 
     public abstract Component getMouseInputComponent();
+
+	public abstract Point2D convertScreenToWorldCoordinates(Point screenCoord);
 }
