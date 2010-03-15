@@ -43,6 +43,20 @@ public class BuildingBlockFactory {
 
         return new BuildingBlock(new Body[] {body}, mat);
     }
+
+    public BuildingBlock createTriangleBlock(Vec2 pos, Material mat) {
+
+        Body body = createBody(pos);
+
+        List<Vec2> vertices = new ArrayList<Vec2>(3);
+        vertices.add(new Vec2(-blockSize, -blockSize));
+        vertices.add(new Vec2(blockSize, -blockSize));
+        vertices.add(new Vec2(0, blockSize));
+
+        addShape(vertices, mat, body);
+
+        return new BuildingBlock(new Body[] {body}, mat);
+    }
     
     public BuildingBlock createLineBlock(Vec2 pos, Material mat) {
 
