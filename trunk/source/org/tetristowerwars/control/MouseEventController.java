@@ -48,7 +48,10 @@ public class MouseEventController implements MouseListener {
 
         if (hitBlock != null) {
             System.out.println("ZOMFG, YOU JUST HIT SOMETHING!!!!");
-            hitBlock.getBodies()[0].applyForce(new Vec2(4000.0f, 5000.0f), new Vec2(-0.0f, 60.0f));
+            hitBlock.getBodies()[0].applyForce(new Vec2(7000.0f, 5000.0f), new Vec2(-0.0f, 60.0f));
+        }
+        else {
+            //System.out.println("miss");
         }
     }
 

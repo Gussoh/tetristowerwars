@@ -66,12 +66,22 @@ public class GameModel {
         return blockPool;
     }
 
-    public BuildingBlock getBlockFromCoordinates(int x, int y) {
-        for (BuildingBlock bb : blockPool) {
-            float tempx = x - bb.getBodies()[0].getPosition().x;
-            float tempy = y - (500 - bb.getBodies()[0].getPosition().y);
+    /**
+     * Returns the first (and hopefully only) block from the given mouse
+     * coordinates.
+     *
+     * @param		x		The x coordinate for the mouse pointer.
+     * @param		y		The y coordinate for the mouse pointer.
+     * @return BuildingBlock
+     */
+	public BuildingBlock getBlockFromCoordinates(int x, int y) {
+		for (BuildingBlock bb : blockPool) {
+			float tempx = x - bb.getBodies()[0].getPosition().x;
+			float tempy = y - (500 - bb.getBodies()[0].getPosition().y);
 
-            // System.out.println("Check x: " + tempx + ", y: " + tempy);
+			// System.out.println("Check x: " + tempx + ", y: " + tempy);
+
+			// Check if the coordinates are close to the upper-left corner
             if (tempx > 0.0f && tempx < 10.0f && tempy > 0.0f && tempy < 10.0f)
                 return bb;
         }

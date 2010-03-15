@@ -31,8 +31,8 @@ public class SwingRenderer extends Renderer {
     private final JFrame frame;
     private final MouseEventController mouseEvent;
 
-    public SwingRenderer(GameModel dataModel, Controller controller, GameModel gameModel) {
-        super(dataModel, controller);
+    public SwingRenderer(GameModel gameModel, Controller controller) {
+        super(gameModel, controller);
         frame = new JFrame("Awesomeness");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(new RenderPanel());
