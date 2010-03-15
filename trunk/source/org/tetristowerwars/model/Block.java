@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
@@ -19,9 +18,11 @@ public abstract class Block {
         return bodies;
     }
 
-    public Block(Body[] body) {
-        this.bodies = body;
+    public Block(Body[] bodies) {
+        this.bodies = bodies;
+        
+        for (Body body : bodies) {
+            body.setUserData(this);
+        }
     }
-
-
 }

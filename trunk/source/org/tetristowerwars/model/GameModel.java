@@ -4,11 +4,14 @@
  */
 package org.tetristowerwars.model;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
+import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -20,7 +23,7 @@ import org.tetristowerwars.model.building.BuildingBlockFactory;
  * @author Andreas
  */
 public class GameModel {
-    
+
     private final LinkedHashSet<BuildingBlock> blockPool = new LinkedHashSet<BuildingBlock>();
     private final ArrayList<Player> players = new ArrayList<Player>();
     private final World world;
@@ -74,18 +77,17 @@ public class GameModel {
      * @param		y		The y coordinate for the mouse pointer.
      * @return BuildingBlock
      */
-	public BuildingBlock getBlockFromCoordinates(int x, int y) {
-		for (BuildingBlock bb : blockPool) {
-			float tempx = x - bb.getBodies()[0].getPosition().x;
-			float tempy = y - (500 - bb.getBodies()[0].getPosition().y);
+    public Block getBlockFromCoordinates(int x, int y) {
+        Shape[] shapes = world.query(new AABB(new Vec2(x - 1, y - 1), new Vec2(x + 1, y + 1)), 1);
 
-			// System.out.println("Check x: " + tempx + ", y: " + tempy);
-
-			// Check if the coordinates are close to the upper-left corner
-            if (tempx > 0.0f && tempx < 10.0f && tempy > 0.0f && tempy < 10.0f)
-                return bb;
+        if (shapes != null && shapes.length > 0) {
+            return (Block) shapes[0].getBody().getUserData();
         }
 
+        return null;
+    }
+
+    public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D startPosition, Point2D endPosition) {
         return null;
     }
 
@@ -105,9 +107,4 @@ public class GameModel {
     public World getWorld() {
         return world;
     }
-
-
-
-
-    
 }
