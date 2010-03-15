@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
 import org.tetristowerwars.model.material.GroundMaterial;
@@ -31,8 +30,8 @@ public class SwingRenderer extends Renderer {
     private final JFrame frame;
     private final RenderPanel renderPanel;
 
-    public SwingRenderer(GameModel gameModel, Controller controller) {
-        super(gameModel, controller);
+    public SwingRenderer(GameModel gameModel) {
+        super(gameModel);
         renderPanel = new RenderPanel();
         frame = new JFrame("Awesomeness");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

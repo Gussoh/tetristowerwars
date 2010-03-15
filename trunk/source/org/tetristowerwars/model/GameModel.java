@@ -76,11 +76,15 @@ public class GameModel {
      * Returns the first (and hopefully only) block from the given mouse
      * coordinates.
      *
+     * @param position
      * @param		x		The x coordinate for the mouse pointer.
      * @param		y		The y coordinate for the mouse pointer.
      * @return BuildingBlock
      */
-    public Block getBlockFromCoordinates(int x, int y) {
+    public Block getBlockFromCoordinates(Point2D position) {
+        float x = (float) position.getX();
+        float y = (float) position.getY();
+
         Shape[] shapes = world.query(new AABB(new Vec2(x - 1, y - 1), new Vec2(x + 1, y + 1)), 1);
 
         if (shapes != null && shapes.length > 0) {

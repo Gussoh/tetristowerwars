@@ -29,7 +29,7 @@ public class Main {
         System.out.println("Hello tetris tower wars!");
         float blockSize = 5;
         final GameModel gameModel = new GameModel(640, 480, 30, blockSize);
-        final Renderer renderer = new SwingRenderer(gameModel, null);
+        final Renderer renderer = new SwingRenderer(gameModel);
         
         final MouseInputManager inputManager = new MouseInputManager(renderer.getMouseInputComponent());
         final Controller controller = new Controller(gameModel, inputManager, renderer);
