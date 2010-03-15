@@ -46,11 +46,13 @@ public class GameModel {
         world = new World(worldBoundries, gravity, true);
 
         BodyDef groundDef = new BodyDef();
+
         groundDef.position.set(width / 2, groundLevel - height);
         groundBody = world.createBody(groundDef);
 
         PolygonDef groundShapeDef = new PolygonDef();
         groundShapeDef.setAsBox(width, height);
+        groundShapeDef.friction = 0.8f;
         groundBody.createShape(groundShapeDef);
 
         blockFactory = new BuildingBlockFactory(world, blockSize);
@@ -63,7 +65,7 @@ public class GameModel {
         lastStepTime = currentTimeMs;
 
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
-            buildingBlockJoint.dampAngularVelocity(0.95f);
+            buildingBlockJoint.dampAngularVelocity();
         }
 
         world.step(stepTimeMs / 1000, ITERATIONS_PER_STEP);
