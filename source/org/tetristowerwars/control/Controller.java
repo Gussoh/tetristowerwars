@@ -32,21 +32,42 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
-		BuildingBlock collisionBlock;
+        Block collisionBlock;
 
-		if ((collisionBlock = (BuildingBlock)gameModel.getBlockFromCoordinates(event.getPosition().x, event.getPosition().y)) == null)
-		{
-			return;
-		}
+	if ((collisionBlock = gameModel.getBlockFromCoordinates(event.getPosition().x, event.getPosition().y)) == null)
+	{
+            return;
+        }
 
-		ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint(collisionBlock, renderer.convertScreenToWorldCoordinates(event.getPosition())));
+        if (collisionBlock instanceof BuildingBlock) {
+            // Check if a building block joint already exists for this action id
+            if (ownerToBuildingBlockMap.containsKey(event.getActionId()) == true) {
+                throw new IllegalStateException();
+            }
+
+            ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock)collisionBlock, renderer.convertScreenToWorldCoordinates(event.getPosition())));
+        }
+        /*
+        else if (collisionBlock instanceof CanonBlock) {
+        }
+        else if (collisionBlock instanceof BulletBlock) {
+        }
+        */
     }
 
     @Override
     public void onInputDeviceReleased(InputEvent event) {
+        // If a building block joint exists for this very id
+        if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
+            gameModel.removeBuldingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()));
+        }
     }
 
     @Override
     public void onInputDeviceDragged(InputEvent event) {
+        // If a building block joint exists for this very id
+        if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
+            gameModel.moveBuildingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()), renderer.convertScreenToWorldCoordinates(event.getPosition()));
+        }
     }
 }
