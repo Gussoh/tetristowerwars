@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,7 +15,6 @@ import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.control.Controller;
-import org.tetristowerwars.control.MouseEventController;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
 import org.tetristowerwars.model.material.GroundMaterial;
@@ -27,21 +27,21 @@ import org.tetristowerwars.model.material.Material;
 public class SwingRenderer extends Renderer {
 
     private final JFrame frame;
-    private final MouseEventController mouseEvent;
+    private final RenderPanel renderPanel;
 
     public SwingRenderer(GameModel gameModel, Controller controller) {
         super(gameModel, controller);
+        renderPanel = new RenderPanel();
         frame = new JFrame("Awesomeness");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new RenderPanel());
+        frame.add(renderPanel);
         frame.pack();
         frame.setVisible(true);
+    }
 
-        // Jättefulhaxx för gameModel för referens till MouseEventController.
 
-        // Add mouse listener to the frame
-        mouseEvent = new MouseEventController(gameModel);
-        frame.addMouseListener(mouseEvent);
+    public Component getMouseInputComponent() {
+        return renderPanel;
     }
 
     @Override
