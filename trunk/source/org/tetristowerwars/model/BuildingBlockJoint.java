@@ -50,7 +50,7 @@ public class BuildingBlockJoint {
     }
 
     public Vec2 getBodyPosition() {
-        return joint.getAnchor1();
+        return joint.getAnchor2();
     }
 
     public Vec2 getPointerPosition() {
