@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.control;
 
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -14,6 +15,11 @@ import java.awt.event.MouseMotionListener;
  * @author Andreas
  */
 public class MouseInputManager extends InputManager implements MouseListener, MouseMotionListener {
+
+    public MouseInputManager(Component component) {
+        component.addMouseListener(this);
+        component.addMouseMotionListener(this);
+    }
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
