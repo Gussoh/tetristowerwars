@@ -6,6 +6,8 @@
 package org.tetristowerwars.control;
 
 import java.util.HashMap;
+import java.util.Map;
+import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 
 /**
@@ -13,12 +15,12 @@ import org.tetristowerwars.model.GameModel;
  * @author Andreas
  */
 public class Controller implements InputListener {
-    private final GameModel dataModel;
+    private final GameModel gameModel;
     private final InputManager inputManager;
-
+    private final Map<Integer, BuildingBlockJoint> ownerToBuildingBlockMap = new HashMap<Integer, BuildingBlockJoint>();
 
     public Controller(GameModel dataModel, InputManager inputManager) {
-        this.dataModel = dataModel;
+        this.gameModel = dataModel;
         this.inputManager = inputManager;
         inputManager.addInputListener(this);
     }

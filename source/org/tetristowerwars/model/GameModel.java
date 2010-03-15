@@ -32,6 +32,7 @@ public class GameModel {
     private final float width, height;
     private final Body groundBody;
     private final BuildingBlockFactory blockFactory;
+    private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
 
     public GameModel(float width, float height, float groundLevel, float blockSize) {
         this.width = width;
@@ -106,5 +107,9 @@ public class GameModel {
 
     public World getWorld() {
         return world;
+    }
+
+    public LinkedHashSet<BuildingBlockJoint> getBuildingBlockJoints() {
+        return buildingBlockJoints;
     }
 }
