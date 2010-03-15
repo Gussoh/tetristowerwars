@@ -5,15 +5,9 @@
 
 package org.tetristowerwars.model;
 
-import java.awt.Point;
-import org.jbox2d.collision.PolygonDef;
-import org.jbox2d.collision.ShapeDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.DistanceJoint;
-import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.tetristowerwars.model.building.BuildingBlock;
@@ -31,6 +25,7 @@ public class BuildingBlockJoint {
     protected BuildingBlockJoint(World world, BuildingBlock buildingBlock, Vec2 position) {
         this.buildingBlock = buildingBlock;
         this.world = world;
+        this.position = position;
 
         Body blockBody = buildingBlock.getBodies()[0];  // TODO: which one?
 
@@ -47,6 +42,7 @@ public class BuildingBlockJoint {
         mouseJointDef.target.set(position.x, position.y);
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
+
     }
 
     public BuildingBlock getBuildingBlock() {
