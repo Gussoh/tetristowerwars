@@ -16,6 +16,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.JointDef;
+import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
 
 /**
@@ -89,15 +91,18 @@ public class GameModel {
     }
 
     public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
-        return null;
+        BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, new Vec2((float) position.getX(), (float) position.getY()));
+        buildingBlockJoints.add(bbj);
+        return bbj;
     }
 
     public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
-        
+        buildingBlockJoint.updatePointerPosition(new Vec2((float)endPosition.getX(), (float)endPosition.getY()));
     }
 
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
-        
+        buildingBlockJoints.remove(buildingBlockJoint);
+        buildingBlockJoint.destroy();
     }
 
     public ArrayList<Player> getPlayers() {
