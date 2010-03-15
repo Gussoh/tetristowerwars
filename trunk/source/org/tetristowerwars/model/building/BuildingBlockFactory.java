@@ -72,6 +72,30 @@ public class BuildingBlockFactory {
 
         return new BuildingBlock(new Body[] {body}, mat);
     }
+
+    public BuildingBlock createCrossBlock(Vec2 pos, Material mat) {
+
+        Body body = createBody(pos);
+
+        List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+
+        vertices1.add(new Vec2(-blockSize*0.5f, -blockSize*1.5f));
+        vertices1.add(new Vec2(blockSize*0.5f, -blockSize*1.5f));
+        vertices1.add(new Vec2(blockSize*0.5f, blockSize*1.5f));
+        vertices1.add(new Vec2(-blockSize*0.5f, blockSize*1.5f));
+
+        vertices2.add(new Vec2(-blockSize*1.5f, -blockSize*0.5f));
+        vertices2.add(new Vec2(blockSize*1.5f, -blockSize*0.5f));
+        vertices2.add(new Vec2(blockSize*1.5f, blockSize*0.5f));
+        vertices2.add(new Vec2(-blockSize*1.5f, blockSize*0.5f));
+
+        addShape(vertices1, mat, body);
+        addShape(vertices2, mat, body);
+
+        return new BuildingBlock(new Body[] {body}, mat);
+    }
+
     public BuildingBlock createPyramidBlock(Vec2 pos, Material mat) {
 
         Body body = createBody(pos);
@@ -115,6 +139,7 @@ public class BuildingBlockFactory {
 
         return new BuildingBlock(new Body[] {body}, mat);
     }
+
     public BuildingBlock createSBlock(Vec2 pos, Material mat) {
 
         Body body = createBody(pos);
