@@ -6,7 +6,8 @@ package org.tetristowerwars;
 
 import javax.swing.SwingUtilities;
 import org.jbox2d.common.Vec2;
-import org.tetristowerwars.control.MouseEventController;
+import org.tetristowerwars.control.Controller;
+import org.tetristowerwars.control.MouseInputManager;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
@@ -29,6 +30,9 @@ public class Main {
         float blockSize = 5;
         final GameModel gameModel = new GameModel(640, 480, 30, blockSize);
         final Renderer renderer = new SwingRenderer(gameModel, null);
+        
+        final MouseInputManager inputManager = new MouseInputManager(renderer.getMouseInputComponent());
+        final Controller controller = new Controller(gameModel, inputManager);
 
         for (;;) {
             ++kalle;

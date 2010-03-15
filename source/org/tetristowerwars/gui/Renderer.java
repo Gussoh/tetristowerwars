@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.gui;
 
+import java.awt.Component;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
 
@@ -22,4 +23,6 @@ public abstract class Renderer {
     }
 
     public abstract void renderFrame();
+
+    public abstract Component getMouseInputComponent();
 }
