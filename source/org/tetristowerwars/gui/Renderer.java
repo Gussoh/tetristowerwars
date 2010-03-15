@@ -27,4 +27,7 @@ public abstract class Renderer {
     public abstract Component getMouseInputComponent();
 
     public abstract Point2D convertScreenToWorldCoordinates(Point screenCoord);
+
+    public abstract void putCursorPoint(int id, Point point);
+    public abstract void removeCursorPoint(int id);
 }

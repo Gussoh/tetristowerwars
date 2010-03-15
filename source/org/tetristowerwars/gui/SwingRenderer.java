@@ -12,11 +12,13 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.LinkedHashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
@@ -31,7 +33,8 @@ public class SwingRenderer extends Renderer {
 
     private final JFrame frame;
     private final RenderPanel renderPanel;
-    private double scale = 2.0;
+    private double scale = 5.0;
+    private LinkedHashMap<Integer, Point> cursorPoints = new LinkedHashMap<Integer, Point>();
 
     public SwingRenderer(GameModel gameModel) {
         super(gameModel);
@@ -59,6 +62,16 @@ public class SwingRenderer extends Renderer {
         return new Point2D.Double(screenCoord.x/scale, (renderPanel.getHeight() - screenCoord.y)/scale);
     }
 
+    @Override
+    public void putCursorPoint(int id, Point point) {
+        cursorPoints.put(id, point);
+    }
+
+    @Override
+    public void removeCursorPoint(int id) {
+        cursorPoints.remove(id);
+    }
+
     private class RenderPanel extends JPanel {
 
         public RenderPanel() {
@@ -82,6 +95,11 @@ public class SwingRenderer extends Renderer {
             //draw joints
             for (BuildingBlockJoint joint : gameModel.getBuildingBlockJoints()) {
                 drawJoint(g2, joint);
+            }
+
+            g2.setColor(Color.RED);
+            for (Point point : cursorPoints.values()) {
+                g2.fillOval((int) (point.x / scale - 1), (int) (point.y / scale - 1), 3, 3);
             }
         }
 
