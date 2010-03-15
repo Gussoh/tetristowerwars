@@ -14,6 +14,8 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.DistanceJoint;
 import org.jbox2d.dynamics.joints.DistanceJointDef;
+import org.jbox2d.dynamics.joints.MouseJoint;
+import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.tetristowerwars.model.building.BuildingBlock;
 
 /**
@@ -22,36 +24,26 @@ import org.tetristowerwars.model.building.BuildingBlock;
  */
 public class BuildingBlockJoint {
     private final BuildingBlock buildingBlock;
-    private final Body mouseBody;
-    private final DistanceJoint joint;
+    private final MouseJoint joint;
     private final World world;
+    private Vec2 position;
 
     protected BuildingBlockJoint(World world, BuildingBlock buildingBlock, Vec2 position) {
         this.buildingBlock = buildingBlock;
         this.world = world;
-        BodyDef mouseBodyDef = new BodyDef();
-        Body blockBody = buildingBlock.getBodies()[0];  // TODO: which one?
-        PolygonDef mouseShapeDef = new PolygonDef();
-        
-        mouseBodyDef.position.set(position);
-        mouseShapeDef.isSensor = true;
-        mouseShapeDef.setAsBox(1, 1);
 
-        mouseBody = world.createBody(mouseBodyDef);
-        mouseBody.createShape(mouseShapeDef);
+        Body blockBody = buildingBlock.getBodies()[0];  // TODO: which one?
 
         Vec2 localCoordinates = new Vec2(position.x, position.y);
         localCoordinates.x -= blockBody.getPosition().x;
         localCoordinates.y -= blockBody.getPosition().y;
 
-        DistanceJointDef distanceJointDef = new DistanceJointDef();
-        distanceJointDef.body1 = blockBody;
-        distanceJointDef.body2 = mouseBody;
-        distanceJointDef.length = 3;
-        distanceJointDef.localAnchor1.set(localCoordinates);
-        distanceJointDef.localAnchor2.set(0, 0);
+        MouseJointDef mouseJointDef = new MouseJointDef();
+        mouseJointDef.body2 = blockBody;
+        mouseJointDef.maxForce = 100;
+        mouseJointDef.target.set(position.x, position.y);
 
-        joint = (DistanceJoint) world.createJoint(distanceJointDef);
+        joint = (MouseJoint) world.createJoint(mouseJointDef);
     }
 
     public BuildingBlock getBuildingBlock() {
@@ -63,15 +55,15 @@ public class BuildingBlockJoint {
     }
 
     public Vec2 getPointerPosition() {
-        return joint.getAnchor2();
+        return position;
     }
 
     protected void updatePointerPosition(Vec2 position) {
-        mouseBody.setXForm(position, 0);
+        this.position = position;
+        joint.setTarget(position);
     }
 
     public void destroy() {
         world.destroyJoint(joint);
-        world.destroyBody(mouseBody);
     }
 }
