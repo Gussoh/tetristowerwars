@@ -39,8 +39,11 @@ public class BuildingBlockJoint {
         localCoordinates.y -= blockBody.getPosition().y;
 
         MouseJointDef mouseJointDef = new MouseJointDef();
+        mouseJointDef.body1 = blockBody;
         mouseJointDef.body2 = blockBody;
-        mouseJointDef.maxForce = 100;
+        mouseJointDef.maxForce = 1000000;
+        mouseJointDef.dampingRatio = 1f;
+        
         mouseJointDef.target.set(position.x, position.y);
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
