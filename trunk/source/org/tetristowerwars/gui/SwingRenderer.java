@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,7 +17,6 @@ import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.MouseEventController;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
-import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.GroundMaterial;
 import org.tetristowerwars.model.material.Material;
 
