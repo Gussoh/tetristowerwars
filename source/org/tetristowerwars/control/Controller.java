@@ -20,13 +20,13 @@ import org.tetristowerwars.model.building.BuildingBlock;
 public class Controller implements InputListener {
     private final GameModel gameModel;
     private final InputManager inputManager;
-	private final Renderer renderer;
+    private final Renderer renderer;
     private final Map<Integer, BuildingBlockJoint> ownerToBuildingBlockMap = new HashMap<Integer, BuildingBlockJoint>();
 
     public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
         this.gameModel = dataModel;
         this.inputManager = inputManager;
-		this.renderer = renderer;
+        this.renderer = renderer;
         inputManager.addInputListener(this);
     }
 

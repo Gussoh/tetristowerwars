@@ -52,10 +52,10 @@ public class SwingRenderer extends Renderer {
         frame.repaint();
     }
 
-	@Override
-	public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
-		return new Point2D.Float((float)screenCoord.x, (float)(frame.getHeight() - screenCoord.y));
-	}
+    @Override
+    public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
+        return new Point2D.Float((float)screenCoord.x, (float)(frame.getHeight() - screenCoord.y));
+    }
 
     private class RenderPanel extends JPanel {
 
