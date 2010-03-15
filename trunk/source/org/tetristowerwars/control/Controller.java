@@ -34,7 +34,7 @@ public class Controller implements InputListener {
     public void onInputDevicePressed(InputEvent event) {
         Block collisionBlock;
 
-	if ((collisionBlock = gameModel.getBlockFromCoordinates(event.getPosition().x, event.getPosition().y)) == null)
+	if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertScreenToWorldCoordinates(event.getPosition())) == null)
 	{
             return;
         }
@@ -60,6 +60,7 @@ public class Controller implements InputListener {
         // If a building block joint exists for this very id
         if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
             gameModel.removeBuldingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()));
+            ownerToBuildingBlockMap.remove(event.getActionId());
         }
     }
 
