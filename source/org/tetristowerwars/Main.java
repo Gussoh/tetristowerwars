@@ -43,43 +43,53 @@ public class Main {
                 public void run() {
                     renderer.renderFrame();
 
-                    if (kalle % 50 == 0) {
+                    if(gameModel.getWorld().getBodyCount()<50) {
 
-                        BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(240, 400),
-                                new ConcreteMaterial());
-                        gameModel.addToBlockPool(b);
-                    }
+                        if (kalle % 50 == 0) {
 
-                    if (kalle % 50 == 0) {
+                            BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(240, 400),
+                                    new ConcreteMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
 
-                        BuildingBlock b = gameModel.getBlockFactory().createSBlock(new Vec2(280, 400),
-                                new AluminiumMaterial());
-                        gameModel.addToBlockPool(b);
-                    }
+                        if (kalle % 50 == 0) {
 
-                    if (kalle % 50 == 0) {
+                            BuildingBlock b = gameModel.getBlockFactory().createCrossBlock(new Vec2(280, 400),
+                                    new AluminiumMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
 
-                        BuildingBlock b = gameModel.getBlockFactory().createSquareBlock(new Vec2(320, 400),
-                                new SteelMaterial());
-                        gameModel.addToBlockPool(b);
-                    }
+                        if (kalle % 50 == 0) {
 
-                    if (kalle % 50 == 0) {
+                            BuildingBlock b = gameModel.getBlockFactory().createSBlock(new Vec2(320, 400),
+                                    new SteelMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
 
-                        BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(360, 400),
-                                new WoodMaterial());
-                        gameModel.addToBlockPool(b);
-                    }
+                        if (kalle % 50 == 0) {
 
-                    if (kalle % 50 == 0) {
+                            BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(360, 400),
+                                    new WoodMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
 
-                        BuildingBlock b = gameModel.getBlockFactory().createLBlock(new Vec2(400, 400),
-                                new ConcreteMaterial());
-                        gameModel.addToBlockPool(b);
-                    }
+                        if (kalle % 50 == 0) {
 
-                    if (kalle % 400 == 0) {
-                        System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
+                            BuildingBlock b = gameModel.getBlockFactory().createLBlock(new Vec2(400, 400),
+                                    new ConcreteMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
+
+                        if (kalle % 50 == 0) {
+
+                            BuildingBlock b = gameModel.getBlockFactory().createSquareBlock(new Vec2(440, 400),
+                                    new ConcreteMaterial());
+                            gameModel.addToBlockPool(b);
+                        }
+
+                        if (kalle % 400 == 0) {
+                            System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
+                        }
                     }
 
                     gameModel.update();

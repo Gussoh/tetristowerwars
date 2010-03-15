@@ -31,6 +31,7 @@ public class SwingRenderer extends Renderer {
 
     private final JFrame frame;
     private final RenderPanel renderPanel;
+    private double scale = 2.0;
 
     public SwingRenderer(GameModel gameModel) {
         super(gameModel);
@@ -55,7 +56,7 @@ public class SwingRenderer extends Renderer {
 
     @Override
     public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
-        return new Point2D.Float((float)screenCoord.x, (float)(renderPanel.getHeight() - screenCoord.y));
+        return new Point2D.Double(screenCoord.x/scale, (renderPanel.getHeight() - screenCoord.y)/scale);
     }
 
     private class RenderPanel extends JPanel {
@@ -68,6 +69,7 @@ public class SwingRenderer extends Renderer {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
+            g2.scale(scale, scale);
 
             //draw ground
             drawBody(g2, gameModel.getGroundBody(), new GroundMaterial());
@@ -97,7 +99,7 @@ public class SwingRenderer extends Renderer {
                 Vec2[] vertices = shape.getVertices();
                 AffineTransform currentTransform = g2.getTransform();
 
-                g2.translate(body.getPosition().x, getHeight() - body.getPosition().y);
+                g2.translate(body.getPosition().x, getHeight()/scale - body.getPosition().y);
                 g2.rotate(-body.getAngle());
           
                 //fillPolygon implementation
@@ -118,7 +120,7 @@ public class SwingRenderer extends Renderer {
 
         private void drawJoint(Graphics2D g2, BuildingBlockJoint joint) {
             g2.setColor(Color.BLACK);
-            g2.drawLine((int)joint.getPointerPosition().x, getHeight()-(int)joint.getPointerPosition().y, (int)joint.getBodyPosition().x, getHeight()-(int)joint.getBodyPosition().y);
+            g2.drawLine((int)joint.getPointerPosition().x, (int)(getHeight()/scale) - (int)joint.getPointerPosition().y, (int)joint.getBodyPosition().x, (int)(getHeight()/scale)-(int)joint.getBodyPosition().y);
         }
 
     }
