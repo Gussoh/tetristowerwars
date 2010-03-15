@@ -32,7 +32,7 @@ public class Main {
         final Renderer renderer = new SwingRenderer(gameModel, null);
         
         final MouseInputManager inputManager = new MouseInputManager(renderer.getMouseInputComponent());
-        final Controller controller = new Controller(gameModel, inputManager);
+        final Controller controller = new Controller(gameModel, inputManager, renderer);
 
         for (;;) {
             ++kalle;

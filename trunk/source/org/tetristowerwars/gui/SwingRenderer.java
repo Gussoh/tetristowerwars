@@ -8,7 +8,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jbox2d.collision.PolygonShape;
@@ -49,6 +51,11 @@ public class SwingRenderer extends Renderer {
     public void renderFrame() {
         frame.repaint();
     }
+
+	@Override
+	public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
+		return new Point2D.Float((float)screenCoord.x, (float)(frame.getHeight() - screenCoord.y));
+	}
 
     private class RenderPanel extends JPanel {
 
