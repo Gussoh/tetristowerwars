@@ -175,6 +175,7 @@ public class BuildingBlockFactory {
         BodyDef boxBodyDef = new BodyDef();
         boxBodyDef.allowSleep = true;
         boxBodyDef.position.set(pos.x, pos.y);
+        
         return world.createBody(boxBodyDef);
     }
 
@@ -184,6 +185,8 @@ public class BuildingBlockFactory {
         shapeDef.density = mat.getDensity();
         shapeDef.vertices = vertices;
         shapeDef.isSensor = false;
+        shapeDef.friction = 0.8f;
+        shapeDef.restitution = 0.1f;
         body.createShape(shapeDef);
         body.setMassFromShapes();
     }

@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.model;
 
+import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
@@ -21,6 +22,7 @@ public class BuildingBlockJoint {
     private final MouseJoint joint;
     private final World world;
     private Vec2 position;
+    private final MassData originalMassData;
 
     protected BuildingBlockJoint(World world, BuildingBlock buildingBlock, Vec2 position) {
         this.buildingBlock = buildingBlock;
@@ -36,12 +38,22 @@ public class BuildingBlockJoint {
         MouseJointDef mouseJointDef = new MouseJointDef();
         mouseJointDef.body1 = blockBody;
         mouseJointDef.body2 = blockBody;
-        mouseJointDef.maxForce = 1000000; // TODO: Is this a good value?
+        mouseJointDef.maxForce = 5000; // TODO: Is this a good value?
         mouseJointDef.dampingRatio = 1f;
         
         mouseJointDef.target.set(position.x, position.y);
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
+
+        originalMassData = new MassData();
+        originalMassData.mass = blockBody.getMass();
+        originalMassData.I = blockBody.getInertia();
+        originalMassData.center = blockBody.getLocalCenter();
+
+        MassData newMassData = new MassData(originalMassData);
+        newMassData.mass /= 200;
+        newMassData.I /= 200;
+        blockBody.setMass(newMassData);
     }
 
     public BuildingBlock getBuildingBlock() {
@@ -63,11 +75,12 @@ public class BuildingBlockJoint {
 
     public void destroy() {
         world.destroyJoint(joint);
+        buildingBlock.getBodies()[0].setMass(originalMassData);
     }
 
-    protected void dampAngularVelocity(float factor) {
+    protected void dampAngularVelocity() {
         Body b = buildingBlock.getBodies()[0];
 
-        b.setAngularVelocity(b.getAngularVelocity() * factor);
+        b.setAngularVelocity(b.getAngularVelocity() * 0.999f);
     }
 }
