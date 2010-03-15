@@ -88,8 +88,16 @@ public class GameModel {
         return null;
     }
 
-    public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D startPosition, Point2D endPosition) {
+    public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
         return null;
+    }
+
+    public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
+        
+    }
+
+    public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
+        
     }
 
     public ArrayList<Player> getPlayers() {
