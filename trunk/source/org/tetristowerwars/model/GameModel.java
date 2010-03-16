@@ -16,7 +16,10 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
-import org.tetristowerwars.model.material.SteelMaterial;
+import org.tetristowerwars.model.cannon.BulletBlock;
+import org.tetristowerwars.model.cannon.BulletFactory;
+import org.tetristowerwars.model.cannon.CannonBlock;
+import org.tetristowerwars.model.cannon.CannonFactory;
 
 /**
  *
@@ -36,8 +39,8 @@ public class GameModel {
     private final float width, height;
     private final Body groundBody;
     private final BuildingBlockFactory blockFactory;
-    private final CannonBlockFactory cannonBlockFactory;
-    private final BulletBlockFactory bulletBlockFactory;
+    private final CannonFactory cannonFactory;
+    private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
 
     public GameModel(float width, float height, float groundLevel, float blockSize) {
@@ -60,8 +63,8 @@ public class GameModel {
         groundBody.createShape(groundShapeDef);
 
         blockFactory = new BuildingBlockFactory(world, blockSize);
-        cannonBlockFactory = new CannonBlockFactory(world, blockSize);
-        bulletBlockFactory = new BulletBlockFactory(world, blockSize);
+        cannonFactory = new CannonFactory(world, blockSize);
+        bulletFactory = new BulletFactory(world, blockSize);
     }
 
     public void update() {
@@ -141,12 +144,14 @@ public class GameModel {
     public boolean createCannonBlock(int actionId, CannonBlock cannonBlock) {
         // TODO: Limit cannon blocks, check here
 
-        BulletBlock bb = getBulletBlockFactory().createBullet(cannonBlock);
+        BulletBlock bb = getBulletFactory().createBullet(cannonBlock);
 
         // Apply a force to the center of the bullet body...hoepfully?
         bb.getBodies()[0].applyForce(new Vec2(15.0f, 15.0f), bb.getBodies()[0].getPosition());
 
         addToBulletBlockPool(bb);
+
+        return true;
     }
 
     public ArrayList<Player> getPlayers() {
@@ -169,12 +174,12 @@ public class GameModel {
         return blockFactory;
     }
 
-    public CannonBlockFactory getCannonBlockFactory() {
-        return cannonBlockFactory;
+    public CannonFactory getCannonFactory() {
+        return cannonFactory;
     }
 
-    public BulletBlockFactory getBulletBlockFactory() {
-        return bulletBlockFactory;
+    public BulletFactory getBulletFactory() {
+        return bulletFactory;
     }
 
     public World getWorld() {

@@ -18,10 +18,12 @@ import javax.swing.JPanel;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.control.Controller;
+import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.cannon.BulletBlock;
+import org.tetristowerwars.model.cannon.CannonBlock;
 import org.tetristowerwars.model.material.GroundMaterial;
 import org.tetristowerwars.model.material.Material;
 
@@ -89,7 +91,17 @@ public class SwingRenderer extends Renderer {
 
             //draw blocks
             for (BuildingBlock block : gameModel.getBlockPool()) {
-                drawBlock(g2, block);
+                drawBlock(g2, (Block)block);
+            }
+
+            //draw cannons
+            for (CannonBlock block : gameModel.getCannonBlockPool()) {
+                drawBlock(g2, (Block)block);
+            }
+
+            //draw bullets
+            for (BulletBlock block : gameModel.getBulletBlockPool()) {
+                drawBlock(g2, (Block)block);
             }
 
             //draw joints
@@ -103,11 +115,18 @@ public class SwingRenderer extends Renderer {
             }
         }
 
-        private void drawBlock(Graphics2D g2, BuildingBlock block)
+        private void drawBlock(Graphics2D g2, Block block)
         {
 
             for (Body body : block.getBodies()) {
-                drawBody(g2, body, block.getMaterial());
+                if (block instanceof BuildingBlock)
+                {
+                    drawBody(g2, body, ((BuildingBlock)block).getMaterial());
+                }
+                else
+                {
+                    drawBody(g2, body, null);
+                }
             }
         }
 
@@ -124,12 +143,20 @@ public class SwingRenderer extends Renderer {
                 int[] xpoints = new int[vertices.length];
                 int[] ypoints = new int[vertices.length];
                 
-                for (int i = 0; i < vertices.length; i++) {
+                for (int i = 0; i < vertices.length; ++i) {
                     xpoints[i] = (int)vertices[i].x;
                     ypoints[i] = -(int)vertices[i].y;
                 }
 
-                g2.setColor(mat.getColor()); //color defined by material
+                if (mat != null)
+                {
+                    g2.setColor(mat.getColor()); //color defined by material
+                }
+                else
+                {
+                    g2.setColor(Color.black);
+                }
+
                 g2.fillPolygon(xpoints, ypoints, vertices.length);
 
                 g2.setTransform(currentTransform);
