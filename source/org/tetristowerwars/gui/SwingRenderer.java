@@ -9,12 +9,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.LinkedHashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -78,12 +80,16 @@ public class SwingRenderer extends Renderer {
 
         public RenderPanel() {
             setPreferredSize(new Dimension(640, 480));
+            setDoubleBuffered(true);
+
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.scale(scale, scale);
 
             //draw ground
@@ -91,17 +97,17 @@ public class SwingRenderer extends Renderer {
 
             //draw blocks
             for (BuildingBlock block : gameModel.getBlockPool()) {
-                drawBlock(g2, (Block)block);
+                drawBuildingBlock(g2, block);
             }
 
             //draw cannons
             for (CannonBlock block : gameModel.getCannonBlockPool()) {
-                drawBlock(g2, (Block)block);
+                drawCannonBlock(g2, block);
             }
 
             //draw bullets
             for (BulletBlock block : gameModel.getBulletBlockPool()) {
-                drawBlock(g2, (Block)block);
+                drawBullet(g2, block);
             }
 
             //draw joints
@@ -115,18 +121,15 @@ public class SwingRenderer extends Renderer {
             }
         }
 
-        private void drawBlock(Graphics2D g2, Block block)
-        {
-
+        private void drawBuildingBlock(Graphics2D g2, BuildingBlock block) {
             for (Body body : block.getBodies()) {
-                if (block instanceof BuildingBlock)
-                {
-                    drawBody(g2, body, ((BuildingBlock)block).getMaterial());
-                }
-                else
-                {
-                    drawBody(g2, body, null);
-                }
+                drawBody(g2, body, block.getMaterial());
+            }
+        }
+
+        private void drawCannonBlock(Graphics2D g2, CannonBlock block) {
+            for (Body body : block.getBodies()) {
+                drawBody(g2, body, block.getMaterial());
             }
         }
 
@@ -148,14 +151,7 @@ public class SwingRenderer extends Renderer {
                     ypoints[i] = -(int)vertices[i].y;
                 }
 
-                if (mat != null)
-                {
-                    g2.setColor(mat.getColor()); //color defined by material
-                }
-                else
-                {
-                    g2.setColor(Color.black);
-                }
+                g2.setColor(mat.getColor()); //color defined by material
 
                 g2.fillPolygon(xpoints, ypoints, vertices.length);
 
@@ -166,6 +162,21 @@ public class SwingRenderer extends Renderer {
         private void drawJoint(Graphics2D g2, BuildingBlockJoint joint) {
             g2.setColor(Color.BLACK);
             g2.drawLine((int)joint.getPointerPosition().x, (int)(getHeight()/scale) - (int)joint.getPointerPosition().y, (int)joint.getBodyPosition().x, (int)(getHeight()/scale)-(int)joint.getBodyPosition().y);
+        }
+
+        private void drawBullet(Graphics2D g2, BulletBlock bullet) {
+
+            g2.setColor(Color.red);
+
+            Body body = bullet.getBodies()[0];
+            CircleShape shape = (CircleShape)body.m_shapeList;
+
+            int radius = (int)shape.getRadius();
+            Vec2 pos = body.getPosition();
+
+            //TODO: WTF am I doing?
+            g2.fillOval((int)pos.x-radius, (int)(getHeight()/scale)-(int)pos.y-radius, radius*2+1, radius*2+1);
+
         }
 
     }

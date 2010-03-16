@@ -7,6 +7,7 @@ package org.tetristowerwars.model.cannon;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -33,13 +34,7 @@ public class BulletFactory {
         Vec2 canPos = cannon.getBodies()[0].getPosition();
         Body body = createBody(new Vec2(canPos.x-blockSize-1, canPos.y+blockSize+1));
 
-        List<Vec2> vertices = new ArrayList<Vec2>(4);
-        vertices.add(new Vec2(-blockSize*0.5f, -blockSize*0.5f));
-        vertices.add(new Vec2(blockSize*0.5f, -blockSize*0.5f));
-        vertices.add(new Vec2(blockSize*0.5f, blockSize*0.5f));
-        vertices.add(new Vec2(-blockSize*0.5f, blockSize*0.5f));
-
-        addShape(vertices, new SteelMaterial(), body);
+        addShape(blockSize/2, new SteelMaterial(), body);
 
         return new BulletBlock(new Body[] {body});
 
@@ -54,11 +49,12 @@ public class BulletFactory {
         return world.createBody(boxBodyDef);
     }
 
-    private void addShape(List<Vec2> vertices, Material mat, Body body) {
+    private void addShape(float radius, Material mat, Body body) {
 
-        PolygonDef shapeDef = new PolygonDef();
+        CircleDef shapeDef = new CircleDef();
         shapeDef.density = mat.getDensity();
-        shapeDef.vertices = vertices;
+        shapeDef.radius = radius;
+        shapeDef.localPosition = new Vec2(0,0); //????
         shapeDef.isSensor = false;
         shapeDef.friction = 0.8f;
         shapeDef.restitution = 0.1f;
