@@ -147,7 +147,7 @@ public class GameModel {
         BulletBlock bb = getBulletFactory().createBullet(cannonBlock);
 
         // Apply a force to the center of the bullet body...hoepfully?
-        bb.getBodies()[0].applyForce(new Vec2(15.0f, 15.0f), bb.getBodies()[0].getPosition());
+        bb.getBodies()[0].applyImpulse(new Vec2(cannonBlock.getForce(), cannonBlock.getForce()), bb.getBodies()[0].getPosition());
 
         addToBulletBlockPool(bb);
 

@@ -30,7 +30,8 @@ public class BulletFactory {
 
     public BulletBlock createBullet(CannonBlock cannon) {
 
-        Body body = createBody(cannon.getBodies()[0].getPosition());
+        Vec2 canPos = cannon.getBodies()[0].getPosition();
+        Body body = createBody(new Vec2(canPos.x-blockSize-1, canPos.y+blockSize+1));
 
         List<Vec2> vertices = new ArrayList<Vec2>(4);
         vertices.add(new Vec2(-blockSize*0.5f, -blockSize*0.5f));
