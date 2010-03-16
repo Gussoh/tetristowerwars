@@ -18,6 +18,7 @@ import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.cannon.CannonBlock;
 import org.tetristowerwars.model.material.AluminiumMaterial;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
@@ -73,9 +74,8 @@ public class Main {
 
                         if (kalle % 50 == 0) {
 
-                            BuildingBlock b = gameModel.getBlockFactory().createCrossBlock(new Vec2(80, 400),
-                                    new AluminiumMaterial());
-                            gameModel.addToBlockPool(b);
+                            CannonBlock b = gameModel.getCannonFactory().createBasicCannon(new Vec2(80, 400));
+                            gameModel.addToCannonBlockPool(b);
                         }
 
                         if (kalle % 50 == 0) {
