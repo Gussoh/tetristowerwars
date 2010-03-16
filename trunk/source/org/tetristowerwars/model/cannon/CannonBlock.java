@@ -4,9 +4,10 @@
  */
 package org.tetristowerwars.model.cannon;
 
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.Block;
+import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -26,6 +27,10 @@ public class CannonBlock extends Block {
 
     public int getForce() {
         return force;
+    }
+
+    public Material getMaterial() {
+        return new SteelMaterial();
     }
 
 }
