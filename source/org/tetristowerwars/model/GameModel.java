@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.model;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
@@ -16,9 +15,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.JointDef;
-import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
+import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -26,7 +24,11 @@ import org.tetristowerwars.model.building.BuildingBlockFactory;
  */
 public class GameModel {
 
+    //private final LinkedHashSet<Block> blockPool = new LinkedHashSet<Block>();
+    // Trying out generic block pool?
     private final LinkedHashSet<BuildingBlock> blockPool = new LinkedHashSet<BuildingBlock>();
+    private final LinkedHashSet<CannonBlock> cannonBlockPool = new LinkedHashSet<CannonBlock>();
+    private final LinkedHashSet<BulletBlock> bulletBlockPool = new LinkedHashSet<BulletBlock>();
     private final ArrayList<Player> players = new ArrayList<Player>();
     private final World world;
     private static final int ITERATIONS_PER_STEP = 10; // Lower value means less accurate but faster
@@ -34,6 +36,8 @@ public class GameModel {
     private final float width, height;
     private final Body groundBody;
     private final BuildingBlockFactory blockFactory;
+    private final CannonBlockFactory cannonBlockFactory;
+    private final BulletBlockFactory bulletBlockFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
 
     public GameModel(float width, float height, float groundLevel, float blockSize) {
@@ -56,6 +60,8 @@ public class GameModel {
         groundBody.createShape(groundShapeDef);
 
         blockFactory = new BuildingBlockFactory(world, blockSize);
+        cannonBlockFactory = new CannonBlockFactory(world, blockSize);
+        bulletBlockFactory = new BulletBlockFactory(world, blockSize);
     }
 
     public void update() {
@@ -79,13 +85,21 @@ public class GameModel {
         return blockPool;
     }
 
+    public LinkedHashSet<CannonBlock> getCannonBlockPool() {
+        return cannonBlockPool;
+    }
+
+    public LinkedHashSet<BulletBlock> getBulletBlockPool() {
+        return bulletBlockPool;
+    }
+
     /**
-     * Returns the first (and hopefully only) block from the given mouse
+     * Returns the first (and hopefully only) block from the given input
      * coordinates.
      *
      * @param position
-     * @param		x		The x coordinate for the mouse pointer.
-     * @param		y		The y coordinate for the mouse pointer.
+     * @param		x		The x coordinate for the input device.
+     * @param		y		The y coordinate for the input device.
      * @return BuildingBlock
      */
     public Block getBlockFromCoordinates(Point2D position) {
@@ -116,17 +130,51 @@ public class GameModel {
         buildingBlockJoint.destroy();
     }
 
+    /**
+     * Creates a new cannon block to the world and applies a force to it.
+     *
+     * @return boolean          True if a new cannon block was created.
+     *
+     * TODO: Limit cannon blocks to X for each player. PlayerId NYI?
+     */
+
+    public boolean createCannonBlock(int actionId, CannonBlock cannonBlock) {
+        // TODO: Limit cannon blocks, check here
+
+        BulletBlock bb = getBulletBlockFactory().createBullet(cannonBlock);
+
+        // Apply a force to the center of the bullet body...hoepfully?
+        bb.getBodies()[0].applyForce(new Vec2(15.0f, 15.0f), bb.getBodies()[0].getPosition());
+
+        addToBulletBlockPool(bb);
+    }
+
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
     public void addToBlockPool(BuildingBlock block) {
-
         blockPool.add(block);
+    }
+
+    public void addToBulletBlockPool(BulletBlock block) {
+        bulletBlockPool.add(block);
+    }
+
+    public void addToCannonBlockPool(CannonBlock block) {
+        cannonBlockPool.add(block);
     }
 
     public BuildingBlockFactory getBlockFactory() {
         return blockFactory;
+    }
+
+    public CannonBlockFactory getCannonBlockFactory() {
+        return cannonBlockFactory;
+    }
+
+    public BulletBlockFactory getBulletBlockFactory() {
+        return bulletBlockFactory;
     }
 
     public World getWorld() {
