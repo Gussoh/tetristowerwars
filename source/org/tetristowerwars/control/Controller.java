@@ -10,10 +10,10 @@ import java.util.Map;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
-import org.tetristowerwars.model.BulletBlock;
-import org.tetristowerwars.model.CannonBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.building.BuildingBlock;
+import org.tetristowerwars.model.cannon.BulletBlock;
+import org.tetristowerwars.model.cannon.CannonBlock;
 
 /**
  *
