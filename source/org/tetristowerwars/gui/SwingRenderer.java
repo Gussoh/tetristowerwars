@@ -11,8 +11,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedHashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -153,7 +160,13 @@ public class SwingRenderer extends Renderer {
 
                 g2.setColor(mat.getColor()); //color defined by material
 
-                g2.fillPolygon(xpoints, ypoints, vertices.length);
+                Path2D path = new Path2D.Float();
+
+                path.moveTo(vertices[0].x, -vertices[0].y);
+                for (int i = 1; i < vertices.length; i++) {
+                    path.lineTo(vertices[i].x, -vertices[i].y);
+                }
+                g2.fill(path);
 
                 g2.setTransform(currentTransform);
             }
@@ -161,7 +174,7 @@ public class SwingRenderer extends Renderer {
 
         private void drawJoint(Graphics2D g2, BuildingBlockJoint joint) {
             g2.setColor(Color.BLACK);
-            g2.drawLine((int)joint.getPointerPosition().x, (int)(getHeight()/scale) - (int)joint.getPointerPosition().y, (int)joint.getBodyPosition().x, (int)(getHeight()/scale)-(int)joint.getBodyPosition().y);
+            g2.draw(new Line2D.Float(joint.getPointerPosition().x, (getHeight()/(float)scale) - joint.getPointerPosition().y, joint.getBodyPosition().x, (getHeight()/(float)scale)-joint.getBodyPosition().y));
         }
 
         private void drawBullet(Graphics2D g2, BulletBlock bullet) {
@@ -171,11 +184,10 @@ public class SwingRenderer extends Renderer {
             Body body = bullet.getBodies()[0];
             CircleShape shape = (CircleShape)body.m_shapeList;
 
-            int radius = (int)shape.getRadius();
+            float radius = shape.getRadius();
             Vec2 pos = body.getPosition();
 
-            //TODO: WTF am I doing?
-            g2.fillOval((int)pos.x-radius, (int)(getHeight()/scale)-(int)pos.y-radius, radius*2+1, radius*2+1);
+            g2.fill(new Ellipse2D.Float(pos.x-radius,(getHeight()/(float)scale-pos.y-radius), radius*2, radius*2));
 
         }
 
