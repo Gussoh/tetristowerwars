@@ -149,15 +149,6 @@ public class SwingRenderer extends Renderer {
                 g2.translate(body.getPosition().x, getHeight()/scale - body.getPosition().y);
                 g2.rotate(-body.getAngle());
           
-                //fillPolygon implementation
-                int[] xpoints = new int[vertices.length];
-                int[] ypoints = new int[vertices.length];
-                
-                for (int i = 0; i < vertices.length; ++i) {
-                    xpoints[i] = (int)vertices[i].x;
-                    ypoints[i] = -(int)vertices[i].y;
-                }
-
                 g2.setColor(mat.getColor()); //color defined by material
 
                 Path2D path = new Path2D.Float();
