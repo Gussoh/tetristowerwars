@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
 import org.jbox2d.dynamics.ContactFilter;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
 import org.tetristowerwars.model.cannon.BulletBlock;
 import org.tetristowerwars.model.cannon.BulletFactory;
@@ -93,19 +95,61 @@ public class GameModel implements BoundaryListener {
 
         // Check if non-owned blocks should be owned by a player or perhaps destroyed.
         // A copy is needed since we need to modify the block pool while iterating over it.
-        Set<BuildingBlock> blockPoolCopy = (Set<BuildingBlock>) buildingBlockPool.clone();
 
-        for (BuildingBlock buildingBlock : blockPoolCopy) {
-            for (Player player : players) {
-                Vec2 blockPos = buildingBlock.getBodies()[0].getPosition();
-                if (blockPos.x >= player.getLeftLimit() + 2 && blockPos.x <= player.getRightLimit() - 2) {
-                    setOwnerForBlockOrDestroy(player, buildingBlock);
+
+        for (Player player : players) {
+
+            for (Iterator<BuildingBlock> it = buildingBlockPool.iterator(); it.hasNext();) {
+                BuildingBlock buildingBlock = it.next();
+                boolean destroyBodies = false;
+
+                for (Body body : buildingBlock.getBodies()) {
+                    float blockX = body.getPosition().x;
+
+                    if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
+                        it.remove();
+                        if (getAttachedJoint(buildingBlock) != null) {
+                            player.addBuildingBlock(buildingBlock);
+                        } else {
+                            destroyBodies = true;
+                        }
+                    }
+                }
+
+                if (destroyBodies) {
+                    for (Body body : buildingBlock.getBodies()) {
+                        world.destroyBody(body);
+                    }
                 }
             }
+
+            for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
+
+                boolean destroyBodies = false;
+                for (Body body : buildingBlock.getBodies()) {
+                    float blockX = body.getPosition().x;
+
+                    if (blockX <= player.getLeftLimit() - 2 || blockX >= player.getRightLimit() + 2) {
+                        destroyBodies = true;
+                    }
+                }
+
+                if (destroyBodies) {
+                    BuildingBlockJoint blockJoint = getAttachedJoint(buildingBlock);
+
+                    if (blockJoint != null) {
+                        removeBuldingBlockJoint(blockJoint);
+                    }
+
+                    player.removeBuildingBlock(buildingBlock);
+                    for (Body body : buildingBlock.getBodies()) {
+                        world.destroyBody(body);
+                    }
+                }
+            }
+
         }
 
-
-       
     }
 
     public Body getGroundBody() {
@@ -143,12 +187,15 @@ public class GameModel implements BoundaryListener {
     }
 
     public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
-        buildingBlockJoint.updatePointerPosition(new Vec2((float) endPosition.getX(), (float) endPosition.getY()));
+        if (buildingBlockJoints.contains(buildingBlockJoint)) {
+            buildingBlockJoint.updatePointerPosition(new Vec2((float) endPosition.getX(), (float) endPosition.getY()));
+        }
     }
 
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
-        buildingBlockJoints.remove(buildingBlockJoint);
-        buildingBlockJoint.destroy();
+        if (buildingBlockJoints.remove(buildingBlockJoint)) {
+            buildingBlockJoint.destroy();
+        }
     }
 
     public List<Player> getPlayers() {
@@ -208,22 +255,14 @@ public class GameModel implements BoundaryListener {
         return player;
     }
 
-    public void setOwnerForBlockOrDestroy(Player player, BuildingBlock buildingBlock) {
-        if (buildingBlockPool.remove(buildingBlock)) {
-            boolean hasJoint = false;
-            for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
-                if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
-                    hasJoint = true;
-                }
-            }
-
-            if (hasJoint) {
-                player.addBuildingBlock(buildingBlock);
-            } else {
-                for (Body body : buildingBlock.getBodies()) {
-                    world.destroyBody(body);
-                }
+    public BuildingBlockJoint getAttachedJoint(BuildingBlock buildingBlock) {
+        for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+            if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
+                return buildingBlockJoint;
             }
         }
+
+        return null;
     }
 }
+
