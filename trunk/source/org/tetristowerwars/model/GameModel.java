@@ -177,7 +177,10 @@ public class GameModel implements BoundaryListener {
             }
         } else if (userdata instanceof BulletBlock) {
             BulletBlock bulletBlock = (BulletBlock) userdata;
-            
+            bulletBlock.getOwner().removeBullet(bulletBlock);
+            for (Body b : bulletBlock.getBodies()) {
+                bodiesToRemove.add(b);
+            }
         }
     }
 
