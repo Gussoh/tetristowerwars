@@ -9,6 +9,7 @@ import org.tetristowerwars.model.cannon.CannonBlock;
 import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.jbox2d.collision.AABB;
 import org.tetristowerwars.model.cannon.BulletBlock;
 
 /**
@@ -21,13 +22,18 @@ public class Player {
     private final LinkedHashSet<CannonBlock> cannons = new LinkedHashSet<CannonBlock>();
     private final LinkedHashSet<BulletBlock> bullets = new LinkedHashSet<BulletBlock>();
     private final String name;
+    private final float leftLimit;
+    private final float rightLimit;
 
-    public Player(String name) {
+
+    protected Player(String name, float leftLimit, float rightLimit) {
         this.name = name;
+        this.leftLimit = leftLimit;
+        this.rightLimit = rightLimit;
     }
 
-    public LinkedHashSet<BuildingBlock> getBuildingBlocks() {
-        return buildingBlocks;
+    public Set<BuildingBlock> getBuildingBlocks() {
+        return Collections.unmodifiableSet(buildingBlocks);
     }
 
     public Set<CannonBlock> getCannons() {
@@ -65,4 +71,32 @@ public class Player {
             bullet.setOwner(null);
         }
     }
+
+    protected void removeBuildingBlock(BuildingBlock buildingBlock) {
+        if (buildingBlocks.remove(buildingBlock)) {
+            buildingBlock.setOwner(null);
+        }
+    }
+
+    protected void addBuildingBlock(BuildingBlock buildingBlock) {
+        if (buildingBlock.getOwner() != null) {
+            throw new IllegalArgumentException("BuildingBlock already owned by player: " + buildingBlock.getOwner());
+        }
+        buildingBlocks.add(buildingBlock);
+        buildingBlock.setOwner(this);
+    }
+
+    public float getLeftLimit() {
+        return leftLimit;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public float getRightLimit() {
+        return rightLimit;
+    }
+
+    
 }

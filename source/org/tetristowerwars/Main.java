@@ -56,8 +56,8 @@ public class Main {
 
         tuioClient.connect();
 
-        Player player1 = gameModel.createPlayer("Player 1");
-        Player player2 = gameModel.createPlayer("Player 2");
+        Player player1 = gameModel.createPlayer("Player 1", 0, 80);
+        Player player2 = gameModel.createPlayer("Player 2", 180, 300);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(80, 30));
@@ -75,23 +75,23 @@ public class Main {
                     if (gameModel.getWorld().getBodyCount() < 10) {
 
                         if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createPyramidBlock(new Vec2(40, 400), new ConcreteMaterial());
+                            gameModel.getBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createSBlock(new Vec2(20, 400), new SteelMaterial());
+                            gameModel.getBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createLineBlock(new Vec2(60, 400), new WoodMaterial());
+                            gameModel.getBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createLBlock(new Vec2(04, 400), new ConcreteMaterial());
+                            gameModel.getBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createSquareBlock(new Vec2(40, 400), new ConcreteMaterial());
+                            gameModel.getBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 400 == 0) {

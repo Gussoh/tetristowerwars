@@ -18,11 +18,11 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
+import org.jbox2d.dynamics.ContactFilter;
 import org.jbox2d.dynamics.World;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
 import org.tetristowerwars.model.cannon.BulletBlock;
 import org.tetristowerwars.model.cannon.BulletFactory;
-import org.tetristowerwars.model.cannon.CannonBlock;
 import org.tetristowerwars.model.cannon.CannonFactory;
 
 /**
@@ -71,6 +71,7 @@ public class GameModel implements BoundaryListener {
         cannonFactory = new CannonFactory(world, blockSize);
         bulletFactory = new BulletFactory(world, blockSize);
         world.setBoundaryListener(this);
+
     }
 
     public void update() {
@@ -89,6 +90,17 @@ public class GameModel implements BoundaryListener {
             world.destroyBody(body);
         }
         bodiesToRemove.clear();
+
+        // Check if non-owned blocks should be owned by a player
+        for (BuildingBlock buildingBlock : buildingBlockPool) {
+            for (Player player : players) {
+                Vec2 blockPos = buildingBlock.getBodies()[0].getPosition();
+                if (blockPos.x >= player.getLeftLimit() + 2 && blockPos.x <= player.getRightLimit() - 2) {
+                    setOwnerForBlock(player, buildingBlock);
+                }
+            }
+        }
+
     }
 
     public Body getGroundBody() {
@@ -137,7 +149,7 @@ public class GameModel implements BoundaryListener {
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
     }
-    
+
     public BuildingBlockFactory getBlockFactory() {
         return blockFactory;
     }
@@ -169,12 +181,12 @@ public class GameModel implements BoundaryListener {
             BuildingBlock buildingBlock = (BuildingBlock) userdata;
             buildingBlockPool.remove(buildingBlock);
             for (Player player : players) {
-                player.getBuildingBlocks().remove(buildingBlock);
+                player.removeBuildingBlock(buildingBlock);
             }
-
             for (Body b : buildingBlock.getBodies()) {
                 bodiesToRemove.add(b);
             }
+
         } else if (userdata instanceof BulletBlock) {
             BulletBlock bulletBlock = (BulletBlock) userdata;
             bulletBlock.getOwner().removeBullet(bulletBlock);
@@ -184,10 +196,16 @@ public class GameModel implements BoundaryListener {
         }
     }
 
-    public Player createPlayer(String name) {
-        Player player = new Player(name);
+    public Player createPlayer(String name, float leftLimit, float rightLimit) {
+        Player player = new Player(name, leftLimit, rightLimit);
         players.add(player);
 
         return player;
+    }
+
+    public void setOwnerForBlock(Player player, BuildingBlock buildingBlock) {
+        if (buildingBlockPool.remove(buildingBlock)) {
+            player.addBuildingBlock(buildingBlock);
+        }
     }
 }
