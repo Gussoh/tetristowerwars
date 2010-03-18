@@ -91,16 +91,21 @@ public class GameModel implements BoundaryListener {
         }
         bodiesToRemove.clear();
 
-        // Check if non-owned blocks should be owned by a player
-        for (BuildingBlock buildingBlock : buildingBlockPool) {
+        // Check if non-owned blocks should be owned by a player or perhaps destroyed.
+        // A copy is needed since we need to modify the block pool while iterating over it.
+        Set<BuildingBlock> blockPoolCopy = (Set<BuildingBlock>) buildingBlockPool.clone();
+
+        for (BuildingBlock buildingBlock : blockPoolCopy) {
             for (Player player : players) {
                 Vec2 blockPos = buildingBlock.getBodies()[0].getPosition();
                 if (blockPos.x >= player.getLeftLimit() + 2 && blockPos.x <= player.getRightLimit() - 2) {
-                    setOwnerForBlock(player, buildingBlock);
+                    setOwnerForBlockOrDestroy(player, buildingBlock);
                 }
             }
         }
 
+
+       
     }
 
     public Body getGroundBody() {
@@ -203,9 +208,22 @@ public class GameModel implements BoundaryListener {
         return player;
     }
 
-    public void setOwnerForBlock(Player player, BuildingBlock buildingBlock) {
+    public void setOwnerForBlockOrDestroy(Player player, BuildingBlock buildingBlock) {
         if (buildingBlockPool.remove(buildingBlock)) {
-            player.addBuildingBlock(buildingBlock);
+            boolean hasJoint = false;
+            for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+                if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
+                    hasJoint = true;
+                }
+            }
+
+            if (hasJoint) {
+                player.addBuildingBlock(buildingBlock);
+            } else {
+                for (Body body : buildingBlock.getBodies()) {
+                    world.destroyBody(body);
+                }
+            }
         }
     }
 }
