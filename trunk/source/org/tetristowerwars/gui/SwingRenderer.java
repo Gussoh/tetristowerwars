@@ -20,7 +20,9 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jbox2d.collision.CircleShape;
@@ -48,6 +50,7 @@ public class SwingRenderer extends Renderer {
     private final RenderPanel renderPanel;
     private double scale = 5.0;
     private LinkedHashMap<Integer, Point> cursorPoints = new LinkedHashMap<Integer, Point>();
+    private final List<Color> niceColors = new ArrayList<Color>();
 
     public SwingRenderer(GameModel gameModel) {
         super(gameModel);
@@ -57,6 +60,10 @@ public class SwingRenderer extends Renderer {
         frame.add(renderPanel);
         frame.pack();
         frame.setVisible(true);
+
+        niceColors.add(Color.red);
+        niceColors.add(Color.green);
+        niceColors.add(Color.yellow);
     }
 
     @Override
@@ -101,20 +108,27 @@ public class SwingRenderer extends Renderer {
             g2.scale(scale, scale);
 
             //draw ground
-            drawBody(g2, gameModel.getGroundBody(), new GroundMaterial());
+            drawBody(g2, gameModel.getGroundBody());
 
             //draw blocks
+            g2.setColor(Color.GRAY);
             for (BuildingBlock block : gameModel.getBlockPool()) {
                 drawBuildingBlock(g2, block);
             }
 
             //draw cannons
-            for (Player player : gameModel.getPlayers()) {
-                for (CannonBlock cannonBlock : player.getCannons()) {
+            for (int i = 0; i < gameModel.getPlayers().size(); i++) {
+                g2.setColor(niceColors.get(i));
+
+                for (BuildingBlock buildingBlock : gameModel.getPlayers().get(i).getBuildingBlocks()) {
+                    drawBuildingBlock(g2, buildingBlock);
+                }
+
+                for (CannonBlock cannonBlock : gameModel.getPlayers().get(i).getCannons()) {
                     drawCannonBlock(g2, cannonBlock);
                 }
 
-                for (BulletBlock bulletBlock : player.getBullets()) {
+                for (BulletBlock bulletBlock : gameModel.getPlayers().get(i).getBullets()) {
                     drawBullet(g2, bulletBlock);
                 }
             }
@@ -132,17 +146,17 @@ public class SwingRenderer extends Renderer {
 
         private void drawBuildingBlock(Graphics2D g2, BuildingBlock block) {
             for (Body body : block.getBodies()) {
-                drawBody(g2, body, block.getMaterial());
+                drawBody(g2, body);
             }
         }
 
         private void drawCannonBlock(Graphics2D g2, CannonBlock block) {
             for (Body body : block.getBodies()) {
-                drawBody(g2, body, new SteelMaterial());
+                drawBody(g2, body);
             }
         }
 
-        private void drawBody(Graphics2D g2, Body body, Material mat) {
+        private void drawBody(Graphics2D g2, Body body) {
             for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
 
                 Vec2[] vertices = shape.getVertices();
@@ -150,8 +164,6 @@ public class SwingRenderer extends Renderer {
 
                 g2.translate(body.getPosition().x, getHeight() / scale - body.getPosition().y);
                 g2.rotate(-body.getAngle());
-
-                g2.setColor(mat.getColor()); //color defined by material
 
                 Path2D path = new Path2D.Float();
 
