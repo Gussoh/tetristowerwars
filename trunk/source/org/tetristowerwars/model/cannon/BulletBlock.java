@@ -14,8 +14,15 @@ import org.tetristowerwars.model.Block;
  */
 public class BulletBlock extends Block {
 
-    public BulletBlock(Body[] body) {
+    private final CannonBlock cannon;
+
+    public BulletBlock(Body[] body, CannonBlock cannon) {
         super(body);
+        this.cannon = cannon;
+        cannon.getOwner().addBullet(this);
     }
 
+    public CannonBlock getCannon() {
+        return cannon;
+    }
 }
