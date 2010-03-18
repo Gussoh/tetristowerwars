@@ -53,7 +53,7 @@ public class Controller implements InputListener {
         }
         else if (collisionBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
-            gameModel.createCannonBlock(event.getActionId(), (CannonBlock)collisionBlock);
+            gameModel.getBulletFactory().createBullet((CannonBlock)collisionBlock);
         }
         else if (collisionBlock instanceof BulletBlock) {
         }

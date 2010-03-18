@@ -5,10 +5,7 @@
 
 package org.tetristowerwars.model.cannon;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.jbox2d.collision.CircleDef;
-import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -36,8 +33,9 @@ public class BulletFactory {
 
         addShape(blockSize/2, new SteelMaterial(), body);
 
-        return new BulletBlock(new Body[] {body});
+        body.applyImpulse(new Vec2(-cannon.getForce(), cannon.getForce()), body.getPosition());
 
+        return new BulletBlock(new Body[] {body}, cannon);
     }
 
     private Body createBody(Vec2 pos) {
@@ -45,6 +43,7 @@ public class BulletFactory {
         BodyDef boxBodyDef = new BodyDef();
         boxBodyDef.allowSleep = true;
         boxBodyDef.position.set(pos.x, pos.y);
+
 
         return world.createBody(boxBodyDef);
     }

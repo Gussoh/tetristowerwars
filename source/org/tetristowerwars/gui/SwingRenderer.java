@@ -30,11 +30,13 @@ import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.building.BuildingBlock;
 import org.tetristowerwars.model.cannon.BulletBlock;
 import org.tetristowerwars.model.cannon.CannonBlock;
 import org.tetristowerwars.model.material.GroundMaterial;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -57,7 +59,6 @@ public class SwingRenderer extends Renderer {
         frame.setVisible(true);
     }
 
-
     @Override
     public Component getMouseInputComponent() {
         return renderPanel;
@@ -70,7 +71,7 @@ public class SwingRenderer extends Renderer {
 
     @Override
     public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
-        return new Point2D.Double(screenCoord.x/scale, (renderPanel.getHeight() - screenCoord.y)/scale);
+        return new Point2D.Double(screenCoord.x / scale, (renderPanel.getHeight() - screenCoord.y) / scale);
     }
 
     @Override
@@ -108,13 +109,14 @@ public class SwingRenderer extends Renderer {
             }
 
             //draw cannons
-            for (CannonBlock block : gameModel.getCannonBlockPool()) {
-                drawCannonBlock(g2, block);
-            }
+            for (Player player : gameModel.getPlayers()) {
+                for (CannonBlock cannonBlock : player.getCannons()) {
+                    drawCannonBlock(g2, cannonBlock);
+                }
 
-            //draw bullets
-            for (BulletBlock block : gameModel.getBulletBlockPool()) {
-                drawBullet(g2, block);
+                for (BulletBlock bulletBlock : player.getBullets()) {
+                    drawBullet(g2, bulletBlock);
+                }
             }
 
             //draw joints
@@ -136,19 +138,19 @@ public class SwingRenderer extends Renderer {
 
         private void drawCannonBlock(Graphics2D g2, CannonBlock block) {
             for (Body body : block.getBodies()) {
-                drawBody(g2, body, block.getMaterial());
+                drawBody(g2, body, new SteelMaterial());
             }
         }
 
         private void drawBody(Graphics2D g2, Body body, Material mat) {
-            for(PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
+            for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
 
                 Vec2[] vertices = shape.getVertices();
                 AffineTransform currentTransform = g2.getTransform();
 
-                g2.translate(body.getPosition().x, getHeight()/scale - body.getPosition().y);
+                g2.translate(body.getPosition().x, getHeight() / scale - body.getPosition().y);
                 g2.rotate(-body.getAngle());
-          
+
                 g2.setColor(mat.getColor()); //color defined by material
 
                 Path2D path = new Path2D.Float();
@@ -165,7 +167,7 @@ public class SwingRenderer extends Renderer {
 
         private void drawJoint(Graphics2D g2, BuildingBlockJoint joint) {
             g2.setColor(Color.BLACK);
-            g2.draw(new Line2D.Float(joint.getPointerPosition().x, (getHeight()/(float)scale) - joint.getPointerPosition().y, joint.getBodyPosition().x, (getHeight()/(float)scale)-joint.getBodyPosition().y));
+            g2.draw(new Line2D.Float(joint.getPointerPosition().x, (getHeight() / (float) scale) - joint.getPointerPosition().y, joint.getBodyPosition().x, (getHeight() / (float) scale) - joint.getBodyPosition().y));
         }
 
         private void drawBullet(Graphics2D g2, BulletBlock bullet) {
@@ -173,14 +175,13 @@ public class SwingRenderer extends Renderer {
             g2.setColor(Color.red);
 
             Body body = bullet.getBodies()[0];
-            CircleShape shape = (CircleShape)body.m_shapeList;
+            CircleShape shape = (CircleShape) body.m_shapeList;
 
             float radius = shape.getRadius();
             Vec2 pos = body.getPosition();
 
-            g2.fill(new Ellipse2D.Float(pos.x-radius,(getHeight()/(float)scale-pos.y-radius), radius*2, radius*2));
+            g2.fill(new Ellipse2D.Float(pos.x - radius, (getHeight() / (float) scale - pos.y - radius), radius * 2, radius * 2));
 
         }
-
     }
 }

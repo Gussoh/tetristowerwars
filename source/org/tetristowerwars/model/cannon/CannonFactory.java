@@ -12,6 +12,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.Material;
 
@@ -29,7 +30,7 @@ public class CannonFactory {
         this.blockSize = blockSize;
     }
 
-    public CannonBlock createBasicCannon(Vec2 pos) {
+    public CannonBlock createBasicCannon(Player player, Vec2 pos) {
 
         Body body = createBody(pos);
 
@@ -44,11 +45,12 @@ public class CannonFactory {
         vertices2.add(new Vec2(blockSize, blockSize));
         vertices2.add(new Vec2(0, blockSize*2));
 
-        addShape(vertices1, new ConcreteMaterial(), body);
-        addShape(vertices2, new ConcreteMaterial(), body);
+        addShape(vertices1, body);
+        addShape(vertices2, body);
 
-        return new CannonBlock(new Body[] {body}, 10000, 5);
-
+        CannonBlock cannonBlock = new CannonBlock(new Body[] {body}, 10000, 5, player);
+        
+        return cannonBlock;
     }
 
 
@@ -61,16 +63,12 @@ public class CannonFactory {
         return world.createBody(boxBodyDef);
     }
 
-    private void addShape(List<Vec2> vertices, Material mat, Body body) {
+    private void addShape(List<Vec2> vertices, Body body) {
 
         PolygonDef shapeDef = new PolygonDef();
-        shapeDef.density = mat.getDensity();
         shapeDef.vertices = vertices;
         shapeDef.isSensor = false;
-        shapeDef.friction = 0.8f;
-        shapeDef.restitution = 0.1f;
         body.createShape(shapeDef);
-        body.setMassFromShapes();
     }
 
 }

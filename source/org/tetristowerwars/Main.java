@@ -17,8 +17,10 @@ import org.tetristowerwars.control.TouchInputManager;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.building.BuildingBlock;
 import org.tetristowerwars.model.cannon.CannonBlock;
+import org.tetristowerwars.model.cannon.CannonFactory;
 import org.tetristowerwars.model.material.AluminiumMaterial;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
@@ -41,7 +43,7 @@ public class Main {
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
 
         float blockSize = 5;
-        final GameModel gameModel = new GameModel(640, 480, 30, blockSize);
+        final GameModel gameModel = new GameModel(300, 480, 30, blockSize, 100);
         final Renderer renderer = new SwingRenderer(gameModel);
         final TuioClient tuioClient = new TuioClient();
 
@@ -54,6 +56,13 @@ public class Main {
 
         tuioClient.connect();
 
+        Player player1 = gameModel.createPlayer("Player 1");
+        Player player2 = gameModel.createPlayer("Player 2");
+
+        CannonFactory cannonFactory = gameModel.getCannonFactory();
+        cannonFactory.createBasicCannon(player1, new Vec2(80, 30));
+        cannonFactory.createBasicCannon(player2, new Vec2(180, 30));
+
         for (;;) {
             ++kalle;
             Thread.sleep(20);
@@ -63,47 +72,26 @@ public class Main {
                 public void run() {
                     renderer.renderFrame();
 
-                    if(gameModel.getWorld().getBodyCount()<50) {
+                    if (gameModel.getWorld().getBodyCount() < 10) {
 
                         if (kalle % 50 == 0) {
-
-                            BuildingBlock b = gameModel.getBlockFactory().createPyramidBlock(new Vec2(40, 400),
-                                    new ConcreteMaterial());
-                            gameModel.addToBlockPool(b);
+                            gameModel.getBlockFactory().createPyramidBlock(new Vec2(40, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-
-                            CannonBlock b = gameModel.getCannonFactory().createBasicCannon(new Vec2(80, 400));
-                            gameModel.addToCannonBlockPool(b);
+                            gameModel.getBlockFactory().createSBlock(new Vec2(20, 400), new SteelMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-
-                            BuildingBlock b = gameModel.getBlockFactory().createSBlock(new Vec2(20, 400),
-                                    new SteelMaterial());
-                            gameModel.addToBlockPool(b);
+                            gameModel.getBlockFactory().createLineBlock(new Vec2(60, 400), new WoodMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-
-                            BuildingBlock b = gameModel.getBlockFactory().createLineBlock(new Vec2(60, 400),
-                                    new WoodMaterial());
-                            gameModel.addToBlockPool(b);
+                            gameModel.getBlockFactory().createLBlock(new Vec2(04, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 50 == 0) {
-
-                            BuildingBlock b = gameModel.getBlockFactory().createLBlock(new Vec2(04, 400),
-                                    new ConcreteMaterial());
-                            gameModel.addToBlockPool(b);
-                        }
-
-                        if (kalle % 50 == 0) {
-
-                            BuildingBlock b = gameModel.getBlockFactory().createSquareBlock(new Vec2(40, 400),
-                                    new ConcreteMaterial());
-                            gameModel.addToBlockPool(b);
+                            gameModel.getBlockFactory().createSquareBlock(new Vec2(40, 400), new ConcreteMaterial());
                         }
 
                         if (kalle % 400 == 0) {
@@ -113,10 +101,7 @@ public class Main {
 
                     gameModel.update();
                 }
-                
             });
-           
-
         }
     }
 }
