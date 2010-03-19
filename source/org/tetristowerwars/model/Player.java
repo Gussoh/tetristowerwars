@@ -52,10 +52,13 @@ public class Player {
         cannonBlock.setOwner(this);
     }
 
-    public void removeCannon(CannonBlock cannonBlock) {
+    public boolean removeCannon(CannonBlock cannonBlock) {
         if (cannons.remove(cannonBlock)) {
             cannonBlock.setOwner(null);
+            return true;
         }
+
+        return false;
     }
 
     public void addBullet(BulletBlock bullet) {
@@ -66,16 +69,22 @@ public class Player {
         bullet.setOwner(this);
     }
 
-    public void removeBullet(BulletBlock bullet) {
+    public boolean removeBullet(BulletBlock bullet) {
         if (bullets.remove(bullet)) {
             bullet.setOwner(null);
+            return true;
         }
+
+        return false;
     }
 
-    protected void removeBuildingBlock(BuildingBlock buildingBlock) {
+    protected boolean removeBuildingBlock(BuildingBlock buildingBlock) {
         if (buildingBlocks.remove(buildingBlock)) {
             buildingBlock.setOwner(null);
+            return true;
         }
+
+        return false;
     }
 
     protected void addBuildingBlock(BuildingBlock buildingBlock) {

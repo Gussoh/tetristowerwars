@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.jbox2d.collision.AABB;
@@ -19,9 +20,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
-import org.jbox2d.dynamics.ContactFilter;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.tetristowerwars.model.building.BuildingBlockFactory;
 import org.tetristowerwars.model.cannon.BulletBlock;
 import org.tetristowerwars.model.cannon.BulletFactory;
@@ -47,7 +46,7 @@ public class GameModel implements BoundaryListener {
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final float playerAreaWidth;
-    private final List<Body> bodiesToRemove = new ArrayList<Body>();
+    private final List<Block> blocksToRemove = new ArrayList<Block>();
 
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize, float playerAreaWidth) {
         this.worldWidth = worldWidth;
@@ -88,10 +87,38 @@ public class GameModel implements BoundaryListener {
 
         world.step(stepTimeMs / 1000, ITERATIONS_PER_STEP);
 
-        for (Body body : bodiesToRemove) {
-            world.destroyBody(body);
+        // blocksToRemove will now contain all blocks that are outside the world.
+        for (Block block : blocksToRemove) {
+            if (block instanceof BuildingBlock) {
+                BuildingBlock buildingBlock = (BuildingBlock) block;
+                if (!buildingBlockPool.remove(buildingBlock)) {
+                    for (Player player : players) {
+                        if (player.removeBuildingBlock(buildingBlock)) {
+                            break;
+                        }
+                    }
+                }
+
+                BuildingBlockJoint bbj;
+                while ((bbj = getAttachedJoint(buildingBlock)) != null) {
+                    removeBuldingBlockJoint(bbj);
+                }
+
+                for (Body b : buildingBlock.getBodies()) {
+                    world.destroyBody(b);
+                }
+
+            } else if (block instanceof BulletBlock) {
+                BulletBlock bulletBlock = (BulletBlock) block;
+                bulletBlock.getOwner().removeBullet(bulletBlock);
+                for (Body b : bulletBlock.getBodies()) {
+                    world.destroyBody(b);
+                }
+            } else {
+                System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
+            }
         }
-        bodiesToRemove.clear();
+        blocksToRemove.clear();
 
         // Check if non-owned blocks should be owned by a player or perhaps destroyed.
         // A copy is needed since we need to modify the block pool while iterating over it.
@@ -123,9 +150,12 @@ public class GameModel implements BoundaryListener {
                 }
             }
 
+            List<BuildingBlock> playerBlocksToRemove = new LinkedList<BuildingBlock>();
+
             for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
 
                 boolean destroyBodies = false;
+
                 for (Body body : buildingBlock.getBodies()) {
                     float blockX = body.getPosition().x;
 
@@ -135,21 +165,23 @@ public class GameModel implements BoundaryListener {
                 }
 
                 if (destroyBodies) {
-                    BuildingBlockJoint blockJoint = getAttachedJoint(buildingBlock);
-
-                    if (blockJoint != null) {
+                    BuildingBlockJoint blockJoint;
+                    
+                    while ((blockJoint = getAttachedJoint(buildingBlock)) != null) {
                         removeBuldingBlockJoint(blockJoint);
                     }
 
-                    player.removeBuildingBlock(buildingBlock);
-                    for (Body body : buildingBlock.getBodies()) {
-                        world.destroyBody(body);
-                    }
+                    playerBlocksToRemove.add(buildingBlock);
                 }
             }
 
+            for (BuildingBlock buildingBlock : playerBlocksToRemove) {
+                player.removeBuildingBlock(buildingBlock);
+                for (Body body : buildingBlock.getBodies()) {
+                    world.destroyBody(body);
+                }
+            }
         }
-
     }
 
     public Body getGroundBody() {
@@ -223,28 +255,14 @@ public class GameModel implements BoundaryListener {
     }
 
     /*
-     * Called by physics engine when a body leaves the world boundaries.
+     * Called by physics engine when a body leaves the world boundries.
      */
     @Override
     public void violation(Body bodyOutsideWorld) {
         Object userdata = bodyOutsideWorld.getUserData();
 
-        if (userdata instanceof BuildingBlock) {
-            BuildingBlock buildingBlock = (BuildingBlock) userdata;
-            buildingBlockPool.remove(buildingBlock);
-            for (Player player : players) {
-                player.removeBuildingBlock(buildingBlock);
-            }
-            for (Body b : buildingBlock.getBodies()) {
-                bodiesToRemove.add(b);
-            }
-
-        } else if (userdata instanceof BulletBlock) {
-            BulletBlock bulletBlock = (BulletBlock) userdata;
-            bulletBlock.getOwner().removeBullet(bulletBlock);
-            for (Body b : bulletBlock.getBodies()) {
-                bodiesToRemove.add(b);
-            }
+        if (userdata instanceof Block) {
+            blocksToRemove.add((Block) userdata);
         }
     }
 
@@ -255,6 +273,13 @@ public class GameModel implements BoundaryListener {
         return player;
     }
 
+    /**
+     * Iterate over all joints to find out if this body is attached to a joint.
+     * This is ok
+     *
+     * @param buildingBlock
+     * @return
+     */
     public BuildingBlockJoint getAttachedJoint(BuildingBlock buildingBlock) {
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
             if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
