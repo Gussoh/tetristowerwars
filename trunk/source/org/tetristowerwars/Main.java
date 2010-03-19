@@ -69,7 +69,7 @@ public class Main {
                 public void run() {
                     renderer.renderFrame();
 
-                    if (gameModel.getWorld().getBodyCount() < 10) {
+                    if (gameModel.getWorld().getBodyCount() < 300) {
 
                         if (kalle % 50 == 0) {
                             gameModel.getBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
