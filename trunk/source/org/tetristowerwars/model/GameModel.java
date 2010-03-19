@@ -38,7 +38,7 @@ public class GameModel implements BoundaryListener {
     private final ArrayList<Player> players = new ArrayList<Player>();
     private final World world;
     private static final int ITERATIONS_PER_STEP = 10; // Lower value means less accurate but faster
-    private long lastStepTime = System.currentTimeMillis();
+    private long lastStepTimeNano = System.nanoTime();
     private final float worldWidth, worldHeight;
     private final Body groundBody;
     private final BuildingBlockFactory blockFactory;
@@ -47,6 +47,8 @@ public class GameModel implements BoundaryListener {
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final float playerAreaWidth;
     private final List<Block> blocksToRemove = new ArrayList<Block>();
+    private float timeTakenToExecuteUpdateMs;
+    private final float constantStepTimeS = 1f / 60f;
 
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize, float playerAreaWidth) {
         this.worldWidth = worldWidth;
@@ -76,16 +78,24 @@ public class GameModel implements BoundaryListener {
     }
 
     public void update() {
-        long currentTimeMs = System.currentTimeMillis();
+        long currentTimeNano = System.nanoTime();
+        long stepTimeNano = currentTimeNano - lastStepTimeNano;
+        int numTimesStepped = 0;
 
-        float stepTimeMs = currentTimeMs - lastStepTime;
-        lastStepTime = currentTimeMs;
-
-        for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
-            buildingBlockJoint.dampAngularVelocity();
+        if (stepTimeNano < 0) { // in case of nanoTime wrapping around
+            stepTimeNano = (long) (constantStepTimeS * 1000000000.0f);
         }
 
-        world.step(stepTimeMs / 1000, ITERATIONS_PER_STEP);
+        while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
+            for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+                buildingBlockJoint.dampAngularVelocity();
+            }
+            world.step(constantStepTimeS, ITERATIONS_PER_STEP);
+            numTimesStepped++;
+            stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
+        }
+
+        lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
 
         // blocksToRemove will now contain all blocks that are outside the world.
         for (Block block : blocksToRemove) {
@@ -166,7 +176,7 @@ public class GameModel implements BoundaryListener {
 
                 if (destroyBodies) {
                     BuildingBlockJoint blockJoint;
-                    
+
                     while ((blockJoint = getAttachedJoint(buildingBlock)) != null) {
                         removeBuldingBlockJoint(blockJoint);
                     }
@@ -181,6 +191,14 @@ public class GameModel implements BoundaryListener {
                     world.destroyBody(body);
                 }
             }
+        }
+
+        for (Player player : players) {
+            player.calcTowerHeight(groundBody);
+        }
+
+        if (numTimesStepped > 0) {
+            timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
         }
     }
 
@@ -248,6 +266,10 @@ public class GameModel implements BoundaryListener {
 
     public World getWorld() {
         return world;
+    }
+
+    public float getTimeTakenToExecuteUpdateMs() {
+        return timeTakenToExecuteUpdateMs;
     }
 
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {

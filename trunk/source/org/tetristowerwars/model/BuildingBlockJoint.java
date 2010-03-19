@@ -44,7 +44,7 @@ public class BuildingBlockJoint {
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
 
-        MassData newMassData = new MassData(buildingBlock.getOriginalMassData());
+        MassData newMassData = new MassData(buildingBlock.getOriginalMassData(0));
         newMassData.mass /= 200;
         newMassData.I /= 200;
         blockBody.setMass(newMassData);
@@ -69,7 +69,7 @@ public class BuildingBlockJoint {
 
     public void destroy() {
         world.destroyJoint(joint);
-        buildingBlock.getBodies()[0].setMass(buildingBlock.getOriginalMassData());
+        buildingBlock.getBodies()[0].setMass(buildingBlock.getOriginalMassData(0));
     }
 
     protected void dampAngularVelocity() {
