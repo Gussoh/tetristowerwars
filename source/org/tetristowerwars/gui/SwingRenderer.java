@@ -11,15 +11,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,16 +26,12 @@ import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.building.BuildingBlock;
 import org.tetristowerwars.model.cannon.BulletBlock;
 import org.tetristowerwars.model.cannon.CannonBlock;
-import org.tetristowerwars.model.material.GroundMaterial;
-import org.tetristowerwars.model.material.Material;
-import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -51,6 +44,7 @@ public class SwingRenderer extends Renderer {
     private double scale = 5.0;
     private LinkedHashMap<Integer, Point> cursorPoints = new LinkedHashMap<Integer, Point>();
     private final List<Color> niceColors = new ArrayList<Color>();
+    private final NumberFormat realNumberFormat = NumberFormat.getNumberInstance();
 
     public SwingRenderer(GameModel gameModel) {
         super(gameModel);
@@ -60,6 +54,9 @@ public class SwingRenderer extends Renderer {
         frame.add(renderPanel);
         frame.pack();
         frame.setVisible(true);
+
+        realNumberFormat.setMaximumFractionDigits(2);
+        realNumberFormat.setMinimumFractionDigits(0);
 
         niceColors.add(Color.red);
         niceColors.add(Color.green);
@@ -108,7 +105,7 @@ public class SwingRenderer extends Renderer {
             g2.scale(scale, scale);
 
             //draw ground
-            drawBody(g2, gameModel.getGroundBody());
+            drawBody(g2, gameModel.getGroundBody(), true);
 
             //draw blocks
             g2.setColor(Color.GRAY);
@@ -138,25 +135,41 @@ public class SwingRenderer extends Renderer {
                 drawJoint(g2, joint);
             }
 
+            // Draw markers
             g2.setColor(Color.RED);
             for (Point point : cursorPoints.values()) {
                 g2.fillOval((int) (point.x / scale - 1), (int) (point.y / scale - 1), 3, 3);
             }
+
+            // Draw tower heights
+            g2.setColor(Color.BLACK);
+            for (Player player : gameModel.getPlayers()) {
+                BuildingBlock bb = player.getHighestBuilingBlockInTower();
+                
+                if (bb != null) {
+                    
+                    for (Body body : bb.getBodies()) {
+                        drawBody(g2, body, false);
+                    }
+                }
+            }
+            g2.scale(1 / scale, 1 / scale);
+            g2.drawString("Physics Engine - time to update: " + realNumberFormat.format(gameModel.getTimeTakenToExecuteUpdateMs()) + " ms", 10, 10);
         }
 
         private void drawBuildingBlock(Graphics2D g2, BuildingBlock block) {
             for (Body body : block.getBodies()) {
-                drawBody(g2, body);
+                drawBody(g2, body, true);
             }
         }
 
         private void drawCannonBlock(Graphics2D g2, CannonBlock block) {
             for (Body body : block.getBodies()) {
-                drawBody(g2, body);
+                drawBody(g2, body, true);
             }
         }
 
-        private void drawBody(Graphics2D g2, Body body) {
+        private void drawBody(Graphics2D g2, Body body, boolean fill) {
             for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
 
                 Vec2[] vertices = shape.getVertices();
@@ -171,7 +184,13 @@ public class SwingRenderer extends Renderer {
                 for (int i = 1; i < vertices.length; i++) {
                     path.lineTo(vertices[i].x, -vertices[i].y);
                 }
-                g2.fill(path);
+                path.closePath();
+                
+                if (fill) {
+                    g2.fill(path);
+                } else {
+                    g2.draw(path);
+                }
 
                 g2.setTransform(currentTransform);
             }

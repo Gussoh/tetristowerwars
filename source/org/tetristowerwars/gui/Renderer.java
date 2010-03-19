@@ -7,7 +7,6 @@ package org.tetristowerwars.gui;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.model.GameModel;
 
 /**
