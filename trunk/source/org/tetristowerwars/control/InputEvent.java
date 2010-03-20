@@ -6,15 +6,17 @@
 package org.tetristowerwars.control;
 
 import java.awt.Point;
-import org.jbox2d.common.Vec2;
 
 /**
  *
  * @author Andreas
  */
 public class InputEvent {
+
+    public static final int PRESSED = 0, RELEASED = 1, DRAGGED = 2;
     private final Point position;
     private final int actionId;
+    private final int type;
 
 
     /**
@@ -22,7 +24,8 @@ public class InputEvent {
      * @param position The position in game world coordinates where the event occurred.
      * @param originator An id identifying the originator of the event.
      */
-    public InputEvent(Point position, int originator) {
+    public InputEvent(int type, Point position, int originator) {
+        this.type = type;
         this.position = position;
         this.actionId = originator;
     }
@@ -33,6 +36,10 @@ public class InputEvent {
 
     public Point getPosition() {
         return position;
+    }
+
+    public int getType() {
+        return type;
     }
 
     @Override

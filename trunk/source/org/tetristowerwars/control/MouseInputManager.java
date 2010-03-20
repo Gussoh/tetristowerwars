@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.control;
 
 import java.awt.Component;
@@ -16,6 +15,9 @@ import java.awt.event.MouseMotionListener;
  * @author Andreas
  */
 public class MouseInputManager extends InputManager implements MouseListener, MouseMotionListener {
+
+    private static final int dummyId = 0;
+
     public MouseInputManager(Component component) {
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
@@ -23,52 +25,39 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
-		// System.out.println("MouseInputManager, clicked at " + e.toString());
+        // Not used
     }
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        this.fireOnPressEvent(new InputEvent(new Point(e.getX(), e.getY()), 0));
-		// System.out.println("MouseInputManager, pressed at " + e.toString());
-
-		/*
-		BuildingBlock hitBlock = gameModel.getBlockFromCoordinates(e.getX(), e.getY());
-
-        if (hitBlock != null) {
-            System.out.println("ZOMFG, YOU JUST HIT SOMETHING!!!!");
-            hitBlock.getBodies()[0].applyForce(new Vec2(7000.0f, 5000.0f), new Vec2(-0.0f, 60.0f));
-        }
-        else {
-            //System.out.println("miss");
-        }
-		*/
+        InputEvent evt = new InputEvent(InputEvent.PRESSED, new Point(e.getX(), e.getY()), dummyId);
+        pushInputEvent(evt);
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
-        this.fireOnReleaseEvent(new InputEvent(new Point(e.getX(), e.getY()), 0));
-		// System.out.println("MouseInputManager, released at " + e.toString());
+        InputEvent evt = new InputEvent(InputEvent.RELEASED, new Point(e.getX(), e.getY()), dummyId);
+        pushInputEvent(evt);
     }
 
     @Override
     public void mouseEntered(java.awt.event.MouseEvent e) {
-		// System.out.println("MouseInputManager, entered at " + e.toString());
+        // Not used
     }
 
     @Override
     public void mouseExited(java.awt.event.MouseEvent e) {
-		// System.out.println("MouseInputManager, exited at " + e.toString());
+        // Not used
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        this.fireOnDraggedEvent(new InputEvent(new Point(e.getX(), e.getY()), 0));
-		// System.out.println("MouseInputManager, dragged at " + e.toString());
+        InputEvent evt = new InputEvent(InputEvent.DRAGGED, new Point(e.getX(), e.getY()), dummyId);
+        pushInputEvent(evt);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-		// System.out.println("MouseInputManager, moved at " + e.toString());
+        // Not used
     }
-
 }
