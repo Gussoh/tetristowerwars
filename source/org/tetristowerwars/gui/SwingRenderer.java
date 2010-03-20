@@ -16,12 +16,16 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -70,7 +74,20 @@ public class SwingRenderer extends Renderer {
 
     @Override
     public void renderFrame() {
-        frame.repaint();
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    renderPanel.paintImmediately(renderPanel.getVisibleRect());
+                }
+            });
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SwingRenderer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(SwingRenderer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     @Override
@@ -138,7 +155,8 @@ public class SwingRenderer extends Renderer {
             // Draw markers
             g2.setColor(Color.RED);
             for (Point point : cursorPoints.values()) {
-                g2.fillOval((int) (point.x / scale - 1), (int) (point.y / scale - 1), 3, 3);
+                Ellipse2D ellipse = new Ellipse2D.Double(point.x / scale - 1, point.y / scale - 1, 3, 3);
+                g2.fill(ellipse);
             }
 
             // Draw tower heights

@@ -60,5 +60,4 @@ public class BulletFactory {
         body.createShape(shapeDef);
         body.setMassFromShapes();
     }
-
 }

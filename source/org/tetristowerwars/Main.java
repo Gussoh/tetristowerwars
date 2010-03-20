@@ -8,7 +8,6 @@ import TUIO.TuioClient;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
-import javax.swing.SwingUtilities;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.InputManager;
@@ -32,9 +31,7 @@ public class Main {
     static int kalle = 0;
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Hello tetris tower wars!");
-
-
+      
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         DisplayMode displayMode = ge.getDefaultScreenDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
@@ -59,46 +56,45 @@ public class Main {
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(80, 30));
         cannonFactory.createBasicCannon(player2, new Vec2(180, 30));
+       
 
         for (;;) {
             ++kalle;
-            Thread.sleep(20);
-            SwingUtilities.invokeLater(new Runnable() {
+            Thread.yield();
+            
+            mouseInputManager.pumpEvents();
+            touchInputManager.pumpEvents();
 
-                @Override
-                public void run() {
-                    renderer.renderFrame();
+            if (gameModel.update() > 0) {
+                renderer.renderFrame();
+            }
 
-                    if (gameModel.getWorld().getBodyCount() < 300) {
+            if (gameModel.getBlockPool().size() < 20) {
 
-                        if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
-                        }
-
-                        if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
-                        }
-
-                        if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
-                        }
-
-                        if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
-                        }
-
-                        if (kalle % 50 == 0) {
-                            gameModel.getBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
-                        }
-
-                        if (kalle % 400 == 0) {
-                            System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
-                        }
-                    }
-
-                    gameModel.update();
+                if (kalle % 50 == 0) {
+                    gameModel.getBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
                 }
-            });
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
+                }
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
+                }
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
+                }
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
+                }
+
+                if (kalle % 400 == 0) {
+                    System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
+                }
+            }
         }
     }
 }

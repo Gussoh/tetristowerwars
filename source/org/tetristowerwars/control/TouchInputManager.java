@@ -13,6 +13,7 @@ import TUIO.TuioTime;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -20,12 +21,12 @@ import java.awt.Point;
  */
 public class TouchInputManager extends InputManager implements TuioListener {
     private final Dimension screenDimension;
-    private final Component panelComponent;
+    private final Component gamePanel;
     
-    public TouchInputManager(TuioClient client, Dimension screenDimension, Component panelComponent) {
+    public TouchInputManager(TuioClient client, Dimension screenDimension, Component gamePanel) {
         client.addTuioListener(this);
         this.screenDimension = screenDimension;
-        this.panelComponent = panelComponent;
+        this.gamePanel = gamePanel;
     }
 
     @Override
@@ -45,17 +46,17 @@ public class TouchInputManager extends InputManager implements TuioListener {
 
     @Override
     public void addTuioCursor(TuioCursor tc) {
-        fireOnPressEvent(createInputEvent(tc));
+        createInputEvent(InputEvent.PRESSED, tc);
     }
 
     @Override
     public void updateTuioCursor(TuioCursor tc) {
-        fireOnDraggedEvent(createInputEvent(tc));
+        createInputEvent(InputEvent.DRAGGED, tc);
     }
 
     @Override
     public void removeTuioCursor(TuioCursor tc) {
-        fireOnReleaseEvent(createInputEvent(tc));
+        createInputEvent(InputEvent.RELEASED, tc);
     }
 
     @Override
@@ -63,13 +64,15 @@ public class TouchInputManager extends InputManager implements TuioListener {
         // NOT USED
     }
 
-    private InputEvent createInputEvent(TuioCursor tc) {
+    private void createInputEvent(int type, TuioCursor tc) {
         int x = tc.getScreenX(screenDimension.width);
         int y = tc.getScreenY(screenDimension.height);
-        Point locationOnScreen = panelComponent.getLocationOnScreen();
-        Point locationOnPanel = new Point(x - locationOnScreen.x, y - locationOnScreen.y);
 
-        return new InputEvent(locationOnPanel, tc.getCursorID());
+        Point point = new Point(x, y);
+        SwingUtilities.convertPointFromScreen(point, gamePanel);
+        
+        InputEvent evt = new InputEvent(type, point, tc.getCursorID());
+        pushInputEvent(evt);
     }
 
     // TODO: Implement

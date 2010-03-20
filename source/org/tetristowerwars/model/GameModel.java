@@ -77,7 +77,7 @@ public class GameModel implements BoundaryListener {
 
     }
 
-    public void update() {
+    public int update() {
         long currentTimeNano = System.nanoTime();
         long stepTimeNano = currentTimeNano - lastStepTimeNano;
         int numTimesStepped = 0;
@@ -96,6 +96,16 @@ public class GameModel implements BoundaryListener {
         }
 
         lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
+
+        if (numTimesStepped > 0) {
+            postProcess();
+            timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
+        }
+
+        return numTimesStepped;
+    }
+
+    private void postProcess() {
 
         // blocksToRemove will now contain all blocks that are outside the world.
         for (Block block : blocksToRemove) {
@@ -195,10 +205,6 @@ public class GameModel implements BoundaryListener {
 
         for (Player player : players) {
             player.calcTowerHeight(groundBody);
-        }
-
-        if (numTimesStepped > 0) {
-            timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
         }
     }
 

@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.control;
 
 import java.util.ArrayList;
@@ -14,7 +13,8 @@ import java.util.List;
  */
 public abstract class InputManager {
 
-    private List<InputListener> inputListeners = new ArrayList<InputListener>();
+    private final List<InputListener> inputListeners = new ArrayList<InputListener>();
+    private final List<InputEvent> events = new ArrayList<InputEvent>();
 
     public void addInputListener(InputListener listener) {
         inputListeners.add(listener);
@@ -24,19 +24,45 @@ public abstract class InputManager {
         inputListeners.remove(listener);
     }
 
-    protected void fireOnPressEvent(InputEvent event) {
+    protected void pushInputEvent(InputEvent event) {
+        synchronized (events) {
+            events.add(event);
+        }
+    }
+
+    public void pumpEvents() {
+        synchronized (events) {
+            for (InputEvent inputEvent : events) {
+                switch (inputEvent.getType()) {
+                    case InputEvent.PRESSED:
+                        fireOnPressEvent(inputEvent);
+                        break;
+                    case InputEvent.RELEASED:
+                        fireOnReleaseEvent(inputEvent);
+                        break;
+                    case InputEvent.DRAGGED:
+                        fireOnDragEvent(inputEvent);
+                        break;
+                }
+            }
+
+            events.clear();
+        }
+    }
+
+    private void fireOnPressEvent(InputEvent event) {
         for (InputListener inputListener : inputListeners) {
             inputListener.onInputDevicePressed(event);
         }
     }
 
-    protected void fireOnReleaseEvent(InputEvent event) {
+    private void fireOnReleaseEvent(InputEvent event) {
         for (InputListener inputListener : inputListeners) {
             inputListener.onInputDeviceReleased(event);
         }
     }
 
-    protected void fireOnDraggedEvent(InputEvent event) {
+    private void fireOnDragEvent(InputEvent event) {
         for (InputListener inputListener : inputListeners) {
             inputListener.onInputDeviceDragged(event);
         }
