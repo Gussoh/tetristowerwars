@@ -20,6 +20,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
 import org.jbox2d.dynamics.World;
+import org.tetristowerwars.sound.SoundPlayer;
 
 /**
  *
@@ -44,6 +45,7 @@ public class GameModel implements BoundaryListener {
     private final List<Block> blocksToRemove = new ArrayList<Block>();
     private float timeTakenToExecuteUpdateMs;
     private final float constantStepTimeS = 1f / 60f;
+    private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
 
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize, float playerAreaWidth) {
         this.worldWidth = worldWidth;
@@ -328,6 +330,14 @@ public class GameModel implements BoundaryListener {
 
         return null;
 
+    }
+
+    public void addGameModelListener(GameModelListener listener) {
+        gameModelListeners.add(listener);
+    }
+
+    public void removeGameModelListener(GameModelListener listener) {
+        gameModelListeners.remove(listener);
     }
 }
 
