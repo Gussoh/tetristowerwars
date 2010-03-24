@@ -22,38 +22,22 @@ public class BuildingBlock extends Block {
     private final MassData massData;
     private final Rectangle2D[] rectangles;
 
-    protected BuildingBlock(Body body, Material material, float area) {
+    protected BuildingBlock(Body body, Material material, Rectangle2D[] rectangles) {
         super(body);
         this.material = material;
         this.massData = new MassData();
-        this.rectangles = null;
+        this.rectangles = rectangles;
 
-        // TODO: Inertias are calculated as if all building blocks are circles/cylinders.
-        // If game experience is bad, fix the real inertia calculations.
+        calcMassData();
+        body.setMass(massData);
 
-        float maxSquaredDistance = 0;
-
-        
-        
-            for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.getNext()) {
-                Vec2[] vertices = shape.getVertices();
-                for (Vec2 vec2 : vertices) {
-                    maxSquaredDistance = Math.max(maxSquaredDistance, vec2.x * vec2.x + vec2.y * vec2.y);
-                }
-            }
-
-            massData.mass = area * material.getDensity();
-            massData.I = massData.mass * maxSquaredDistance / 2.0f;
-            massData.center.set(0, 0);
-            // TODO: Should iterate over bodies
-            body.setMass(massData);
-        
     }
 
-
-    protected float calcMomentOfInertia() {
-
-        float totalInertia = 0;
+    protected void calcMassData() {
+        
+        massData.I = 0;
+        massData.mass = 0;
+        massData.center.setZero();
 
         for (Rectangle2D rectangle : rectangles) {
             float width = (float) rectangle.getWidth();
@@ -65,10 +49,9 @@ public class BuildingBlock extends Block {
 
             float distanceSq = (float) Point2D.distanceSq(0, 0, rectangle.getCenterX(), rectangle.getCenterY());
 
-            totalInertia += inertiaCenter + mass * distanceSq;
+            massData.I += inertiaCenter + mass * distanceSq;
+            massData.mass +=  mass;
         }
-
-        return totalInertia;
     }
 
     public Material getMaterial() {

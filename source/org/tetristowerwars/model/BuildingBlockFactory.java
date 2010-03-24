@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.model;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,27 +43,35 @@ public class BuildingBlockFactory {
 
         addShape(vertices, mat, body);
 
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(-blockSize, -blockSize, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(0, -blockSize, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize, 0, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(0, 0, blockSize, blockSize);
+
+        BuildingBlock block = new BuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
         
         return block;
     }
 
-    public BuildingBlock createTriangleBlock(Vec2 pos, Material mat) {
+    //TODO: fix special code for triangle inertia!
+    public BuildingBlock createTriangleBlock(Vec2 pos, Material mat){
+        throw new UnsupportedOperationException("FIX DIS!");
 
-        Body body = createBody(pos);
-
-        List<Vec2> vertices = new ArrayList<Vec2>(3);
-        vertices.add(new Vec2(-blockSize, -blockSize));
-        vertices.add(new Vec2(blockSize, -blockSize));
-        vertices.add(new Vec2(0, blockSize));
-
-        addShape(vertices, mat, body);
-
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize);
-        buildingBlockPool.add(block);
-
-        return block;
+//        Body body = createBody(pos);
+//
+//        List<Vec2> vertices = new ArrayList<Vec2>(3);
+//        vertices.add(new Vec2(-blockSize, -blockSize));
+//        vertices.add(new Vec2(blockSize, -blockSize));
+//        vertices.add(new Vec2(0, blockSize));
+//
+//        addShape(vertices, mat, body);
+//
+//        BuildingBlock block = new BuildingBlock(body, mat, null);
+//        buildingBlockPool.add(block);
+//
+//        return block;
     }
 
     public BuildingBlock createLineBlock(Vec2 pos, Material mat) {
@@ -77,7 +86,13 @@ public class BuildingBlockFactory {
 
         addShape(vertices, mat, body);
 
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(-blockSize/2, -blockSize*2, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize, -blockSize, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize, 0, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(-blockSize, blockSize, blockSize, blockSize);
+
+        BuildingBlock block = new BuildingBlock(body, mat,recs);
         buildingBlockPool.add(block);
 
         return block;
@@ -103,7 +118,14 @@ public class BuildingBlockFactory {
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
 
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 5);
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize*1.5f, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize*1.5f, -blockSize*0.5f, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize*0.5f, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(blockSize*0.5f, -blockSize*0.5f, blockSize, blockSize);
+        recs[4] = new Rectangle2D.Float(-blockSize*0.5f, blockSize*0.5f, blockSize, blockSize);
+
+        BuildingBlock block = new BuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
 
         return block;
@@ -114,21 +136,27 @@ public class BuildingBlockFactory {
         Body body = createBody(pos);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
-        vertices1.add(new Vec2(-blockSize * 1.5f, -blockSize * (2f / 3f)));
-        vertices1.add(new Vec2(blockSize * 1.5f, -blockSize * (2f / 3f)));
-        vertices1.add(new Vec2(blockSize * 1.5f, blockSize * (1f / 3f)));
-        vertices1.add(new Vec2(-blockSize * 1.5f, blockSize * (1f / 3f)));
+        vertices1.add(new Vec2(-blockSize * 1.5f, -blockSize * (3f / 4f)));
+        vertices1.add(new Vec2(blockSize * 1.5f, -blockSize * (3f / 4f)));
+        vertices1.add(new Vec2(blockSize * 1.5f, blockSize * (1f / 4f)));
+        vertices1.add(new Vec2(-blockSize * 1.5f, blockSize * (1f / 4f)));
 
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
-        vertices2.add(new Vec2(-blockSize * 0.5f, -blockSize * (2f / 3f)));
-        vertices2.add(new Vec2(blockSize * 0.5f, -blockSize * (2f / 3f)));
-        vertices2.add(new Vec2(blockSize * 0.5f, blockSize * (4f / 3f)));
-        vertices2.add(new Vec2(-blockSize * 0.5f, blockSize * (4f / 3f)));
+        vertices2.add(new Vec2(-blockSize * 0.5f, -blockSize * (3f / 4f)));
+        vertices2.add(new Vec2(blockSize * 0.5f, -blockSize * (3f / 4f)));
+        vertices2.add(new Vec2(blockSize * 0.5f, blockSize * (5f / 4f)));
+        vertices2.add(new Vec2(-blockSize * 0.5f, blockSize * (5f / 4f)));
 
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
+
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize*(5f/4f), blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize*1.5f, -blockSize*(1f/4f), blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize*(1f/4f), blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(blockSize*0.5f, -blockSize*(1f/4f), blockSize, blockSize);
         
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
 
         return block;
@@ -139,25 +167,32 @@ public class BuildingBlockFactory {
         Body body = createBody(pos);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
-        vertices1.add(new Vec2(-blockSize * 2.5f, -blockSize * (2f / 3f)));
-        vertices1.add(new Vec2(blockSize * 0.5f, -blockSize * (2f / 3f)));
-        vertices1.add(new Vec2(blockSize * 0.5f, blockSize * (1f / 3f)));
-        vertices1.add(new Vec2(-blockSize * 2.5f, blockSize * (1f / 3f)));
+        vertices1.add(new Vec2(-blockSize * (7f/4f), -blockSize * (3f / 4f)));
+        vertices1.add(new Vec2(blockSize * (5f/4f), -blockSize * (3f / 4f)));
+        vertices1.add(new Vec2(blockSize * (5f/4f), blockSize * (1f / 4f)));
+        vertices1.add(new Vec2(-blockSize * (7f/4f), blockSize * (1f / 4f)));
 
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
-        vertices2.add(new Vec2(-blockSize * 0.5f, -blockSize * (2f / 3f)));
-        vertices2.add(new Vec2(blockSize * 0.5f, -blockSize * (2f / 3f)));
-        vertices2.add(new Vec2(blockSize * 0.5f, blockSize * (4f / 3f)));
-        vertices2.add(new Vec2(-blockSize * 0.5f, blockSize * (4f / 3f)));
+        vertices2.add(new Vec2(blockSize * (1f/4f), -blockSize * (3f / 4f)));
+        vertices2.add(new Vec2(blockSize * (5f/4f), -blockSize * (3f / 4f)));
+        vertices2.add(new Vec2(blockSize * (5f/4f), blockSize * (5f / 4f)));
+        vertices2.add(new Vec2(blockSize * (1f/4f), blockSize * (5f / 4f)));
 
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
 
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(blockSize*(1f/4f), -blockSize*(5f/4f), blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize*(7f/4f), -blockSize*(1f/4f), blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize*(3f/4f), -blockSize*(1f/4f), blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(blockSize*(1f/4f), -blockSize*(1f/4f), blockSize, blockSize);
+
+        BuildingBlock block = new BuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
 
         return block;
     }
+
 
     public BuildingBlock createSBlock(Vec2 pos, Material mat) {
 
@@ -186,7 +221,14 @@ public class BuildingBlockFactory {
         addShape(vertices2, mat, body);
         addShape(vertices3, mat, body);
 
-        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
+        Rectangle2D[] recs = new Rectangle2D[4];
+        recs[0] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(blockSize*0.5f, -blockSize, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize*1.5f, 0, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(-blockSize*0.5f, 0, blockSize, blockSize);
+
+
+        BuildingBlock block = new BuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
 
         return block;
