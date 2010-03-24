@@ -6,7 +6,6 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.model.Block;
 
 /**
  *
@@ -16,7 +15,7 @@ public class BulletBlock extends Block {
 
     private final CannonBlock cannon;
 
-    public BulletBlock(Body[] body, CannonBlock cannon) {
+    public BulletBlock(Body body, CannonBlock cannon) {
         super(body);
         this.cannon = cannon;
         cannon.getOwner().addBullet(this);

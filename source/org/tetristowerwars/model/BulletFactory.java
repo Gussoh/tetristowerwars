@@ -28,14 +28,14 @@ public class BulletFactory {
 
     public BulletBlock createBullet(CannonBlock cannon) {
 
-        Vec2 canPos = cannon.getBodies()[0].getPosition();
+        Vec2 canPos = cannon.getBody().getPosition();
         Body body = createBody(new Vec2(canPos.x-blockSize-1, canPos.y+blockSize+1));
 
         addShape(blockSize/2, new SteelMaterial(), body);
 
         body.applyImpulse(new Vec2(-cannon.getForce(), cannon.getForce()), body.getPosition());
 
-        return new BulletBlock(new Body[] {body}, cannon);
+        return new BulletBlock(body, cannon);
     }
 
     private Body createBody(Vec2 pos) {

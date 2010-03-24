@@ -12,9 +12,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.tetristowerwars.model.Player;
-import org.tetristowerwars.model.material.ConcreteMaterial;
-import org.tetristowerwars.model.material.Material;
 
 /**
  *
@@ -48,7 +45,7 @@ public class CannonFactory {
         addShape(vertices1, body);
         addShape(vertices2, body);
 
-        CannonBlock cannonBlock = new CannonBlock(new Body[] {body}, 10000, 5, player);
+        CannonBlock cannonBlock = new CannonBlock(body, 10000, 5, player);
         
         return cannonBlock;
     }

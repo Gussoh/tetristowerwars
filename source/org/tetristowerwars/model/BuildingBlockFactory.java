@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.model;
 
-import org.tetristowerwars.model.BuildingBlock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +42,7 @@ public class BuildingBlockFactory {
 
         addShape(vertices, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
         buildingBlockPool.add(block);
         
         return block;
@@ -60,7 +59,7 @@ public class BuildingBlockFactory {
 
         addShape(vertices, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize);
         buildingBlockPool.add(block);
 
         return block;
@@ -78,7 +77,7 @@ public class BuildingBlockFactory {
 
         addShape(vertices, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
         buildingBlockPool.add(block);
 
         return block;
@@ -104,7 +103,7 @@ public class BuildingBlockFactory {
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 5);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 5);
         buildingBlockPool.add(block);
 
         return block;
@@ -129,7 +128,7 @@ public class BuildingBlockFactory {
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
         
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
         buildingBlockPool.add(block);
 
         return block;
@@ -154,7 +153,7 @@ public class BuildingBlockFactory {
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
         buildingBlockPool.add(block);
 
         return block;
@@ -187,7 +186,7 @@ public class BuildingBlockFactory {
         addShape(vertices2, mat, body);
         addShape(vertices3, mat, body);
 
-        BuildingBlock block = new BuildingBlock(new Body[]{body}, mat, blockSize * blockSize * 4);
+        BuildingBlock block = new BuildingBlock(body, mat, blockSize * blockSize * 4);
         buildingBlockPool.add(block);
 
         return block;

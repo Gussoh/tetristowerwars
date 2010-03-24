@@ -85,10 +85,7 @@ public class Player {
     protected boolean removeBuildingBlock(BuildingBlock buildingBlock) {
         if (buildingBlocks.remove(buildingBlock)) {
             buildingBlock.setOwner(null);
-
-            for (Body body : buildingBlock.getBodies()) {
-                towerBodies.remove(body);
-            }
+            towerBodies.remove(buildingBlock.getBody());
 
             if (buildingBlock == highestBuilingBlockInTower) {
                 highestBuilingBlockInTower = null;
@@ -107,9 +104,7 @@ public class Player {
         buildingBlocks.add(buildingBlock);
         buildingBlock.setOwner(this);
 
-        for (Body body : buildingBlock.getBodies()) {
-            towerBodies.add(body);
-        }
+        towerBodies.add(buildingBlock.getBody());
     }
 
     public float getLeftLimit() {
@@ -136,19 +131,17 @@ public class Player {
         LinkedHashMap<Body, LinkedHashSet<Body>> body2neighbours = new LinkedHashMap<Body, LinkedHashSet<Body>>();
 
         for (BuildingBlock buildingBlock : buildingBlocks) {
-            for (Body body : buildingBlock.getBodies()) {
-                populateNeighbours(body2neighbours, body);
-            }
+            populateNeighbours(body2neighbours, buildingBlock.getBody());
         }
         // Finalize the undirected graph by adding the ground body.
         populateNeighbours(body2neighbours, groundBody);
         towerBodies.remove(groundBody);
-        
+
         // Will contain the tower height in the end.
         Body highestConnectedBody = groundBody;
 
         HashSet<Body> unprocessedBodies = (HashSet<Body>) towerBodies.clone();
-        
+
 
         Queue<Body> bodiesToCheck = new LinkedList<Body>();
         bodiesToCheck.add(groundBody);

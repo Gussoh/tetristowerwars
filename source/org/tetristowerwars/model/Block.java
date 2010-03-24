@@ -12,21 +12,18 @@ import org.jbox2d.dynamics.Body;
  */
 public abstract class Block {
 
-    private final Body[] bodies;
+    private final Body body;
     private Player owner;
 
 
-    public Block(Body[] bodies) {
-        this.bodies = bodies;
-        
-        for (Body body : bodies) {
-            body.setUserData(this);
-        }
+    public Block(Body body) {
+        this.body = body;
+        body.setUserData(this);
     }
 
 
-    public Body[] getBodies() {
-        return bodies;
+    public Body getBody() {
+        return body;
     }
 
     public Player getOwner() {

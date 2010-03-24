@@ -87,7 +87,7 @@ public class SwingRenderer extends Renderer {
         } catch (InvocationTargetException ex) {
             Logger.getLogger(SwingRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     @Override
@@ -163,12 +163,9 @@ public class SwingRenderer extends Renderer {
             g2.setColor(Color.BLACK);
             for (Player player : gameModel.getPlayers()) {
                 BuildingBlock bb = player.getHighestBuilingBlockInTower();
-                
+
                 if (bb != null) {
-                    
-                    for (Body body : bb.getBodies()) {
-                        drawBody(g2, body, false);
-                    }
+                    drawBody(g2, bb.getBody(), false);
                 }
             }
             g2.scale(1 / scale, 1 / scale);
@@ -176,15 +173,11 @@ public class SwingRenderer extends Renderer {
         }
 
         private void drawBuildingBlock(Graphics2D g2, BuildingBlock block) {
-            for (Body body : block.getBodies()) {
-                drawBody(g2, body, true);
-            }
+            drawBody(g2, block.getBody(), true);
         }
 
         private void drawCannonBlock(Graphics2D g2, CannonBlock block) {
-            for (Body body : block.getBodies()) {
-                drawBody(g2, body, true);
-            }
+            drawBody(g2, block.getBody(), true);
         }
 
         private void drawBody(Graphics2D g2, Body body, boolean fill) {
@@ -203,7 +196,7 @@ public class SwingRenderer extends Renderer {
                     path.lineTo(vertices[i].x, -vertices[i].y);
                 }
                 path.closePath();
-                
+
                 if (fill) {
                     g2.fill(path);
                 } else {
@@ -223,7 +216,7 @@ public class SwingRenderer extends Renderer {
 
             g2.setColor(Color.red);
 
-            Body body = bullet.getBodies()[0];
+            Body body = bullet.getBody();
             CircleShape shape = (CircleShape) body.m_shapeList;
 
             float radius = shape.getRadius();

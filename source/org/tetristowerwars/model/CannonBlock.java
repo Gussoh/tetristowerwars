@@ -4,12 +4,7 @@
  */
 package org.tetristowerwars.model;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.model.Block;
-import org.tetristowerwars.model.Player;
 
 /**
  *
@@ -22,8 +17,8 @@ public class CannonBlock extends Block {
     private final long lastShot = 0;
     
 
-    public CannonBlock(Body[] bodies, int force, int coolDown, Player player) {
-        super(bodies);
+    public CannonBlock(Body body, int force, int coolDown, Player player) {
+        super(body);
         this.force = force;
         this.coolDown = coolDown;
         player.addCannon(this);

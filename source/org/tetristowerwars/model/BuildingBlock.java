@@ -19,13 +19,13 @@ import org.tetristowerwars.model.material.Material;
 public class BuildingBlock extends Block {
 
     private final Material material;
-    private final MassData[] massData;
+    private final MassData massData;
     private final Rectangle2D[] rectangles;
 
-    protected BuildingBlock(Body[] bodies, Material material, float area) {
-        super(bodies);
+    protected BuildingBlock(Body body, Material material, float area) {
+        super(body);
         this.material = material;
-        this.massData = new MassData[bodies.length];
+        this.massData = new MassData();
         this.rectangles = null;
 
         // TODO: Inertias are calculated as if all building blocks are circles/cylinders.
@@ -33,8 +33,8 @@ public class BuildingBlock extends Block {
 
         float maxSquaredDistance = 0;
 
-        for (int i = 0; i < bodies.length; i++) {
-            Body body = bodies[i];
+        
+        
             for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.getNext()) {
                 Vec2[] vertices = shape.getVertices();
                 for (Vec2 vec2 : vertices) {
@@ -42,13 +42,12 @@ public class BuildingBlock extends Block {
                 }
             }
 
-            massData[i] = new MassData();
-            massData[i].mass = area * material.getDensity();
-            massData[i].I = massData[i].mass * maxSquaredDistance / 2.0f;
-            massData[i].center.set(0, 0);
+            massData.mass = area * material.getDensity();
+            massData.I = massData.mass * maxSquaredDistance / 2.0f;
+            massData.center.set(0, 0);
             // TODO: Should iterate over bodies
-            bodies[i].setMass(massData[i]);
-        }
+            body.setMass(massData);
+        
     }
 
 
@@ -76,7 +75,7 @@ public class BuildingBlock extends Block {
         return material;
     }
 
-    public MassData getOriginalMassData(int bodyIndex) {
-        return massData[bodyIndex];
+    public MassData getOriginalMassData() {
+        return massData;
     }
 }
