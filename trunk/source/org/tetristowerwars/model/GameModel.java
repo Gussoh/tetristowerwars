@@ -118,17 +118,12 @@ public class GameModel implements BoundaryListener {
                 while ((bbj = getAttachedJoint(buildingBlock)) != null) {
                     removeBuldingBlockJoint(bbj);
                 }
-
-                for (Body b : buildingBlock.getBodies()) {
-                    world.destroyBody(b);
-                }
+                world.destroyBody(buildingBlock.getBody());
 
             } else if (block instanceof BulletBlock) {
                 BulletBlock bulletBlock = (BulletBlock) block;
                 bulletBlock.getOwner().removeBullet(bulletBlock);
-                for (Body b : bulletBlock.getBodies()) {
-                    world.destroyBody(b);
-                }
+                world.destroyBody(bulletBlock.getBody());
             } else {
                 System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
             }
@@ -137,29 +132,19 @@ public class GameModel implements BoundaryListener {
 
         // Check if non-owned blocks should be owned by a player or perhaps destroyed.
         // A copy is needed since we need to modify the block pool while iterating over it.
-
-
         for (Player player : players) {
 
             for (Iterator<BuildingBlock> it = buildingBlockPool.iterator(); it.hasNext();) {
                 BuildingBlock buildingBlock = it.next();
-                boolean destroyBodies = false;
 
-                for (Body body : buildingBlock.getBodies()) {
-                    float blockX = body.getPosition().x;
+                Body body = buildingBlock.getBody();
+                float blockX = body.getPosition().x;
 
-                    if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
-                        it.remove();
-                        if (getAttachedJoint(buildingBlock) != null) {
-                            player.addBuildingBlock(buildingBlock);
-                        } else {
-                            destroyBodies = true;
-                        }
-                    }
-                }
-
-                if (destroyBodies) {
-                    for (Body body : buildingBlock.getBodies()) {
+                if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
+                    it.remove();
+                    if (getAttachedJoint(buildingBlock) != null) {
+                        player.addBuildingBlock(buildingBlock);
+                    } else {
                         world.destroyBody(body);
                     }
                 }
@@ -168,36 +153,23 @@ public class GameModel implements BoundaryListener {
             List<BuildingBlock> playerBlocksToRemove = new LinkedList<BuildingBlock>();
 
             for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
+                float blockX = buildingBlock.getBody().getPosition().x;
 
-                boolean destroyBodies = false;
-
-                for (Body body : buildingBlock.getBodies()) {
-                    float blockX = body.getPosition().x;
-
-                    if (blockX <= player.getLeftLimit() - 2 || blockX >= player.getRightLimit() + 2) {
-                        destroyBodies = true;
-                    }
-                }
-
-                if (destroyBodies) {
+                if (blockX <= player.getLeftLimit() - 2 || blockX >= player.getRightLimit() + 2) {
                     BuildingBlockJoint blockJoint;
 
                     while ((blockJoint = getAttachedJoint(buildingBlock)) != null) {
                         removeBuldingBlockJoint(blockJoint);
                     }
-
                     playerBlocksToRemove.add(buildingBlock);
                 }
             }
 
             for (BuildingBlock buildingBlock : playerBlocksToRemove) {
                 player.removeBuildingBlock(buildingBlock);
-                for (Body body : buildingBlock.getBodies()) {
-                    world.destroyBody(body);
-                }
+                world.destroyBody(buildingBlock.getBody());
             }
         }
-
         for (Player player : players) {
             player.calcTowerHeight(groundBody);
         }
@@ -205,10 +177,14 @@ public class GameModel implements BoundaryListener {
 
     public Body getGroundBody() {
         return groundBody;
+
+
     }
 
     public Set<BuildingBlock> getBlockPool() {
         return Collections.unmodifiableSet(buildingBlockPool);
+
+
     }
 
     /**
@@ -220,61 +196,91 @@ public class GameModel implements BoundaryListener {
      */
     public Block getBlockFromCoordinates(Point2D position) {
         float x = (float) position.getX();
+
+
         float y = (float) position.getY();
 
         Shape[] shapes = world.query(new AABB(new Vec2(x - 1, y - 1), new Vec2(x + 1, y + 1)), 1);
 
+
+
         if (shapes != null && shapes.length > 0) {
             return (Block) shapes[0].getBody().getUserData();
+
+
         }
 
         return null;
+
+
     }
 
     public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
         BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, new Vec2((float) position.getX(), (float) position.getY()));
         buildingBlockJoints.add(bbj);
+
+
         return bbj;
+
+
     }
 
     public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
         if (buildingBlockJoints.contains(buildingBlockJoint)) {
             buildingBlockJoint.updatePointerPosition(new Vec2((float) endPosition.getX(), (float) endPosition.getY()));
+
+
         }
     }
 
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
         if (buildingBlockJoints.remove(buildingBlockJoint)) {
             buildingBlockJoint.destroy();
+
+
         }
     }
 
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
+
+
     }
 
     public BuildingBlockFactory getBlockFactory() {
         return blockFactory;
+
+
     }
 
     public CannonFactory getCannonFactory() {
         return cannonFactory;
+
+
     }
 
     public BulletFactory getBulletFactory() {
         return bulletFactory;
+
+
     }
 
     public World getWorld() {
         return world;
+
+
     }
 
     public float getTimeTakenToExecuteUpdateMs() {
         return timeTakenToExecuteUpdateMs;
+
+
     }
 
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {
         return Collections.unmodifiableSet(buildingBlockJoints);
+
+
     }
 
     /*
@@ -284,8 +290,12 @@ public class GameModel implements BoundaryListener {
     public void violation(Body bodyOutsideWorld) {
         Object userdata = bodyOutsideWorld.getUserData();
 
+
+
         if (userdata instanceof Block) {
             blocksToRemove.add((Block) userdata);
+
+
         }
     }
 
@@ -293,7 +303,11 @@ public class GameModel implements BoundaryListener {
         Player player = new Player(name, leftLimit, rightLimit);
         players.add(player);
 
+
+
         return player;
+
+
     }
 
     /**
@@ -307,10 +321,13 @@ public class GameModel implements BoundaryListener {
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
             if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
                 return buildingBlockJoint;
+
+
             }
         }
 
         return null;
+
     }
 }
 
