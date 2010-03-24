@@ -5,7 +5,6 @@
 package org.tetristowerwars.model;
 
 import java.awt.geom.Point2D;
-import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,10 +20,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
 import org.jbox2d.dynamics.World;
-import org.tetristowerwars.model.building.BuildingBlockFactory;
-import org.tetristowerwars.model.cannon.BulletBlock;
-import org.tetristowerwars.model.cannon.BulletFactory;
-import org.tetristowerwars.model.cannon.CannonFactory;
 
 /**
  *

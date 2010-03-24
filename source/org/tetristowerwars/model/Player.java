@@ -7,15 +7,12 @@ package org.tetristowerwars.model;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import org.tetristowerwars.model.cannon.CannonBlock;
-import org.tetristowerwars.model.building.BuildingBlock;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.tetristowerwars.model.cannon.BulletBlock;
 
 /**
  *

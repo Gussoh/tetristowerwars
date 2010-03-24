@@ -2,15 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tetristowerwars.model.building;
+package org.tetristowerwars.model;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.material.Material;
 
 /**

@@ -11,7 +11,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
-import org.tetristowerwars.model.building.BuildingBlock;
 
 /**
  *
