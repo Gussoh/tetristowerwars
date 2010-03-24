@@ -21,6 +21,7 @@ import org.tetristowerwars.model.CannonFactory;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.sound.SoundPlayer;
 
 /**
  *
@@ -39,6 +40,7 @@ public class Main {
         float blockSize = 5;
         final GameModel gameModel = new GameModel(300, 480, 30, blockSize, 100);
         final Renderer renderer = new SwingRenderer(gameModel);
+        final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
 
 
