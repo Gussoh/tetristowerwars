@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tetristowerwars.model.cannon;
+package org.tetristowerwars.model;
 
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.common.Vec2;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tetristowerwars.model.cannon;
+package org.tetristowerwars.model;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;

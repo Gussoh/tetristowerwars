@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tetristowerwars.model.building;
+package org.tetristowerwars.model;
 
+import org.tetristowerwars.model.BuildingBlock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
