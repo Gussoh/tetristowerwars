@@ -10,7 +10,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,6 +45,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private Background background;
     private LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer> blockRenderers = new LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer>();
 
+    
 
     /**
      * 
@@ -54,6 +54,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
      */
     public GLRenderer(GameModel gameModel, GraphicsDevice graphicsDevice) {
         super(gameModel);
+        gameModel.addGameModelListener(this);
 
         GLCapabilities capabilities = new GLCapabilities();
 
@@ -190,7 +191,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
-        ;
+        
     }
 
     @Override

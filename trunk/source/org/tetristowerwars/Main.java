@@ -38,7 +38,7 @@ public class Main {
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
 
         float blockSize = 5;
-        final GameModel gameModel = new GameModel(300, 480, 30, blockSize);
+        final GameModel gameModel = new GameModel(260, 480, 30, blockSize);
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, null);
         final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
@@ -54,7 +54,7 @@ public class Main {
         tuioClient.connect();
 
         Player player1 = gameModel.createPlayer("Player 1", 0, 80);
-        Player player2 = gameModel.createPlayer("Player 2", 180, 300);
+        Player player2 = gameModel.createPlayer("Player 2", 180, 260);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(80, 30));

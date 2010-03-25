@@ -59,7 +59,7 @@ public class GameModel {
      * @param blockSize The block side length in meters.
      */
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize) {
-        
+
         // TODO: How is screen coordinates mapped to physics coordiantes?
         worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
         Vec2 gravity = new Vec2(0, -9.82f);
@@ -125,9 +125,7 @@ public class GameModel {
 
         // blocksToRemove will now contain all blocks that are outside the world.
         for (Block block : blocksToRemove) {
-            for (GameModelListener gameModelListener : gameModelListeners) {
-                gameModelListener.onBlockDestruction(block);
-            }
+
             if (block instanceof BuildingBlock) {
                 BuildingBlock buildingBlock = (BuildingBlock) block;
                 if (!buildingBlockPool.remove(buildingBlock)) {
@@ -142,11 +140,18 @@ public class GameModel {
                 while ((bbj = getAttachedJoint(buildingBlock)) != null) {
                     removeBuldingBlockJoint(bbj);
                 }
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onBlockDestruction(buildingBlock);
+                }
                 world.destroyBody(buildingBlock.getBody());
+
 
             } else if (block instanceof BulletBlock) {
                 BulletBlock bulletBlock = (BulletBlock) block;
                 bulletBlock.getOwner().removeBullet(bulletBlock);
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onBlockDestruction(bulletBlock);
+                }
                 world.destroyBody(bulletBlock.getBody());
             } else {
                 System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
@@ -154,9 +159,9 @@ public class GameModel {
         }
         blocksToRemove.clear();
 
-        
+
         for (Player player : players) {
-            
+
             // Check if non-owned blocks has passed into a player area and should be
             // owned by a player or if it should be destroyed.
             for (Iterator<BuildingBlock> it = buildingBlockPool.iterator(); it.hasNext();) {
@@ -167,10 +172,13 @@ public class GameModel {
                 // Is the non-owned block inside a player area?
                 if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
                     it.remove();
-                    
+
                     if (getAttachedJoint(buildingBlock) != null) {
                         player.addBuildingBlock(buildingBlock);
                     } else {
+                        for (GameModelListener gameModelListener : gameModelListeners) {
+                            gameModelListener.onBlockDestruction(buildingBlock);
+                        }
                         world.destroyBody(buildingBlock.getBody());
                     }
                 }
@@ -199,11 +207,14 @@ public class GameModel {
 
             for (BuildingBlock buildingBlock : playerBlocksToRemove) {
                 player.removeBuildingBlock(buildingBlock);
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onBlockDestruction(buildingBlock);
+                }
                 world.destroyBody(buildingBlock.getBody());
             }
         }
 
-        
+
         for (Player player : players) {
             player.calcHighestBuildingBlockInTower(groundBlock);
         }
@@ -404,7 +415,7 @@ public class GameModel {
                 float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
                 Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
                 float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
-                
+
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
                 }
@@ -418,7 +429,6 @@ public class GameModel {
         @Override
         public void persist(ContactPoint point) {
             // Currently not used.
-
         }
 
         /**
@@ -429,7 +439,6 @@ public class GameModel {
         @Override
         public void remove(ContactPoint point) {
             // Currently not used
-
         }
 
         /**
@@ -439,8 +448,6 @@ public class GameModel {
         @Override
         public void result(ContactResult point) {
             // Currently not used.
-
-
         }
 
         /*
