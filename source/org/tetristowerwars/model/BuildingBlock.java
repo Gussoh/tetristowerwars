@@ -7,8 +7,6 @@ package org.tetristowerwars.model;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import org.jbox2d.collision.MassData;
-import org.jbox2d.collision.PolygonShape;
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.material.Material;
 

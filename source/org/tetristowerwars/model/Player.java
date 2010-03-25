@@ -48,7 +48,7 @@ public class Player {
         return Collections.unmodifiableSet(bullets);
     }
 
-    public void addCannon(CannonBlock cannonBlock) {
+    protected void addCannon(CannonBlock cannonBlock) {
         if (cannonBlock.getOwner() != null) {
             throw new IllegalArgumentException("Cannon already owned by player: " + cannonBlock.getOwner());
         }
@@ -56,7 +56,7 @@ public class Player {
         cannonBlock.setOwner(this);
     }
 
-    public boolean removeCannon(CannonBlock cannonBlock) {
+    protected boolean removeCannon(CannonBlock cannonBlock) {
         if (cannons.remove(cannonBlock)) {
             cannonBlock.setOwner(null);
             return true;
@@ -65,7 +65,7 @@ public class Player {
         return false;
     }
 
-    public void addBullet(BulletBlock bullet) {
+    protected void addBullet(BulletBlock bullet) {
         if (bullet.getOwner() != null) {
             throw new IllegalArgumentException("Bullet already owned by player: " + bullet.getOwner());
         }
@@ -73,7 +73,7 @@ public class Player {
         bullet.setOwner(this);
     }
 
-    public boolean removeBullet(BulletBlock bullet) {
+    protected boolean removeBullet(BulletBlock bullet) {
         if (bullets.remove(bullet)) {
             bullet.setOwner(null);
             return true;
@@ -97,6 +97,11 @@ public class Player {
         return false;
     }
 
+    /**
+     * Should only be called from GameModel. Set the owner for a block to this player.
+     * The block is also added to the players owned building blocks.
+     * @param buildingBlock The building block to change ownership of.
+     */
     protected void addBuildingBlock(BuildingBlock buildingBlock) {
         if (buildingBlock.getOwner() != null) {
             throw new IllegalArgumentException("BuildingBlock already owned by player: " + buildingBlock.getOwner());
@@ -107,25 +112,44 @@ public class Player {
         towerBodies.add(buildingBlock.getBody());
     }
 
+    /**
+     * Returns the left limit/border of the player area in world coordinates.
+     * @return a value in meters.
+     */
     public float getLeftLimit() {
         return leftLimit;
     }
 
+    /**
+     *
+     * @return the player name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the right limit/border of the player area in world coordinates.
+     * @return a value in meters
+     */
     public float getRightLimit() {
         return rightLimit;
     }
 
+    /**
+     * The highest building block in a highest valid tower.
+     * A valid tower is a tower in which all blocks have contact where some
+     * block also has contact with the ground.
+     *
+     * @return the highest building block in the highest valid tower.
+     */
     public BuildingBlock getHighestBuilingBlockInTower() {
         return highestBuilingBlockInTower;
     }
 
-    protected void calcTowerHeight(Body groundBody) {
+    protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock) {
 
-        towerBodies.add(groundBody);
+        towerBodies.add(groundBlock.getBody());
 
         // Create undirected graph
         LinkedHashMap<Body, LinkedHashSet<Body>> body2neighbours = new LinkedHashMap<Body, LinkedHashSet<Body>>();
@@ -134,17 +158,17 @@ public class Player {
             populateNeighbours(body2neighbours, buildingBlock.getBody());
         }
         // Finalize the undirected graph by adding the ground body.
-        populateNeighbours(body2neighbours, groundBody);
-        towerBodies.remove(groundBody);
+        populateNeighbours(body2neighbours, groundBlock.getBody());
+        towerBodies.remove(groundBlock.getBody());
 
         // Will contain the tower height in the end.
-        Body highestConnectedBody = groundBody;
+        Body highestConnectedBody = groundBlock.getBody();
 
         HashSet<Body> unprocessedBodies = (HashSet<Body>) towerBodies.clone();
 
 
         Queue<Body> bodiesToCheck = new LinkedList<Body>();
-        bodiesToCheck.add(groundBody);
+        bodiesToCheck.add(groundBlock.getBody());
 
         while (!bodiesToCheck.isEmpty()) {
 
@@ -164,6 +188,7 @@ public class Player {
         highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
     }
 
+    // Used by calcHighestBuildingBlockInTower
     private void populateNeighbours(LinkedHashMap<Body, LinkedHashSet<Body>> body2neighbours, Body body) {
         LinkedHashSet<Body> myNeighbours = getNeighbours(body2neighbours, body);
         for (ContactEdge ce = body.m_contactList; ce != null; ce = ce.next) {
@@ -177,6 +202,7 @@ public class Player {
         }
     }
 
+    // Used by calcHighestBuildingBlockInTower
     private LinkedHashSet<Body> getNeighbours(LinkedHashMap<Body, LinkedHashSet<Body>> body2neighbours, Body body) {
         LinkedHashSet<Body> neighbours = body2neighbours.get(body);
         if (neighbours == null) {

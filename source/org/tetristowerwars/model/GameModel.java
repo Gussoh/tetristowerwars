@@ -37,8 +37,8 @@ public class GameModel {
     private final World world;
     private static final int ITERATIONS_PER_STEP = 10; // Lower value means less accurate but faster
     private long lastStepTimeNano = System.nanoTime();
-    private final float worldWidth, worldHeight;
-    private final Body groundBody;
+    private final AABB worldBoundries;
+    private final GroundBlock groundBlock;
     private final BuildingBlockFactory blockFactory;
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
@@ -55,27 +55,25 @@ public class GameModel {
      *
      * @param worldWidth The width of the world in meters.
      * @param worldHeight The height of the world in meters.
-     * @param groundLevel The ground level
-     * @param blockSize
+     * @param groundLevel The height of the ground in meters.
+     * @param blockSize The block side length in meters.
      */
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize) {
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-
+        
         // TODO: How is screen coordinates mapped to physics coordiantes?
-        AABB worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
+        worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
         Vec2 gravity = new Vec2(0, -9.82f);
         world = new World(worldBoundries, gravity, true);
 
         BodyDef groundDef = new BodyDef();
 
         groundDef.position.set(worldWidth / 2, groundLevel - worldHeight / 2);
-        groundBody = world.createBody(groundDef);
+        groundBlock = new GroundBlock(world.createBody(groundDef));
 
         PolygonDef groundShapeDef = new PolygonDef();
         groundShapeDef.setAsBox(worldWidth / 2, worldHeight / 2);
         groundShapeDef.friction = 0.8f;
-        groundBody.createShape(groundShapeDef);
+        groundBlock.getBody().createShape(groundShapeDef);
 
         blockFactory = new BuildingBlockFactory(buildingBlockPool, world, blockSize);
         cannonFactory = new CannonFactory(world, blockSize);
@@ -84,6 +82,14 @@ public class GameModel {
         world.setContactListener(physicsEngineListener);
     }
 
+    /**
+     * Steps the physics engine if necessary and does game model post processing.
+     * This function keeps track of when it was last executed and will ensure
+     * smooth updates if it is called "often".
+     *
+     * @return How many times the physics engine stepped.
+     * If 0, nothing has changed. This can be used to optimize when to render frames.
+     */
     public int update() {
         long currentTimeNano = System.nanoTime();
         long stepTimeNano = currentTimeNano - lastStepTimeNano;
@@ -112,6 +118,9 @@ public class GameModel {
         return numTimesStepped;
     }
 
+    /**
+     * Performs all game related changes to the game world and should run after the physics engine has stepped.
+     */
     private void postProcess() {
 
         // blocksToRemove will now contain all blocks that are outside the world.
@@ -142,26 +151,34 @@ public class GameModel {
         }
         blocksToRemove.clear();
 
-        // Check if non-owned blocks should be owned by a player or perhaps destroyed.
-        // A copy is needed since we need to modify the block pool while iterating over it.
+        
         for (Player player : players) {
-
+            
+            // Check if non-owned blocks has passed into a player area and should be
+            // owned by a player or if it should be destroyed.
             for (Iterator<BuildingBlock> it = buildingBlockPool.iterator(); it.hasNext();) {
                 BuildingBlock buildingBlock = it.next();
 
-                Body body = buildingBlock.getBody();
-                float blockX = body.getPosition().x;
+                float blockX = buildingBlock.getBody().getPosition().x;
 
+                // Is the non-owned block inside a player area?
                 if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
                     it.remove();
+                    
                     if (getAttachedJoint(buildingBlock) != null) {
                         player.addBuildingBlock(buildingBlock);
                     } else {
-                        world.destroyBody(body);
+                        world.destroyBody(buildingBlock.getBody());
                     }
                 }
             }
 
+            /**
+             * Check if a player owned block has fallen outside the player area, if so delete it!
+             * 
+             * Need to save what blocks to delete since deleting while iterating would result in a
+             * concurrent modification exception.
+             */
             List<BuildingBlock> playerBlocksToRemove = new LinkedList<BuildingBlock>();
 
             for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
@@ -182,15 +199,25 @@ public class GameModel {
                 world.destroyBody(buildingBlock.getBody());
             }
         }
+
+        
         for (Player player : players) {
-            player.calcTowerHeight(groundBody);
+            player.calcHighestBuildingBlockInTower(groundBlock);
         }
     }
 
-    public Body getGroundBody() {
-        return groundBody;
+    /**
+     * Return the ground block.
+     * @return the ground block.
+     */
+    public GroundBlock getGroundBlock() {
+        return groundBlock;
     }
 
+    /**
+     * The building block pool contains all non-owned building blocks.
+     * @return An unmodifiable version of the buildingBlockPool.
+     */
     public Set<BuildingBlock> getBuildingBlockPool() {
         return Collections.unmodifiableSet(buildingBlockPool);
     }
@@ -199,76 +226,109 @@ public class GameModel {
      * Returns the first (and hopefully only) block from the given input
      * coordinates.
      *
-     * @param position
-     * @return BuildingBlock
+     * @param position the position in world coordinates.
+     * @return One block found at those coordinates or null if nothing was found.
      */
     public Block getBlockFromCoordinates(Point2D position) {
         float x = (float) position.getX();
-
-
         float y = (float) position.getY();
-
         Shape[] shapes = world.query(new AABB(new Vec2(x - 1, y - 1), new Vec2(x + 1, y + 1)), 1);
-
-
 
         if (shapes != null && shapes.length > 0) {
             return (Block) shapes[0].getBody().getUserData();
-
-
         }
 
         return null;
-
-
     }
 
+    /**
+     * Creates a new building block joint for a given building block and at a given anchor position.
+     * The joint is "rubber band" like.
+     * Several joints can be connected to the same block at the same time.
+     *
+     * @param buildingBlock The building block to attach to.
+     * @param position The anchor point in world coordinates.
+     * @return The new joint.
+     */
     public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
         BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, new Vec2((float) position.getX(), (float) position.getY()));
         buildingBlockJoints.add(bbj);
 
-
         return bbj;
-
-
     }
 
+    /**
+     * Moves the end point of an existing building block joint to a new position.
+     * Note that if the joint has been removed by the game model due to some game related event,
+     * this method does nothing.
+     * 
+     * @param buildingBlockJoint the joint to update.
+     * @param endPosition The new end position in world coordinates.
+     */
     public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
         if (buildingBlockJoints.contains(buildingBlockJoint)) {
             buildingBlockJoint.updatePointerPosition(new Vec2((float) endPosition.getX(), (float) endPosition.getY()));
-
-
         }
     }
 
+    /**
+     * Removes a joint from the game world.
+     * @param buildingBlockJoint the joint to remove
+     */
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
         if (buildingBlockJoints.remove(buildingBlockJoint)) {
             buildingBlockJoint.destroy();
-
-
         }
     }
 
+    /**
+     * Return all players created in this game model.
+     * @return An unmodifiable list of the players.
+     */
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
     }
 
+    /**
+     * Returns the building block factory which can be used to create new 
+     * building blocks in this game world.
+     * @return
+     */
     public BuildingBlockFactory getBuildingBlockFactory() {
         return blockFactory;
     }
 
+    /**
+     * Returns the cannon block factory which can be used to create new
+     * cannon blocks in this game world.
+     * @return
+     */
     public CannonFactory getCannonFactory() {
         return cannonFactory;
     }
 
+    /**
+     * Returns the bullet block factory which can be used to create new
+     * bullet blocks in this game world.
+     * @return
+     */
     public BulletFactory getBulletFactory() {
         return bulletFactory;
     }
 
+    /**
+     * Returns the last time taken to step the physics engine and run the
+     * post processing method. Used for performance analysis.
+     * @return
+     */
     public float getTimeTakenToExecuteUpdateMs() {
         return timeTakenToExecuteUpdateMs;
     }
 
+    /**
+     * The joints in this game world.
+     * @return An unmodifiable set of the building block joints.
+     */
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {
         return Collections.unmodifiableSet(buildingBlockJoints);
     }
@@ -305,10 +365,18 @@ public class GameModel {
         return null;
     }
 
+    /**
+     * Add a listener to receive game model events.
+     * @param listener the listener to add.
+     */
     public void addGameModelListener(GameModelListener listener) {
         gameModelListeners.add(listener);
     }
 
+    /**
+     * Removes a listener.
+     * @param listener the listener to remove.
+     */
     public void removeGameModelListener(GameModelListener listener) {
         gameModelListeners.remove(listener);
     }
