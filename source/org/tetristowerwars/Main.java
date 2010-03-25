@@ -38,7 +38,7 @@ public class Main {
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
 
         float blockSize = 5;
-        final GameModel gameModel = new GameModel(300, 480, 30, blockSize, 100);
+        final GameModel gameModel = new GameModel(300, 480, 30, blockSize);
         final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
@@ -71,31 +71,28 @@ public class Main {
                 renderer.renderFrame();
             }
 
-            if (gameModel.getBlockPool().size() < 20) {
+            if (gameModel.getBuildingBlockPool().size() < 20) {
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
+                    gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
+                    gameModel.getBuildingBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
                 }
 
-                if (kalle % 400 == 0) {
-                    System.out.println("Number of Objects: " + gameModel.getWorld().getBodyCount());
+                if (kalle % 50 == 0) {
+                    gameModel.getBuildingBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
                 }
+
             }
         }
     }

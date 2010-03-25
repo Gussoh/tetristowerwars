@@ -19,14 +19,16 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
+import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
-import org.tetristowerwars.sound.SoundPlayer;
+import org.jbox2d.dynamics.contacts.ContactPoint;
+import org.jbox2d.dynamics.contacts.ContactResult;
 
 /**
  *
  * @author Andreas
  */
-public class GameModel implements BoundaryListener {
+public class GameModel {
 
     //private final LinkedHashSet<Block> blockPool = new LinkedHashSet<Block>();
     // Trying out generic block pool?
@@ -41,16 +43,24 @@ public class GameModel implements BoundaryListener {
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
-    private final float playerAreaWidth;
     private final List<Block> blocksToRemove = new ArrayList<Block>();
     private float timeTakenToExecuteUpdateMs;
     private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
+    private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
 
-    public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize, float playerAreaWidth) {
+    /**
+     * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
+     * In the game world coordinate space, 1 unit equals 1 meter.
+     *
+     * @param worldWidth The width of the world in meters.
+     * @param worldHeight The height of the world in meters.
+     * @param groundLevel The ground level
+     * @param blockSize
+     */
+    public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize) {
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-        this.playerAreaWidth = playerAreaWidth;
 
         // TODO: How is screen coordinates mapped to physics coordiantes?
         AABB worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
@@ -63,15 +73,15 @@ public class GameModel implements BoundaryListener {
         groundBody = world.createBody(groundDef);
 
         PolygonDef groundShapeDef = new PolygonDef();
-        groundShapeDef.setAsBox(worldWidth, worldHeight);
+        groundShapeDef.setAsBox(worldWidth / 2, worldHeight);
         groundShapeDef.friction = 0.8f;
         groundBody.createShape(groundShapeDef);
 
         blockFactory = new BuildingBlockFactory(buildingBlockPool, world, blockSize);
         cannonFactory = new CannonFactory(world, blockSize);
         bulletFactory = new BulletFactory(world, blockSize);
-        world.setBoundaryListener(this);
-
+        world.setBoundaryListener(physicsEngineListener);
+        world.setContactListener(physicsEngineListener);
     }
 
     public int update() {
@@ -179,14 +189,10 @@ public class GameModel implements BoundaryListener {
 
     public Body getGroundBody() {
         return groundBody;
-
-
     }
 
-    public Set<BuildingBlock> getBlockPool() {
+    public Set<BuildingBlock> getBuildingBlockPool() {
         return Collections.unmodifiableSet(buildingBlockPool);
-
-
     }
 
     /**
@@ -245,91 +251,58 @@ public class GameModel implements BoundaryListener {
 
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
-
-
     }
 
-    public BuildingBlockFactory getBlockFactory() {
+    public BuildingBlockFactory getBuildingBlockFactory() {
         return blockFactory;
-
-
     }
 
     public CannonFactory getCannonFactory() {
         return cannonFactory;
-
-
     }
 
     public BulletFactory getBulletFactory() {
         return bulletFactory;
-
-
-    }
-
-    public World getWorld() {
-        return world;
-
-
     }
 
     public float getTimeTakenToExecuteUpdateMs() {
         return timeTakenToExecuteUpdateMs;
-
-
     }
 
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {
         return Collections.unmodifiableSet(buildingBlockJoints);
-
-
     }
 
-    /*
-     * Called by physics engine when a body leaves the world boundries.
+    /**
+     * Creates a new player in a given area of the game world.
+     *
+     * @param name The name of the player.
+     * @param leftLimit The left limit/border of this player in world coordinates.
+     * @param rightLimit The right limit/border of this player in world coordinates.
+     * @return The created player object.
      */
-    @Override
-    public void violation(Body bodyOutsideWorld) {
-        Object userdata = bodyOutsideWorld.getUserData();
-
-
-
-        if (userdata instanceof Block) {
-            blocksToRemove.add((Block) userdata);
-
-
-        }
-    }
-
     public Player createPlayer(String name, float leftLimit, float rightLimit) {
         Player player = new Player(name, leftLimit, rightLimit);
         players.add(player);
 
-
-
         return player;
-
-
     }
 
     /**
      * Iterate over all joints to find out if this body is attached to a joint.
-     * This is ok
+     * Since we almost never have more than 2 joints,
      *
-     * @param buildingBlock
-     * @return
+     * @param buildingBlock The block to use in the search.
+     * @return The joint this building block is attached to, or null if joint is found.
      */
     public BuildingBlockJoint getAttachedJoint(BuildingBlock buildingBlock) {
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
             if (buildingBlockJoint.getBuildingBlock() == buildingBlock) {
                 return buildingBlockJoint;
-
-
             }
         }
 
         return null;
-
     }
 
     public void addGameModelListener(GameModelListener listener) {
@@ -338,6 +311,68 @@ public class GameModel implements BoundaryListener {
 
     public void removeGameModelListener(GameModelListener listener) {
         gameModelListeners.remove(listener);
+    }
+
+    private class PhysicsEngineListener implements ContactListener, BoundaryListener {
+
+        /**
+         * Called when a contact point is added.
+         * @param point
+         */
+        @Override
+        public void add(ContactPoint point) {
+            //throw new UnsupportedOperationException("Not supported yet.");
+            Object userData1 = point.shape1.getBody().getUserData();
+            Object userData2 = point.shape2.getBody().getUserData();
+
+            if (userData1 instanceof Block && userData2 instanceof Block) {
+                float velocity = point.velocity.length();
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, worldWidth);
+                }
+            }
+        }
+
+        /**
+         * Called when a contact point persists
+         * @param point
+         */
+        @Override
+        public void persist(ContactPoint point) {
+            // Currently not used.
+        }
+
+        /**
+         * Called when a contact point is removed.
+         *
+         * @param point
+         */
+        @Override
+        public void remove(ContactPoint point) {
+            // Currently not used
+        }
+
+        /**
+         * Called after a contact point is solved.
+         * @param point
+         */
+        @Override
+        public void result(ContactResult point) {
+            // Currently not used.
+        }
+
+        /*
+         * Called by physics engine when a body leaves the world boundries.
+         * Bodies cannot be removed here.
+         */
+        @Override
+        public void violation(Body bodyOutsideWorld) {
+            Object userdata = bodyOutsideWorld.getUserData();
+
+            if (userdata instanceof Block) {
+                blocksToRemove.add((Block) userdata);
+            }
+        }
     }
 }
 
