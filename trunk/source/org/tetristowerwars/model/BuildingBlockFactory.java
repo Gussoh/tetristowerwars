@@ -253,7 +253,7 @@ public class BuildingBlockFactory {
         addShape(vertices2, mat, body);
 
         Rectangle2D[] recs = new Rectangle2D[4];
-        recs[0] = new Rectangle2D.Float(-blockSize * (1f / 4f), -blockSize * (1f / 4f), blockSize, blockSize);
+        recs[0] = new Rectangle2D.Float(blockSize * (1f / 4f), -blockSize * (1f / 4f), blockSize, blockSize);
         recs[1] = new Rectangle2D.Float(-blockSize * (7f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
         recs[2] = new Rectangle2D.Float(-blockSize * (3f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * (1f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
