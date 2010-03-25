@@ -69,11 +69,11 @@ public class GameModel {
 
         BodyDef groundDef = new BodyDef();
 
-        groundDef.position.set(worldWidth / 2, groundLevel - worldHeight);
+        groundDef.position.set(worldWidth / 2, groundLevel - worldHeight / 2);
         groundBody = world.createBody(groundDef);
 
         PolygonDef groundShapeDef = new PolygonDef();
-        groundShapeDef.setAsBox(worldWidth / 2, worldHeight);
+        groundShapeDef.setAsBox(worldWidth / 2, worldHeight / 2);
         groundShapeDef.friction = 0.8f;
         groundBody.createShape(groundShapeDef);
 
@@ -328,7 +328,7 @@ public class GameModel {
             if (userData1 instanceof Block && userData2 instanceof Block) {
                 float velocity = point.velocity.length();
                 for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, worldWidth);
+                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, velocity);
                 }
             }
         }
