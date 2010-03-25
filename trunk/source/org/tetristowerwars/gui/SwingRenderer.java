@@ -126,7 +126,7 @@ public class SwingRenderer extends Renderer {
 
             //draw blocks
             g2.setColor(Color.GRAY);
-            for (BuildingBlock block : gameModel.getBlockPool()) {
+            for (BuildingBlock block : gameModel.getBuildingBlockPool()) {
                 drawBuildingBlock(g2, block);
             }
 
