@@ -44,7 +44,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private Map<Integer, Point> id2windowPoints = new LinkedHashMap<Integer, Point>();
     private Background background;
     private LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer> blockRenderers = new LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer>();
-
+    private float renderWorldHeight;
     
 
     /**
@@ -63,7 +63,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setHardwareAccelerated(true);
         capabilities.setStereo(false);
         capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(2);
+        capabilities.setNumSamples(4);
 
         // Use 32-bit RGBA
         capabilities.setRedBits(8);
@@ -99,7 +99,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
-        return new Point2D.Float(windowCoord.x, windowCoord.y);
+        AABB aabb = gameModel.getWorldBoundries();
+        Point2D point = new Point2D.Double((float)windowCoord.x * (aabb.upperBound.x / (float)glCanvas.getWidth()), (float)(glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float)glCanvas.getHeight()));
+
+        System.out.println("WindowCoord: " + windowCoord + ", worldCoord: " + point);
+
+        return point;
     }
 
     @Override
@@ -115,7 +120,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void init(GLAutoDrawable drawable) {
         // TODO: Remove debugGl after testing is done.
-        drawable.setGL(new DebugGL(drawable.getGL()));
+        //drawable.setGL(new DebugGL(drawable.getGL()));
 
         GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -167,18 +172,18 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
 
         float heightRatio = (float) height / (float) width;
-
+        renderWorldHeight = (aabb.upperBound.x - aabb.lowerBound.x) * heightRatio;
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glLoadIdentity();
         glu.gluOrtho2D(aabb.lowerBound.x,
                 aabb.upperBound.x,
                 aabb.lowerBound.y,
-                (aabb.upperBound.x - aabb.lowerBound.x) * heightRatio);
+                renderWorldHeight);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
         try {
-            background = new Background(gl, aabb.upperBound.x, aabb.upperBound.x - aabb.lowerBound.x * heightRatio);
+            background = new Background(gl, aabb.upperBound.x, renderWorldHeight);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }

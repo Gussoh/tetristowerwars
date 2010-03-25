@@ -34,6 +34,7 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
+        
         renderer.putCursorPoint(event.getActionId(), event.getPosition());
 
         Block collisionBlock;

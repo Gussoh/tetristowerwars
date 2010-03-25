@@ -40,16 +40,16 @@ public class Main {
         float blockSize = 5;
         final GameModel gameModel = new GameModel(260, 480, 30, blockSize);
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, null);
-        final Renderer renderer = new SwingRenderer(gameModel);
+        //final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
 
 
-        final InputManager mouseInputManager = new MouseInputManager(renderer.getMouseInputComponent());
-        final InputManager touchInputManager = new TouchInputManager(tuioClient, screenDimensions, renderer.getMouseInputComponent());
+        final InputManager mouseInputManager = new MouseInputManager(glRenderer.getMouseInputComponent());
+        final InputManager touchInputManager = new TouchInputManager(tuioClient, screenDimensions, glRenderer.getMouseInputComponent());
 
-        final Controller mouseController = new Controller(gameModel, mouseInputManager, renderer);
-        final Controller touchController = new Controller(gameModel, touchInputManager, renderer);
+        final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
+        final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
 
         tuioClient.connect();
 
@@ -69,7 +69,7 @@ public class Main {
             touchInputManager.pumpEvents();
 
             if (gameModel.update() > 0) {
-                renderer.renderFrame();
+                //renderer.renderFrame();
                 glRenderer.renderFrame();
             }
 

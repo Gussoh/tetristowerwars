@@ -246,7 +246,7 @@ public class GameModel {
     public Block getBlockFromCoordinates(Point2D position) {
         float x = (float) position.getX();
         float y = (float) position.getY();
-        Shape[] shapes = world.query(new AABB(new Vec2(x - 1, y - 1), new Vec2(x + 1, y + 1)), 1);
+        Shape[] shapes = world.query(new AABB(new Vec2(x - 0.5f, y - 0.5f), new Vec2(x + 0.5f, y + 0.5f)), 1);
 
         if (shapes != null && shapes.length > 0) {
             return (Block) shapes[0].getBody().getUserData();

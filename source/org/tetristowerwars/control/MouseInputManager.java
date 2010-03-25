@@ -32,6 +32,7 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
     public void mousePressed(java.awt.event.MouseEvent e) {
         InputEvent evt = new InputEvent(InputEvent.PRESSED, new Point(e.getX(), e.getY()), dummyId);
         pushInputEvent(evt);
+        
     }
 
     @Override
