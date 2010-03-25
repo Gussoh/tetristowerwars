@@ -122,7 +122,7 @@ public class SwingRenderer extends Renderer {
             g2.scale(scale, scale);
 
             //draw ground
-            drawBody(g2, gameModel.getGroundBody(), true);
+            drawBody(g2, gameModel.getGroundBlock().getBody(), true);
 
             //draw blocks
             g2.setColor(Color.GRAY);
