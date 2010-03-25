@@ -125,10 +125,10 @@ public class BuildingBlockFactory {
         addShape(vertices, mat, body);
 
         Rectangle2D[] recs = new Rectangle2D[4];
-        recs[0] = new Rectangle2D.Float(-blockSize / 2, -blockSize * 2, blockSize, blockSize);
-        recs[1] = new Rectangle2D.Float(-blockSize, -blockSize, blockSize, blockSize);
-        recs[2] = new Rectangle2D.Float(-blockSize, 0, blockSize, blockSize);
-        recs[3] = new Rectangle2D.Float(-blockSize, blockSize, blockSize, blockSize);
+        recs[0] = new Rectangle2D.Float(-blockSize*2, -blockSize*0.5f, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize, -blockSize*0.5f, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(0, -blockSize*0.5f, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(blockSize, -blockSize*0.5f, blockSize, blockSize);
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
@@ -253,10 +253,10 @@ public class BuildingBlockFactory {
         addShape(vertices2, mat, body);
 
         Rectangle2D[] recs = new Rectangle2D[4];
-        recs[0] = new Rectangle2D.Float(blockSize * (1f / 4f), -blockSize * (1f / 4f), blockSize, blockSize);
-        recs[1] = new Rectangle2D.Float(-blockSize * (7f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
-        recs[2] = new Rectangle2D.Float(-blockSize * (3f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
-        recs[3] = new Rectangle2D.Float(blockSize * (1f / 4f), blockSize * (3f / 4f), blockSize, blockSize);
+        recs[0] = new Rectangle2D.Float(blockSize * (1f / 4f), blockSize * (1f / 4f), blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize * (7f / 4f), -blockSize * (3f / 4f), blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize * (3f / 4f), -blockSize * (3f / 4f), blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(blockSize * (1f / 4f), -blockSize * (3f / 4f), blockSize, blockSize);
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
         buildingBlockPool.add(block);
@@ -331,8 +331,8 @@ public class BuildingBlockFactory {
         addShape(vertices3, mat, body);
 
         Rectangle2D[] recs = new Rectangle2D[4];
-        recs[0] = new Rectangle2D.Float(-blockSize * 1.5f, blockSize, blockSize, blockSize);
-        recs[1] = new Rectangle2D.Float(-blockSize * 0.5f, blockSize, blockSize, blockSize);
+        recs[0] = new Rectangle2D.Float(-blockSize * 1.5f, -blockSize, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize, blockSize, blockSize);
         recs[2] = new Rectangle2D.Float(-blockSize * 0.5f, 0, blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * 0.5f, 0, blockSize, blockSize);
 
