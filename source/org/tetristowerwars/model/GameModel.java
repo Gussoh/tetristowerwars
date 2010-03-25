@@ -401,7 +401,7 @@ public class GameModel {
                 float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
                 Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
                 float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
-                System.out.println("Normal speed: " + normalSpeed);
+                
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
                 }
