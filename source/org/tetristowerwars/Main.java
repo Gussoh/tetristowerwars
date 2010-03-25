@@ -79,7 +79,11 @@ public class Main {
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createSBlock(new Vec2(120, 400), new SteelMaterial());
+                    gameModel.getBuildingBlockFactory().createRightSBlock(new Vec2(120, 400), new SteelMaterial());
+                }
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBuildingBlockFactory().createLeftSBlock(new Vec2(130, 400), new SteelMaterial());
                 }
 
                 if (kalle % 50 == 0) {
@@ -87,7 +91,11 @@ public class Main {
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLBlock(new Vec2(100, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createRightLBlock(new Vec2(100, 400), new ConcreteMaterial());
+                }
+
+                if (kalle % 50 == 0) {
+                    gameModel.getBuildingBlockFactory().createLeftLBlock(new Vec2(110, 400), new ConcreteMaterial());
                 }
 
                 if (kalle % 50 == 0) {
