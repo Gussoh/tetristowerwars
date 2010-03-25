@@ -42,7 +42,7 @@ public class SoundPlayer implements GameModelListener {
     private static final int MAX_CLIPS = 4;
     private static final String[] collisionSounds = new String[]{"collision1.wav"};
     private static final String[] collisionHardSounds = new String[]{"collisionHard1.wav", "collisionHard2.wav", "collisionHard3.wav", "collisionHard4.wav", "collisionHard4.wav"};
-    private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3"};
+    private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"};
 
     SourceDataLine sourceDataLine;
     AudioInputStream audioInputStream;
