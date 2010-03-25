@@ -4,8 +4,10 @@
  */
 package org.tetristowerwars.sound;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +18,11 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
+import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -35,7 +39,13 @@ public class SoundPlayer implements GameModelListener {
     private GameModel gameModel;
     private String soundLocation = "res/sound/";
     private Mixer.Info mixer = null;
-    private static final int MAX_CLIPS = 10;
+    private static final int MAX_CLIPS = 4;
+    private static final String[] collisionSounds = new String[]{"collision1.wav"};
+    private static final String[] collisionHardSounds = new String[]{"collisionHard1.wav", "collisionHard2.wav", "collisionHard3.wav", "collisionHard4.wav", "collisionHard4.wav"};
+    private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3"};
+
+    SourceDataLine sourceDataLine;
+    AudioInputStream audioInputStream;
 
     public SoundPlayer(GameModel gameModel) {
         this.gameModel = gameModel;
@@ -46,6 +56,8 @@ public class SoundPlayer implements GameModelListener {
             }
         }
         gameModel.addGameModelListener(this);
+
+        playMusic();
     }
 
     public static void main(String[] args) {
@@ -76,7 +88,7 @@ public class SoundPlayer implements GameModelListener {
             AudioFormat decodedFormat = new AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
                     baseFormat.getSampleRate(), // sample rate (same as base format)
-                    16, // sample size in bits (thx to Javazoom)
+                    16, // sample size in bits
                     baseFormat.getChannels(), // # of Channels
                     baseFormat.getChannels() * 2, // Frame Size
                     baseFormat.getSampleRate(), // Frame Rate
@@ -116,7 +128,7 @@ public class SoundPlayer implements GameModelListener {
             if (list.size() >= MAX_CLIPS) {
                 return null;
             }
-            
+
             list.add(loadSound(filename));
         }
     }
@@ -160,14 +172,86 @@ public class SoundPlayer implements GameModelListener {
         playSound(filename, volume, false);
     }
 
+    private String getRandomIndex(String[] data) {
+        return data[(int) (Math.random() * data.length)];
+    }
+
+    private void playMusic() {
+        try {
+            AudioInputStream in = AudioSystem.getAudioInputStream(new File(soundLocation + getRandomIndex(music)));
+
+            AudioFormat baseFormat = in.getFormat();
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
+                    baseFormat.getSampleRate(), // sample rate (same as base format)
+                    16, // sample size in bits
+                    baseFormat.getChannels(), // # of Channels
+                    baseFormat.getChannels() * 2, // Frame Size
+                    baseFormat.getSampleRate(), // Frame Rate
+                    false // Big Endian
+                    );
+
+            audioInputStream = AudioSystem.getAudioInputStream(decodedFormat, in);
+
+            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, decodedFormat);
+            sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+            sourceDataLine.open(decodedFormat);
+            sourceDataLine.start();
+
+//Create a thread to play back
+// the data and start it
+// running. It will run until
+// all the data has been played
+// back.
+            Thread playThread = new Thread(new PlayThread());
+            playThread.start();
+        } catch (Exception e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+    }
+
+    class PlayThread extends Thread {
+
+        byte tempBuffer[] = new byte[10000];
+
+        public void run() {
+            try {
+                int cnt;
+//Keep looping until the input
+// read method returns -1 for
+// empty stream.
+                while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
+                    if (cnt > 0) {
+//Write data to the internal
+// buffer of the data line
+// where it will be delivered
+// to the speaker.
+                        sourceDataLine.write(tempBuffer, 0, cnt);
+                    }
+                }
+//Block and wait for internal
+// buffer of the data line to
+// empty.
+                sourceDataLine.drain();
+                sourceDataLine.close();
+
+                playMusic();
+            } catch (Exception e) {
+                System.out.println(e);
+                System.exit(0);
+            }
+        }
+    }
+
     @Override
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
         //System.out.println("collision: " + collisionSpeed);
         if (collisionSpeed > 1.0) {
             if (collisionSpeed > 10) {
-                playSound("collisionHard1.wav", (collisionSpeed - 10) / 8);
+                playSound(getRandomIndex(collisionHardSounds), (collisionSpeed - 10) / 8);
             } else {
-                playSound("collision1.wav", collisionSpeed / 4);
+                playSound(getRandomIndex(collisionSounds), collisionSpeed / 4);
             }
         }
     }
