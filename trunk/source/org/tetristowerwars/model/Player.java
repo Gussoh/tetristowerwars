@@ -185,7 +185,12 @@ public class Player {
             }
         }
 
-        highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
+        if (highestConnectedBody.getUserData() instanceof BuildingBlock) {
+            highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
+        } else {
+            highestBuilingBlockInTower = null;
+        }
+
     }
 
     // Used by calcHighestBuildingBlockInTower

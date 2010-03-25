@@ -39,6 +39,7 @@ public class Main {
 
         float blockSize = 5;
         final GameModel gameModel = new GameModel(300, 480, 30, blockSize);
+        //final Renderer renderer = new GLRenderer(gameModel, null);
         final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
@@ -71,7 +72,7 @@ public class Main {
                 renderer.renderFrame();
             }
 
-            if (gameModel.getBuildingBlockPool().size() < 20) {
+            if (gameModel.getBuildingBlockPool().size() < 10) {
 
                 if (kalle % 50 == 0) {
                     gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());

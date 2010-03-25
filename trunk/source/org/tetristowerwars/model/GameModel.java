@@ -381,6 +381,10 @@ public class GameModel {
         gameModelListeners.remove(listener);
     }
 
+    public AABB getWorldBoundries() {
+        return worldBoundries;
+    }
+
     private class PhysicsEngineListener implements ContactListener, BoundaryListener {
 
         /**
@@ -394,9 +398,12 @@ public class GameModel {
             Object userData2 = point.shape2.getBody().getUserData();
 
             if (userData1 instanceof Block && userData2 instanceof Block) {
-                float velocity = point.velocity.length();
+                float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
+                Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
+                float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
+                System.out.println("Normal speed: " + normalSpeed);
                 for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, velocity);
+                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
                 }
             }
         }
@@ -408,6 +415,7 @@ public class GameModel {
         @Override
         public void persist(ContactPoint point) {
             // Currently not used.
+
         }
 
         /**
@@ -418,6 +426,7 @@ public class GameModel {
         @Override
         public void remove(ContactPoint point) {
             // Currently not used
+
         }
 
         /**
@@ -427,6 +436,8 @@ public class GameModel {
         @Override
         public void result(ContactResult point) {
             // Currently not used.
+
+
         }
 
         /*

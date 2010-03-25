@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.control;
 
 import java.util.HashMap;
@@ -20,6 +19,7 @@ import org.tetristowerwars.model.CannonBlock;
  * @author Andreas
  */
 public class Controller implements InputListener {
+
     private final GameModel gameModel;
     private final InputManager inputManager;
     private final Renderer renderer;
@@ -38,8 +38,7 @@ public class Controller implements InputListener {
 
         Block collisionBlock;
 
-	if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertScreenToWorldCoordinates(event.getPosition()))) == null)
-	{
+        if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()))) == null) {
             return;
         }
 
@@ -49,13 +48,11 @@ public class Controller implements InputListener {
                 throw new IllegalStateException();
             }
 
-            ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock)collisionBlock, renderer.convertScreenToWorldCoordinates(event.getPosition())));
-        }
-        else if (collisionBlock instanceof CannonBlock) {
+            ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
+        } else if (collisionBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
-            gameModel.getBulletFactory().createBullet((CannonBlock)collisionBlock);
-        }
-        else if (collisionBlock instanceof BulletBlock) {
+            gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
+        } else if (collisionBlock instanceof BulletBlock) {
         }
     }
 
@@ -74,12 +71,12 @@ public class Controller implements InputListener {
         renderer.putCursorPoint(event.getActionId(), event.getPosition());
         // If a building block joint exists for this very id
         if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
-            gameModel.moveBuildingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()), renderer.convertScreenToWorldCoordinates(event.getPosition()));
+            gameModel.moveBuildingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
         }
     }
 
     public void writeEvent(InputEvent event) {
         System.out.print(event.toString());
-        System.out.println(", world: " + renderer.convertScreenToWorldCoordinates(event.getPosition()));
+        System.out.println(", world: " + renderer.convertWindowToWorldCoordinates(event.getPosition()));
     }
 }

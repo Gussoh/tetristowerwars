@@ -161,7 +161,7 @@ public class SoundPlayer implements GameModelListener {
     }
 
     @Override
-    public void onBlockCollision(Block block1, Block block2, float collisionSpeed) {
+    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
         //System.out.println("collision: " + collisionSpeed);
         if (collisionSpeed > 1.0) {
             if (collisionSpeed > 10) {
