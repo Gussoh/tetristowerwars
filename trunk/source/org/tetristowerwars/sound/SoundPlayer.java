@@ -132,9 +132,6 @@ public class SoundPlayer implements GameModelListener {
                 clip.stop();
                 clip.flush();
 
-                System.out.println("Open: " + clip.isOpen());
-                System.out.println("Active: " + clip.isActive());
-
                 FloatControl gainControl = null;
                 if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
                     gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
