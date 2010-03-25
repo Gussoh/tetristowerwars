@@ -39,7 +39,7 @@ public class Main {
 
         float blockSize = 5;
         final GameModel gameModel = new GameModel(300, 480, 30, blockSize);
-        //final Renderer renderer = new GLRenderer(gameModel, null);
+        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, null);
         final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
@@ -70,6 +70,7 @@ public class Main {
 
             if (gameModel.update() > 0) {
                 renderer.renderFrame();
+                glRenderer.renderFrame();
             }
 
             if (gameModel.getBuildingBlockPool().size() < 10) {

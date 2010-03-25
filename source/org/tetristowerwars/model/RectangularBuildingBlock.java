@@ -43,4 +43,8 @@ public class RectangularBuildingBlock extends BuildingBlock {
             massData.mass += mass;
         }
     }
+
+    public Rectangle2D[] getRectangles() {
+        return rectangles;
+    }
 }

@@ -125,6 +125,9 @@ public class GameModel {
 
         // blocksToRemove will now contain all blocks that are outside the world.
         for (Block block : blocksToRemove) {
+            for (GameModelListener gameModelListener : gameModelListeners) {
+                gameModelListener.onBlockDestruction(block);
+            }
             if (block instanceof BuildingBlock) {
                 BuildingBlock buildingBlock = (BuildingBlock) block;
                 if (!buildingBlockPool.remove(buildingBlock)) {
