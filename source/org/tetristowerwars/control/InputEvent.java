@@ -21,7 +21,8 @@ public class InputEvent {
 
     /**
      * Creates a new input event, describing the details of the event.
-     * @param position The position in game world coordinates where the event occurred.
+     * @param type Type of event. See constants in InputEvent.
+     * @param position The position in window coordinates.
      * @param originator An id identifying the originator of the event.
      */
     public InputEvent(int type, Point position, int originator) {
@@ -34,6 +35,10 @@ public class InputEvent {
         return actionId;
     }
 
+    /**
+     *
+     * @return the position in window coordinates.
+     */
     public Point getPosition() {
         return position;
     }

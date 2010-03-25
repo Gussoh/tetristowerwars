@@ -91,8 +91,8 @@ public class SwingRenderer extends Renderer {
     }
 
     @Override
-    public Point2D convertScreenToWorldCoordinates(Point screenCoord) {
-        return new Point2D.Double(screenCoord.x / scale, (renderPanel.getHeight() - screenCoord.y) / scale);
+    public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
+        return new Point2D.Double(windowCoord.x / scale, (renderPanel.getHeight() - windowCoord.y) / scale);
     }
 
     @Override
@@ -110,7 +110,6 @@ public class SwingRenderer extends Renderer {
         public RenderPanel() {
             setPreferredSize(new Dimension(640, 480));
             setDoubleBuffered(true);
-
         }
 
         @Override

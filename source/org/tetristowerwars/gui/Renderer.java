@@ -17,16 +17,21 @@ public abstract class Renderer {
 
     protected final GameModel gameModel;
 
-    public Renderer(GameModel dataModel) {
-        this.gameModel = dataModel;
+    public Renderer(GameModel gameModel) {
+        this.gameModel = gameModel;
     }
 
     public abstract void renderFrame();
 
     public abstract Component getMouseInputComponent();
 
-    public abstract Point2D convertScreenToWorldCoordinates(Point screenCoord);
+    public abstract Point2D convertWindowToWorldCoordinates(Point windowCoord);
 
+    /**
+     *
+     * @param id An id for the point.
+     * @param point The point in window coordinates.
+     */
     public abstract void putCursorPoint(int id, Point point);
     public abstract void removeCursorPoint(int id);
 }
