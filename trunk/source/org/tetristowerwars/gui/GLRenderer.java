@@ -63,7 +63,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setHardwareAccelerated(true);
         capabilities.setStereo(false);
         capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(4);
+        capabilities.setNumSamples(2);
 
         // Use 32-bit RGBA
         capabilities.setRedBits(8);
@@ -101,8 +101,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
         AABB aabb = gameModel.getWorldBoundries();
         Point2D point = new Point2D.Double((float)windowCoord.x * (aabb.upperBound.x / (float)glCanvas.getWidth()), (float)(glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float)glCanvas.getHeight()));
-
-        System.out.println("WindowCoord: " + windowCoord + ", worldCoord: " + point);
 
         return point;
     }

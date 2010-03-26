@@ -25,6 +25,7 @@ public class Background {
     private final Texture groundTexture;
     private final FloatBuffer vertexBuffer;
     private final FloatBuffer texCoordBuffer;
+    private static final float cityShrinkFactor = 10.0f;
 
     public Background(GL gl, float renderWorldWidth, float renderWorldHeight) throws IOException {
         skyTexture = TextureIO.newTexture(new File("res/gfx/sky.png"), true);
@@ -38,7 +39,7 @@ public class Background {
 
         float horizonHeight = renderWorldHeight * 0.2f;
 
-        float cityRepeats = 4.0f * renderWorldWidth / cityTexture.getWidth();
+        float cityRepeats = cityShrinkFactor * renderWorldWidth / cityTexture.getWidth();
 
         cityTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
 
@@ -65,10 +66,10 @@ public class Background {
         vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight}); // right-bottom
         texCoordBuffer.put(new float[]{cityRepeats, 1.0f});
 
-        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight + cityTexture.getHeight() / 4}); // right-top
+        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight + cityTexture.getHeight() / cityShrinkFactor}); // right-top
         texCoordBuffer.put(new float[]{cityRepeats, 0.0f});
 
-        vertexBuffer.put(new float[]{0.0f, horizonHeight + cityTexture.getHeight() / 4}); // left-top
+        vertexBuffer.put(new float[]{0.0f, horizonHeight + cityTexture.getHeight() / cityShrinkFactor}); // left-top
         texCoordBuffer.put(new float[]{0.0f, 0.0f});
 
 
