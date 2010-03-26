@@ -4,10 +4,8 @@
  */
 package org.tetristowerwars.sound;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,7 +134,7 @@ public class SoundPlayer implements GameModelListener {
     public void playSound(String filename, float volume, boolean repeat) {
 
 
-        System.out.println("playing " + filename + " at volume " + volume);
+        //System.out.println("playing " + filename + " at volume " + volume);
         Clip clip = getFirstAvailable(filename);
 
         if (clip != null) {
@@ -163,7 +161,7 @@ public class SoundPlayer implements GameModelListener {
                     gainControl.setValue(value);
                 }
                 clip.loop(repeat ? Clip.LOOP_CONTINUOUSLY : 0);
-                System.out.println("Active: " + clip.isActive());
+                //System.out.println("Active: " + clip.isActive());
             }
         }
     }
