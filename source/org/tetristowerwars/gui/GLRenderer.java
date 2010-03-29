@@ -10,11 +10,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
@@ -23,8 +25,9 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
-import org.tetristowerwars.gui.gl.Background;
-import org.tetristowerwars.gui.gl.BuildingBlockRenderer;
+import org.tetristowerwars.gui.gl.BackgroundRenderer;
+import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
+import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -42,10 +45,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private final GLCanvas glCanvas;
     private final JFrame frame;
     private Map<Integer, Point> id2windowPoints = new LinkedHashMap<Integer, Point>();
-    private Background background;
-    private LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer> blockRenderers = new LinkedHashMap<RectangularBuildingBlock, BuildingBlockRenderer>();
+    private BackgroundRenderer backgroundRenderer;
+    private JointRenderer jointRenderer;
+    private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderer = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
-    
+    private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
+    private float[] jointColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
     /**
      * 
@@ -62,8 +67,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setDoubleBuffered(true);
         capabilities.setHardwareAccelerated(true);
         capabilities.setStereo(false);
-        capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(2);
+        capabilities.setSampleBuffers(false);
+        capabilities.setNumSamples(4);
 
         // Use 32-bit RGBA
         capabilities.setRedBits(8);
@@ -76,7 +81,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
 
         glCanvas = new GLCanvas(capabilities, null, null, graphicsDevice);
-        
+
         glCanvas.addGLEventListener(this);
         glCanvas.setAutoSwapBufferMode(true);
 
@@ -100,7 +105,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
         AABB aabb = gameModel.getWorldBoundries();
-        Point2D point = new Point2D.Double((float)windowCoord.x * (aabb.upperBound.x / (float)glCanvas.getWidth()), (float)(glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float)glCanvas.getHeight()));
+        Point2D point = new Point2D.Double((float) windowCoord.x * (aabb.upperBound.x / (float) glCanvas.getWidth()), (float) (glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float) glCanvas.getHeight()));
 
         return point;
     }
@@ -122,6 +127,14 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        jointRenderer = new JointRenderer();
+
+        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        gl.glEnable(GL_BLEND);
+        gl.glEnable(GL_LINE_SMOOTH);
+        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     }
 
     @Override
@@ -130,10 +143,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
         // Draw background
-        if (background != null) {
-            background.render(gl);
+        if (backgroundRenderer != null) {
+            backgroundRenderer.render(gl);
         }
 
 
@@ -141,22 +153,44 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         for (BuildingBlock buildingBlock : gameModel.getBuildingBlockPool()) {
             if (buildingBlock instanceof RectangularBuildingBlock) {
                 RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
-                if (!blockRenderers.containsKey(rbb)) {
-                    blockRenderers.put(rbb, new BuildingBlockRenderer(gl, rbb));
+                if (!rectBlock2renderer.containsKey(rbb)) {
+                    RectangularBuildingBlockRenderer rbbr = new RectangularBuildingBlockRenderer(gl, rbb);
+                    rectBlock2renderer.put(rbb, rbbr);
                 }
             }
         }
 
 
-        // Draw building blocks
-        gl.glEnableClientState(GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        // Create render list based on texture name to avoid expense texture.bind operations.
+        // TODO: Sort by texture should improve speed, write vertex data to one buffer per texture instead?
+        ArrayList<RectangularBuildingBlockRenderer> renderList = new ArrayList<RectangularBuildingBlockRenderer>(rectBlock2renderer.values());
+        Collections.sort(renderList);
 
-        for (BuildingBlockRenderer bbr : blockRenderers.values()) {
-            bbr.render(gl);
+        String currentMaterialName = "";
+        for (RectangularBuildingBlockRenderer rbbr : renderList) {
+            if (!currentMaterialName.equals(rbbr.getMaterialName())) {
+                currentMaterialName = rbbr.getMaterialName();
+                rbbr.bindTexture();
+            }
+            rbbr.render(gl);
         }
 
+        // Render block outlines
         gl.glDisable(GL_TEXTURE_2D);
+
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glColor4fv(blockOutlineColor, 0);
+        for (RectangularBuildingBlockRenderer rbbr : renderList) {
+            rbbr.renderLines(gl);
+        }
+
+        // Render joints between mouse/finger and block.
+        gl.glColor4fv(jointColor, 0);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        jointRenderer.render(gl, gameModel.getBuildingBlockJoints());
+
+
+        gl.glEnable(GL_TEXTURE_2D);
     }
 
     @Override
@@ -181,10 +215,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
         try {
-            background = new Background(gl, aabb.upperBound.x, renderWorldHeight);
+            backgroundRenderer = new BackgroundRenderer(gl, aabb.upperBound.x, renderWorldHeight, gameModel.getGroundLevel());
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        // Scale linewidth
+        gl.glLineWidth(0.2f * (float) width / 100.0f);
     }
 
     @Override
@@ -194,24 +231,21 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
-        
     }
 
     @Override
     public void onJointCreation(BuildingBlockJoint blockJoint) {
-
     }
 
     @Override
     public void onBlockDestruction(Block block) {
         if (block instanceof RectangularBuildingBlock) {
             RectangularBuildingBlock rbb = (RectangularBuildingBlock) block;
-            blockRenderers.remove(rbb);
+            rectBlock2renderer.remove(rbb);
         }
     }
 
     @Override
     public void onJointDestruction(BuildingBlockJoint blockJoint) {
-
     }
 }

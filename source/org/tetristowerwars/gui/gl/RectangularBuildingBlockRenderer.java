@@ -29,19 +29,23 @@ import static javax.media.opengl.GL.*;
  *
  * @author Andreas
  */
-public class BuildingBlockRenderer {
+public class RectangularBuildingBlockRenderer implements Comparable<RectangularBuildingBlockRenderer> {
 
     private final BuildingBlock buildingBlock;
     private final FloatBuffer vertexBuffer;
     private final FloatBuffer texCoordsBuffer;
     private final FloatBuffer normalBuffer;
     private final int numQuads;
+    private final int numPoints;
     private static final Map<Class<? extends Material>, Texture> material2Texture = new HashMap<Class<? extends Material>, Texture>();
     private final Texture texture;
+    private final String materialName;
 
-    public BuildingBlockRenderer(GL gl, RectangularBuildingBlock buildingBlock) {
+    public RectangularBuildingBlockRenderer(GL gl, RectangularBuildingBlock buildingBlock) {
         this.buildingBlock = buildingBlock;
         numQuads = buildingBlock.getRectangles().length;
+        numPoints = buildingBlock.getOutline().length;
+
 
         Class<? extends Material> mat = buildingBlock.getMaterial().getClass();
 
@@ -50,8 +54,9 @@ public class BuildingBlockRenderer {
         }
 
         texture = material2Texture.get(mat);
+        materialName = buildingBlock.getMaterial().getClass().getSimpleName();
 
-        vertexBuffer = BufferUtil.newFloatBuffer(numQuads * 4 * 2); // 4 vertices per quad * 2 floats per vertex
+        vertexBuffer = BufferUtil.newFloatBuffer(numQuads * 4 * 2 + numPoints * 2); // 4 vertices per quad * 2 floats per vertex
         texCoordsBuffer = BufferUtil.newFloatBuffer(numQuads * 4 * 2);
         normalBuffer = BufferUtil.newFloatBuffer(numQuads * 4 * 3); // 3 floats per vertex for normals.
 
@@ -69,8 +74,17 @@ public class BuildingBlockRenderer {
             texCoordsBuffer.put(new float[]{1.0f, 0.0f});
         }
 
+        for (Vec2 vec2 : buildingBlock.getOutline()) {
+            vertexBuffer.put(vec2.x);
+            vertexBuffer.put(vec2.y);
+        }
+
         vertexBuffer.rewind();
         texCoordsBuffer.rewind();
+    }
+
+    public void bindTexture() {
+        texture.bind();
     }
 
     private void createTexture(Class<? extends Material> mat) throws GLException {
@@ -97,16 +111,31 @@ public class BuildingBlockRenderer {
         gl.glPushMatrix();
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordsBuffer);
+        setupMatrix(gl);
+        gl.glDrawArrays(GL_QUADS, 0, numQuads * 4);
+        gl.glPopMatrix();
+    }
 
-        if (texture != null) {
-            texture.bind();
-        }
-        
+    public void renderLines(GL gl) {
+        gl.glPushMatrix();
+        gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+        setupMatrix(gl);
+        gl.glDrawArrays(GL_LINE_LOOP, numQuads * 4, numPoints);
+        gl.glPopMatrix();
+    }
+
+    private void setupMatrix(GL gl) {
         Vec2 pos = buildingBlock.getBody().getPosition();
         gl.glTranslatef(pos.x, pos.y, 0);
         gl.glRotatef((float) Math.toDegrees(buildingBlock.getBody().getAngle()), 0, 0, 1.0f);
-        gl.glDrawArrays(GL_QUADS, 0, numQuads * 4);
+    }
 
-        gl.glPopMatrix();
+    @Override
+    public int compareTo(RectangularBuildingBlockRenderer o) {
+        return materialName.compareTo(o.materialName);
+    }
+
+    public String getMaterialName() {
+        return materialName;
     }
 }

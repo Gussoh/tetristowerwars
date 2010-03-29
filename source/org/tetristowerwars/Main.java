@@ -38,7 +38,7 @@ public class Main {
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
 
         float blockSize = 5;
-        final GameModel gameModel = new GameModel(260, 480, 30, blockSize);
+        final GameModel gameModel = new GameModel(260, 480, 10, blockSize);
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, null);
         //final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
