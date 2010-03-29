@@ -50,7 +50,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize, 0, blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(0, 0, blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, vertices.toArray(new Vec2[0]));
         buildingBlockPool.add(block);
 
         return block;
@@ -125,12 +125,12 @@ public class BuildingBlockFactory {
         addShape(vertices, mat, body);
 
         Rectangle2D[] recs = new Rectangle2D[4];
-        recs[0] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize*2, blockSize, blockSize);
-        recs[1] = new Rectangle2D.Float(-blockSize*0.5f, -blockSize, blockSize, blockSize);
-        recs[2] = new Rectangle2D.Float(-blockSize*0.5f, 0, blockSize, blockSize);
-        recs[3] = new Rectangle2D.Float(-blockSize*0.5f, blockSize, blockSize, blockSize);
+        recs[0] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize * 2, blockSize, blockSize);
+        recs[1] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize, blockSize, blockSize);
+        recs[2] = new Rectangle2D.Float(-blockSize * 0.5f, 0, blockSize, blockSize);
+        recs[3] = new Rectangle2D.Float(-blockSize * 0.5f, blockSize, blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, vertices.toArray(new Vec2[0]));
         buildingBlockPool.add(block);
 
         return block;
@@ -142,6 +142,20 @@ public class BuildingBlockFactory {
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        Vec2[] outline = new Vec2[12];
+
+        outline[0] = new Vec2(-blockSize * 0.5f, -blockSize * 1.5f);
+        outline[1] = new Vec2(blockSize * 0.5f, -blockSize * 1.5f);
+        outline[2] = new Vec2(blockSize * 0.5f, -blockSize * 0.5f);
+        outline[3] = new Vec2(blockSize * 1.5f, -blockSize * 0.5f);
+        outline[4] = new Vec2(blockSize * 1.5f, blockSize * 0.5f);
+        outline[5] = new Vec2(blockSize * 0.5f, blockSize * 0.5f);
+        outline[6] = new Vec2(blockSize * 0.5f, blockSize * 1.5f);
+        outline[7] = new Vec2(-blockSize * 0.5f, blockSize * 1.5f);
+        outline[8] = new Vec2(-blockSize * 0.5f, blockSize * 0.5f);
+        outline[9] = new Vec2(-blockSize * 1.5f, blockSize * 0.5f);
+        outline[10] = new Vec2(-blockSize * 1.5f, -blockSize * 0.5f);
+        outline[10] = new Vec2(-blockSize * 0.5f, -blockSize * 0.5f);
 
         vertices1.add(new Vec2(-blockSize * 0.5f, -blockSize * 1.5f));
         vertices1.add(new Vec2(blockSize * 0.5f, -blockSize * 1.5f));
@@ -163,7 +177,7 @@ public class BuildingBlockFactory {
         recs[3] = new Rectangle2D.Float(blockSize * 0.5f, -blockSize * 0.5f, blockSize, blockSize);
         recs[4] = new Rectangle2D.Float(-blockSize * 0.5f, blockSize * 0.5f, blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;
@@ -174,12 +188,23 @@ public class BuildingBlockFactory {
         Body body = createBody(pos);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        Vec2[] outline = new Vec2[8];
+
+        outline[0] = new Vec2(-blockSize * 1.5f, -blockSize * (3f / 4f));
+        outline[1] = new Vec2(blockSize * 1.5f, -blockSize * (3f / 4f));
+        outline[2] = new Vec2(blockSize * 1.5f, blockSize * (1f / 4f));
+        outline[3] = new Vec2(blockSize * 0.5f, blockSize * (1f / 4f));
+        outline[4] = new Vec2(blockSize * 0.5f, blockSize * (5f / 4f));
+        outline[5] = new Vec2(-blockSize * 0.5f, blockSize * (5f / 4f));
+        outline[6] = new Vec2(-blockSize * 0.5f, blockSize * (1f / 4f));
+        outline[7] = new Vec2(-blockSize * 1.5f, blockSize * (1f / 4f));
+
         vertices1.add(new Vec2(-blockSize * 1.5f, -blockSize * (3f / 4f)));
         vertices1.add(new Vec2(blockSize * 1.5f, -blockSize * (3f / 4f)));
         vertices1.add(new Vec2(blockSize * 1.5f, blockSize * (1f / 4f)));
         vertices1.add(new Vec2(-blockSize * 1.5f, blockSize * (1f / 4f)));
 
-        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
         vertices2.add(new Vec2(-blockSize * 0.5f, -blockSize * (3f / 4f)));
         vertices2.add(new Vec2(blockSize * 0.5f, -blockSize * (3f / 4f)));
         vertices2.add(new Vec2(blockSize * 0.5f, blockSize * (5f / 4f)));
@@ -194,7 +219,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize * (1f / 4f), blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * 0.5f, -blockSize * (1f / 4f), blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;
@@ -206,12 +231,21 @@ public class BuildingBlockFactory {
         Body body = createBody(pos);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
+        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        Vec2[] outline = new Vec2[6];
+
+        outline[0] = new Vec2(-blockSize * (7f / 4f), -blockSize * (3f / 4f));
+        outline[1] = new Vec2(blockSize * (5f / 4f), -blockSize * (3f / 4f));
+        outline[2] = new Vec2(blockSize * (5f / 4f), blockSize * (5f / 4f));
+        outline[3] = new Vec2(blockSize * (1f / 4f), blockSize * (5f / 4f));
+        outline[4] = new Vec2(blockSize * (1f / 4f), blockSize * (1f / 4f));
+        outline[5] = new Vec2(-blockSize * (7f / 4f), blockSize * (1f / 4f));
+
         vertices1.add(new Vec2(-blockSize * (7f / 4f), -blockSize * (3f / 4f)));
         vertices1.add(new Vec2(blockSize * (5f / 4f), -blockSize * (3f / 4f)));
         vertices1.add(new Vec2(blockSize * (5f / 4f), blockSize * (1f / 4f)));
         vertices1.add(new Vec2(-blockSize * (7f / 4f), blockSize * (1f / 4f)));
 
-        List<Vec2> vertices2 = new ArrayList<Vec2>(4);
         vertices2.add(new Vec2(blockSize * (1f / 4f), -blockSize * (3f / 4f)));
         vertices2.add(new Vec2(blockSize * (5f / 4f), -blockSize * (3f / 4f)));
         vertices2.add(new Vec2(blockSize * (5f / 4f), blockSize * (5f / 4f)));
@@ -226,7 +260,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize * (3f / 4f), -blockSize * (1f / 4f), blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * (1f / 4f), -blockSize * (1f / 4f), blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;
@@ -238,12 +272,22 @@ public class BuildingBlockFactory {
         Body body = createBody(pos);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
-        vertices1.add(new Vec2(-blockSize * (7f / 4), -blockSize * (1f / 4f)));
-        vertices1.add(new Vec2(blockSize * (5f / 4), -blockSize * (1f / 4f)));
-        vertices1.add(new Vec2(blockSize * (5f / 4), blockSize * (3f / 4f)));
-        vertices1.add(new Vec2(-blockSize * (7f / 4), blockSize * (3f / 4f)));
-
         List<Vec2> vertices2 = new ArrayList<Vec2>(4);
+        Vec2[] outline = new Vec2[6];
+
+        outline[0] = new Vec2(-blockSize * (7f / 4f), -blockSize * (1f / 4f));
+        outline[1] = new Vec2(blockSize * (1f / 4f), -blockSize * (1f / 4f));
+        outline[2] = new Vec2(blockSize * (1f / 4f), -blockSize * (5f / 4f));
+        outline[3] = new Vec2(blockSize * (5f / 4f), -blockSize * (5f / 4f));
+        outline[4] = new Vec2(blockSize * (5f / 4f), blockSize * (3f / 4f));
+        outline[5] = new Vec2(-blockSize * (7f / 4f), blockSize * (3f / 4f));
+
+
+        vertices1.add(new Vec2(-blockSize * (7f / 4f), -blockSize * (1f / 4f)));
+        vertices1.add(new Vec2(blockSize * (5f / 4f), -blockSize * (1f / 4f)));
+        vertices1.add(new Vec2(blockSize * (5f / 4f), blockSize * (3f / 4f)));
+        vertices1.add(new Vec2(-blockSize * (7f / 4f), blockSize * (3f / 4f)));
+
         vertices2.add(new Vec2(blockSize * (1f / 4f), -blockSize * (5f / 4f)));
         vertices2.add(new Vec2(blockSize * (5f / 4f), -blockSize * (5f / 4f)));
         vertices2.add(new Vec2(blockSize * (5f / 4f), blockSize * (3f / 4f)));
@@ -258,7 +302,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize * (3f / 4f), -blockSize * (3f / 4f), blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * (1f / 4f), -blockSize * (3f / 4f), blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;
@@ -267,6 +311,16 @@ public class BuildingBlockFactory {
     public BuildingBlock createRightSBlock(Vec2 pos, Material mat) {
 
         Body body = createBody(pos);
+        Vec2[] outline = new Vec2[8];
+
+        outline[0] = new Vec2(-blockSize * 1.5f, -blockSize);
+        outline[1] = new Vec2(blockSize * 0.5f, -blockSize);
+        outline[2] = new Vec2(blockSize * 0.5f, 0);
+        outline[3] = new Vec2(blockSize * 1.5f, 0);
+        outline[4] = new Vec2(blockSize * 1.5f, blockSize);
+        outline[5] = new Vec2(-blockSize * 0.5f, blockSize);
+        outline[6] = new Vec2(-blockSize * 0.5f, 0);
+        outline[7] = new Vec2(-blockSize * 1.5f, 0);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
         vertices1.add(new Vec2(-blockSize * 1.5f, -blockSize));
@@ -297,7 +351,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize * 1.5f, 0, blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(-blockSize * 0.5f, 0, blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;
@@ -306,6 +360,16 @@ public class BuildingBlockFactory {
     public BuildingBlock createLeftSBlock(Vec2 pos, Material mat) {
 
         Body body = createBody(pos);
+
+        Vec2[] outline = new Vec2[8];
+        outline[0] = new Vec2(-blockSize * 1.5f, 0);
+        outline[1] = new Vec2(-blockSize * 0.5f, 0);
+        outline[2] = new Vec2(-blockSize * 0.5f, -blockSize);
+        outline[3] = new Vec2(blockSize * 1.5f, -blockSize);
+        outline[4] = new Vec2(blockSize * 1.5f, 0);
+        outline[5] = new Vec2(blockSize * 0.5f, 0);
+        outline[6] = new Vec2(blockSize * 0.5f, blockSize);
+        outline[7] = new Vec2(-blockSize * 1.5f, blockSize);
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
         vertices1.add(new Vec2(-blockSize * 1.5f, 0));
@@ -336,7 +400,7 @@ public class BuildingBlockFactory {
         recs[2] = new Rectangle2D.Float(-blockSize * 0.5f, 0, blockSize, blockSize);
         recs[3] = new Rectangle2D.Float(blockSize * 0.5f, 0, blockSize, blockSize);
 
-        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs);
+        BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
 
         return block;

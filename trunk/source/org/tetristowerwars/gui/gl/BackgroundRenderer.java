@@ -18,26 +18,29 @@ import static javax.media.opengl.GL.*;
  *
  * @author Andreas
  */
-public class Background {
+public class BackgroundRenderer {
 
     private final Texture skyTexture;
     private final Texture cityTexture;
     private final Texture groundTexture;
     private final FloatBuffer vertexBuffer;
     private final FloatBuffer texCoordBuffer;
+    private final FloatBuffer color;
     private static final float cityShrinkFactor = 10.0f;
 
-    public Background(GL gl, float renderWorldWidth, float renderWorldHeight) throws IOException {
+    public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel) throws IOException {
         skyTexture = TextureIO.newTexture(new File("res/gfx/sky.png"), true);
         cityTexture = TextureIO.newTexture(new File("res/gfx/citysilhuette.png"), true);
         groundTexture = TextureIO.newTexture(new File("res/gfx/ground.png"), true);
 
-        
+        color = BufferUtil.newFloatBuffer(4);
+        color.put(new float[] {1.0f, 1.0f, 1.0f, 1.0f});
+        color.rewind();
 
         vertexBuffer = BufferUtil.newFloatBuffer(3 * 4 * 2); // 3 quads, 4 vertices each, 2 floats per vertex
         texCoordBuffer = BufferUtil.newFloatBuffer(3 * 4 * 2);
 
-        float horizonHeight = renderWorldHeight * 0.2f;
+        float horizonHeight = groundLevel + 40;
 
         float cityRepeats = cityShrinkFactor * renderWorldWidth / cityTexture.getWidth();
 
@@ -93,9 +96,7 @@ public class Background {
 
 
     public void render(GL gl) {
-
-        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+        gl.glColor4fv(color);
 
         gl.glVertexPointer(2, GL.GL_FLOAT, 0, vertexBuffer);
         gl.glTexCoordPointer(2, GL.GL_FLOAT, 0, texCoordBuffer);
@@ -103,19 +104,15 @@ public class Background {
         skyTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 0, 4);
 
-        //gl.glBlendFunc (GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        
         gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         
-        gl.glEnable(GL.GL_BLEND);
         cityTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 4, 4);
-        gl.glDisable(GL.GL_BLEND);
+        
 
         groundTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 8, 4);
-
-        gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
 
     }
 }

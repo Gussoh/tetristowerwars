@@ -48,6 +48,7 @@ public class GameModel {
     private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
+    private final float groundLevel;
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -64,6 +65,7 @@ public class GameModel {
         worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
         Vec2 gravity = new Vec2(0, -9.82f);
         world = new World(worldBoundries, gravity, true);
+        this.groundLevel = groundLevel;
 
         BodyDef groundDef = new BodyDef();
 
@@ -397,6 +399,10 @@ public class GameModel {
 
     public AABB getWorldBoundries() {
         return worldBoundries;
+    }
+
+    public float getGroundLevel() {
+        return groundLevel;
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener {

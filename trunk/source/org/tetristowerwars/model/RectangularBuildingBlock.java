@@ -6,6 +6,7 @@ package org.tetristowerwars.model;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.material.Material;
 
@@ -15,10 +16,12 @@ import org.tetristowerwars.model.material.Material;
  */
 public class RectangularBuildingBlock extends BuildingBlock {
     private final Rectangle2D[] rectangles;
+    private final Vec2[] outline;
 
-    public RectangularBuildingBlock(Body body, Material material, Rectangle2D[] rectangles) {
+    public RectangularBuildingBlock(Body body, Material material, Rectangle2D[] rectangles, Vec2[] outline) {
         super(body, material);
         this.rectangles = rectangles;
+        this.outline = outline;
 
         calcMassData();
         body.setMass(massData);
@@ -46,5 +49,9 @@ public class RectangularBuildingBlock extends BuildingBlock {
 
     public Rectangle2D[] getRectangles() {
         return rectangles;
+    }
+
+    public Vec2[] getOutline() {
+        return outline;
     }
 }
