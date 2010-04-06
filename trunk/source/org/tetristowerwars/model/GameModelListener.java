@@ -19,4 +19,6 @@ public interface GameModelListener {
     public void onJointDestruction(BuildingBlockJoint blockJoint);
 
     public void onBlockCreation(Block block);
+
+    public void onBuildingBlockOwnerChanged(BuildingBlock block);
 }

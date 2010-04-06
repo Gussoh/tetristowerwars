@@ -21,7 +21,6 @@ public abstract class BuildingBlock extends Block {
         super(body);
         this.material = material;
         this.massData = new MassData();
-
     }
 
     protected abstract void calcMassData();
