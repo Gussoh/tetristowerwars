@@ -271,7 +271,9 @@ public class GameModel {
     public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
         BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, new Vec2((float) position.getX(), (float) position.getY()));
         buildingBlockJoints.add(bbj);
-
+        for (GameModelListener gameModelListener : gameModelListeners) {
+            gameModelListener.onJointCreation(bbj);
+        }
         return bbj;
     }
 
@@ -295,6 +297,9 @@ public class GameModel {
      */
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
         if (buildingBlockJoints.remove(buildingBlockJoint)) {
+            for (GameModelListener gameModelListener : gameModelListeners) {
+                gameModelListener.onJointDestruction(buildingBlockJoint);
+            }
             buildingBlockJoint.destroy();
         }
     }
