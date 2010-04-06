@@ -50,6 +50,7 @@ public class GameModel {
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
+    private final ArrayList<WinningCondition> winningConditions = new ArrayList<WinningCondition>();
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -423,6 +424,20 @@ public class GameModel {
 
     protected World getWorld() {
         return world;
+    }
+
+     public void addWinningCondition(WinningCondition condition) {
+        winningConditions.add(condition);
+    }
+
+    public boolean checkWinningConditions() {
+        for (WinningCondition condition : winningConditions) {
+            if  (condition.gameIsOver()) {
+                System.out.println("GEJM ÖVER!");
+                return true;
+            }
+        }
+        return false;
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {
