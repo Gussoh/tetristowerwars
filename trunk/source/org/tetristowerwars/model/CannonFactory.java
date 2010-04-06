@@ -11,7 +11,6 @@ import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
 
 /**
  *
@@ -19,11 +18,11 @@ import org.jbox2d.dynamics.World;
  */
 public class CannonFactory {
     
-    private final World world;
+    private final GameModel gameModel;
     private float blockSize;
 
-    public CannonFactory(World world, float blockSize) {
-        this.world = world;
+    public CannonFactory(GameModel gameModel, float blockSize) {
+        this.gameModel = gameModel;    
         this.blockSize = blockSize;
     }
 
@@ -57,7 +56,7 @@ public class CannonFactory {
         boxBodyDef.allowSleep = true;
         boxBodyDef.position.set(pos.x, pos.y);
 
-        return world.createBody(boxBodyDef);
+        return gameModel.getWorld().createBody(boxBodyDef);
     }
 
     private void addShape(List<Vec2> vertices, Body body) {

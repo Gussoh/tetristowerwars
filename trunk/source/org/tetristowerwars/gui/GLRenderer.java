@@ -260,4 +260,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onJointDestruction(BuildingBlockJoint blockJoint) {
     }
+
+    @Override
+    public void onBlockCreation(Block block) {
+        
+    }
 }

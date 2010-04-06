@@ -19,6 +19,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
+import org.jbox2d.dynamics.ContactFilter;
 import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.ContactPoint;
@@ -77,11 +78,12 @@ public class GameModel {
         groundShapeDef.friction = 0.8f;
         groundBlock.getBody().createShape(groundShapeDef);
 
-        blockFactory = new BuildingBlockFactory(buildingBlockPool, world, blockSize);
-        cannonFactory = new CannonFactory(world, blockSize);
-        bulletFactory = new BulletFactory(world, blockSize);
+        blockFactory = new BuildingBlockFactory(buildingBlockPool, this, blockSize);
+        cannonFactory = new CannonFactory(this, blockSize);
+        bulletFactory = new BulletFactory(this, blockSize);
         world.setBoundaryListener(physicsEngineListener);
         world.setContactListener(physicsEngineListener);
+        world.setContactFilter(physicsEngineListener);
     }
 
     /**
@@ -405,7 +407,17 @@ public class GameModel {
         return groundLevel;
     }
 
-    private class PhysicsEngineListener implements ContactListener, BoundaryListener {
+    protected void fireBodyCreationNotification(Block block) {
+        for (GameModelListener gameModelListener : gameModelListeners) {
+            gameModelListener.onBlockCreation(block);
+        }
+    }
+
+    protected World getWorld() {
+        return world;
+    }
+
+    private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {
 
         /**
          * Called when a contact point is added.
@@ -425,6 +437,8 @@ public class GameModel {
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
                 }
+            } else if (userData1 instanceof BulletBlock) {
+            } else if (userData2 instanceof BulletBlock) {
             }
         }
 
@@ -467,6 +481,20 @@ public class GameModel {
             if (userdata instanceof Block) {
                 blocksToRemove.add((Block) userdata);
             }
+        }
+
+        @Override
+        public boolean shouldCollide(Shape shape1, Shape shape2) {
+            Object userData1 = shape1.getBody().getUserData();
+            Object userData2 = shape2.getBody().getUserData();
+
+            if (userData1 instanceof BulletBlock) {
+                return ((BulletBlock) userData1).getCannon() != userData2;
+            } else if (userData2 instanceof BulletBlock) {
+                return ((BulletBlock) userData2).getCannon() != userData1;
+            }
+
+            return true;
         }
     }
 }
