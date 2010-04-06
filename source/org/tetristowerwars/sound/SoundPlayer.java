@@ -23,6 +23,7 @@ import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.tetristowerwars.model.Block;
+import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
@@ -269,5 +270,10 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onJointDestruction(BuildingBlockJoint blockJoint) {
+    }
+
+    @Override
+    public void onBuildingBlockOwnerChanged(BuildingBlock block) {
+        
     }
 }

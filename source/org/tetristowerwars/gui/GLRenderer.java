@@ -265,4 +265,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void onBlockCreation(Block block) {
         
     }
+
+    @Override
+    public void onBuildingBlockOwnerChanged(BuildingBlock block) {
+        
+    }
 }

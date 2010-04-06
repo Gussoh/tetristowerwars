@@ -179,6 +179,9 @@ public class GameModel {
 
                     if (getAttachedJoint(buildingBlock) != null) {
                         player.addBuildingBlock(buildingBlock);
+                        for (GameModelListener gameModelListener : gameModelListeners) {
+                            gameModelListener.onBuildingBlockOwnerChanged(buildingBlock);
+                        }
                     } else {
                         for (GameModelListener gameModelListener : gameModelListeners) {
                             gameModelListener.onBlockDestruction(buildingBlock);
