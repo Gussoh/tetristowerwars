@@ -23,7 +23,7 @@ public class Controller implements InputListener {
     private final GameModel gameModel;
     private final InputManager inputManager;
     private final Renderer renderer;
-    private final Map<Integer, BuildingBlockJoint> ownerToBuildingBlockMap = new HashMap<Integer, BuildingBlockJoint>();
+    private final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
 
     public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
         this.gameModel = dataModel;
@@ -45,11 +45,11 @@ public class Controller implements InputListener {
 
         if (collisionBlock instanceof BuildingBlock) {
             // Check if a building block joint already exists for this action id
-            if (ownerToBuildingBlockMap.containsKey(event.getActionId()) == true) {
+            if (actionIdToJoint.containsKey(event.getActionId()) == true) {
                 throw new IllegalStateException();
             }
 
-            ownerToBuildingBlockMap.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
+            actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
         } else if (collisionBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
             gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
@@ -61,9 +61,9 @@ public class Controller implements InputListener {
     public void onInputDeviceReleased(InputEvent event) {
         renderer.removeCursorPoint(event.getActionId());
         // If a building block joint exists for this very id
-        if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
-            gameModel.removeBuldingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()));
-            ownerToBuildingBlockMap.remove(event.getActionId());
+        if (actionIdToJoint.get(event.getActionId()) != null) {
+            gameModel.removeBuldingBlockJoint(actionIdToJoint.get(event.getActionId()));
+            actionIdToJoint.remove(event.getActionId());
         }
     }
 
@@ -71,8 +71,8 @@ public class Controller implements InputListener {
     public void onInputDeviceDragged(InputEvent event) {
         renderer.putCursorPoint(event.getActionId(), event.getPosition());
         // If a building block joint exists for this very id
-        if (ownerToBuildingBlockMap.get(event.getActionId()) != null) {
-            gameModel.moveBuildingBlockJoint(ownerToBuildingBlockMap.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
+        if (actionIdToJoint.get(event.getActionId()) != null) {
+            gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
         }
     }
 
