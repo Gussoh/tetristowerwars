@@ -5,13 +5,12 @@
 
 package org.tetristowerwars.model.winningcondition;
 
-import java.util.List;
+import java.util.Map;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
-import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
 
 /**
@@ -62,6 +61,14 @@ public class LimitedBlocksWinningCondition extends WinningCondition implements G
 
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
+    }
+
+    @Override
+    public void onWinningConditionFulfilled(WinningCondition condition) {
+    }
+
+    @Override
+    public void onLeaderChanged(Map scoreList) {
     }
 
 }

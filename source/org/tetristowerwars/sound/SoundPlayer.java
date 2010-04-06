@@ -27,6 +27,7 @@ import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
+import org.tetristowerwars.model.WinningCondition;
 
 /**
  *
@@ -215,7 +216,14 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onBlockCreation(Block block) {
-        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void onWinningConditionFulfilled(WinningCondition condition) {
+    }
+
+    @Override
+    public void onLeaderChanged(Map scoreList) {
     }
 
     class PlayThread extends Thread {

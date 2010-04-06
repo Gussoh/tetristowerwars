@@ -51,6 +51,7 @@ public class GameModel {
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
     private final ArrayList<WinningCondition> winningConditions = new ArrayList<WinningCondition>();
+    private Player leader = null;
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -432,8 +433,17 @@ public class GameModel {
 
     public boolean checkWinningConditions() {
         for (WinningCondition condition : winningConditions) {
+            if (condition.getLeader() != leader) {
+                leader = condition.getLeader();
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onLeaderChanged(condition.getScores());
+                }
+            }
             if  (condition.gameIsOver()) {
                 System.out.println("GEJM ÖVER!");
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onWinningConditionFulfilled(condition);
+                }
                 return true;
             }
         }
