@@ -60,4 +60,8 @@ public class LimitedBlocksWinningCondition extends WinningCondition implements G
         }
     }
 
+    @Override
+    public void onBuildingBlockOwnerChanged(BuildingBlock block) {
+    }
+
 }
