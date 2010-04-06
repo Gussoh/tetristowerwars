@@ -34,6 +34,7 @@ public class Player {
     private final float leftLimit;
     private final float rightLimit;
     private BuildingBlock highestBuilingBlockInTower;
+    private float towerHeight;
 
     protected Player(String name, float leftLimit, float rightLimit) {
         this.name = name;
@@ -152,6 +153,10 @@ public class Player {
         return highestBuilingBlockInTower;
     }
 
+    public float getTowerHeight() {
+        return towerHeight;
+    }
+
     protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock) {
 
         towerBodies.add(groundBlock.getBody());
@@ -218,6 +223,7 @@ public class Player {
 
         if (highestConnectedBody.getUserData() instanceof BuildingBlock) {
             highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
+            towerHeight = highestPositionInBody;
         } else {
             highestBuilingBlockInTower = null;
         }
