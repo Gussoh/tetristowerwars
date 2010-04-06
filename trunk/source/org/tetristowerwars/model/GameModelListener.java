@@ -5,6 +5,8 @@
 
 package org.tetristowerwars.model;
 
+import java.util.Map;
+
 /**
  *
  * @author Andreas
@@ -21,4 +23,8 @@ public interface GameModelListener {
     public void onBlockCreation(Block block);
 
     public void onBuildingBlockOwnerChanged(BuildingBlock block);
+
+    public void onWinningConditionFulfilled(WinningCondition condition);
+
+    public void onLeaderChanged(Map scoreList);
 }

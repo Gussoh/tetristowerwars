@@ -35,6 +35,7 @@ import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
 import org.tetristowerwars.model.RectangularBuildingBlock;
 import static javax.media.opengl.GL.*;
+import org.tetristowerwars.model.WinningCondition;
 
 /**
  *
@@ -269,5 +270,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
         
+    }
+
+    @Override
+    public void onWinningConditionFulfilled(WinningCondition condition) {
+    }
+
+    @Override
+    public void onLeaderChanged(Map scoreList) {
     }
 }

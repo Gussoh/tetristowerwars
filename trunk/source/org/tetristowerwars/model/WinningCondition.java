@@ -27,7 +27,7 @@ public abstract class WinningCondition {
 
     public abstract boolean gameIsOver();
 
-    public Player getWinner() {
+    public Player getLeader() {
         List<Player> players = model.getPlayers();
         Player winner = null;
         float highest = 0;
@@ -42,10 +42,10 @@ public abstract class WinningCondition {
     }
 
     public Map getScores() {
-        TreeMap<Player, Integer> scores = new TreeMap<Player, Integer>();
+        TreeMap<Player, Float> scores = new TreeMap<Player, Float>();
         List<Player> players = model.getPlayers();
         for (Player player : players) {
-            scores.put(player, player.getScore());
+            scores.put(player, player.getTowerHeight());
         }
         return scores;
     }

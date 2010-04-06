@@ -35,6 +35,7 @@ public class Player {
     private final float rightLimit;
     private BuildingBlock highestBuilingBlockInTower;
     private float towerHeight;
+    private int score = 0;
 
     protected Player(String name, float leftLimit, float rightLimit) {
         this.name = name;
@@ -254,12 +255,4 @@ public class Player {
         return neighbours;
     }
 
-    //TODO: define and implement
-    public int getScore() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public int getNumberOfBlocks() {
-        return buildingBlocks.size();
-    }
 }
