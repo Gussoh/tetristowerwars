@@ -4,6 +4,8 @@
  */
 package org.tetristowerwars.model;
 
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -11,6 +13,9 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import org.jbox2d.collision.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
@@ -163,6 +168,7 @@ public class Player {
 
         // Will contain the tower height in the end.
         Body highestConnectedBody = groundBlock.getBody();
+        float highestPositionInBody = groundBlock.getBody().getPosition().y;
 
         HashSet<Body> unprocessedBodies = (HashSet<Body>) towerBodies.clone();
 
@@ -173,8 +179,33 @@ public class Player {
         while (!bodiesToCheck.isEmpty()) {
 
             Body bodyToCheck = bodiesToCheck.remove();
-            if (bodyToCheck.getPosition().y > highestConnectedBody.getPosition().y) {
-                highestConnectedBody = bodyToCheck;
+            XForm xForm = bodyToCheck.getXForm();
+
+            Object userData = bodyToCheck.getUserData();
+            if (userData instanceof RectangularBuildingBlock) {
+                RectangularBuildingBlock rbb = (RectangularBuildingBlock) userData;
+                for (Vec2 v : rbb.getOutline()) {
+                    float yPos = xForm.position.y + xForm.R.col1.y * v.x + xForm.R.col2.y * v.y;
+                    if (yPos > highestPositionInBody) {
+                        highestPositionInBody = yPos;
+                        highestConnectedBody = bodyToCheck;
+                    }
+                }
+            } else if (userData instanceof TriangularBuildingBlock) {
+                TriangularBuildingBlock tbb = (TriangularBuildingBlock) userData;
+                for (Path2D path2D : tbb.getTriangles()) {
+                    for (PathIterator pi = path2D.getPathIterator(null); !pi.isDone(); pi.next()) {
+                        float coords[] = new float[8];
+                        pi.currentSegment(coords);
+                        for (int i = 0; i < coords.length; i += 2) {
+                            float yPos = xForm.position.y + xForm.R.col1.y * coords[i] + xForm.R.col2.y * coords[i + 1];
+                            if (yPos > highestPositionInBody) {
+                                highestPositionInBody = yPos;
+                                highestConnectedBody = bodyToCheck;
+                            }
+                        }
+                    }
+                }
             }
 
             for (Body body : body2neighbours.get(bodyToCheck)) {
