@@ -253,4 +253,13 @@ public class Player {
         }
         return neighbours;
     }
+
+    //TODO: define and implement
+    public int getScore() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public int getNumberOfBlocks() {
+        return buildingBlocks.size();
+    }
 }

@@ -18,9 +18,13 @@ import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
+import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
+import org.tetristowerwars.model.winningcondition.LimitedBlocksWinningCondition;
+import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.sound.SoundPlayer;
 
 /**
@@ -32,7 +36,7 @@ public class Main {
     static int kalle = 0;
 
     public static void main(String[] args) throws InterruptedException {
-      
+
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         DisplayMode displayMode = ge.getDefaultScreenDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
@@ -59,16 +63,19 @@ public class Main {
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(80, 30));
         cannonFactory.createBasicCannon(player2, new Vec2(180, 30));
-       
+
+        //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
+        //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
+        //WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
 
         for (;;) {
             ++kalle;
             Thread.yield();
-            
+
             mouseInputManager.pumpEvents();
             touchInputManager.pumpEvents();
 
-            if (gameModel.update() > 0) {
+            if (!gameModel.checkWinningConditions() && gameModel.update() > 0) {
                 //renderer.renderFrame();
                 glRenderer.renderFrame();
             }
