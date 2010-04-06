@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +25,7 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
+import org.tetristowerwars.gui.gl.BulletRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.model.Block;
@@ -47,7 +47,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private Map<Integer, Point> id2windowPoints = new LinkedHashMap<Integer, Point>();
     private BackgroundRenderer backgroundRenderer;
     private JointRenderer jointRenderer;
-    private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderer = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
+    private BulletRenderer bulletRenderer;
+    private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
     private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
     private float[] jointColor = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -128,10 +129,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         jointRenderer = new JointRenderer();
+        try {
+            bulletRenderer = new BulletRenderer(gl);
+        } catch (IOException ex) {
+            Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glEnableClientState(GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glEnable(GL_BLEND);
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -143,19 +147,25 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        
         // Draw background
         if (backgroundRenderer != null) {
+            // This blend function is needed for photoshop-like blend.
+            gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             backgroundRenderer.render(gl);
         }
 
 
-        // Update block renderers if necessary
+        // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
+        // there is no need to iterate over player blocks
         for (BuildingBlock buildingBlock : gameModel.getBuildingBlockPool()) {
             if (buildingBlock instanceof RectangularBuildingBlock) {
                 RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
-                if (!rectBlock2renderer.containsKey(rbb)) {
+                if (!rectBlock2renderers.containsKey(rbb)) {
                     RectangularBuildingBlockRenderer rbbr = new RectangularBuildingBlockRenderer(gl, rbb);
-                    rectBlock2renderer.put(rbb, rbbr);
+                    rectBlock2renderers.put(rbb, rbbr);
                 }
             }
         }
@@ -163,7 +173,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         // Create render list based on texture name to avoid expense texture.bind operations.
         // TODO: Sort by texture should improve speed, write vertex data to one buffer per texture instead?
-        ArrayList<RectangularBuildingBlockRenderer> renderList = new ArrayList<RectangularBuildingBlockRenderer>(rectBlock2renderer.values());
+        ArrayList<RectangularBuildingBlockRenderer> renderList = new ArrayList<RectangularBuildingBlockRenderer>(rectBlock2renderers.values());
         Collections.sort(renderList);
 
         String currentMaterialName = "";
@@ -175,9 +185,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             rbbr.render(gl);
         }
 
+        bulletRenderer.render(gl, gameModel);
+
         // Render block outlines
         gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+        // This blend function is needed for good looking anti-aliased lines.
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl.glColor4fv(blockOutlineColor, 0);
         for (RectangularBuildingBlockRenderer rbbr : renderList) {
@@ -185,12 +199,10 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
 
         // Render joints between mouse/finger and block.
+        // Blend function already set.
         gl.glColor4fv(jointColor, 0);
-        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         jointRenderer.render(gl, gameModel.getBuildingBlockJoints());
 
-
-        gl.glEnable(GL_TEXTURE_2D);
     }
 
     @Override
@@ -241,7 +253,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void onBlockDestruction(Block block) {
         if (block instanceof RectangularBuildingBlock) {
             RectangularBuildingBlock rbb = (RectangularBuildingBlock) block;
-            rectBlock2renderer.remove(rbb);
+            rectBlock2renderers.remove(rbb);
         }
     }
 
