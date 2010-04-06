@@ -17,4 +17,6 @@ public interface GameModelListener {
     public void onBlockDestruction(Block block);
 
     public void onJointDestruction(BuildingBlockJoint blockJoint);
+
+    public void onBlockCreation(Block block);
 }

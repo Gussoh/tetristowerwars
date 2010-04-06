@@ -13,7 +13,6 @@ import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
 import org.tetristowerwars.model.material.Material;
 
 /**
@@ -23,12 +22,12 @@ import org.tetristowerwars.model.material.Material;
 public class BuildingBlockFactory {
 
     private final Set<BuildingBlock> buildingBlockPool;
-    private final World world;
+    private final GameModel gameModel;
     private final float blockSize;
 
-    public BuildingBlockFactory(Set<BuildingBlock> buildingBlockPool, World world, float blockSize) {
+    public BuildingBlockFactory(Set<BuildingBlock> buildingBlockPool, GameModel gameModel, float blockSize) {
         this.buildingBlockPool = buildingBlockPool;
-        this.world = world;
+        this.gameModel = gameModel;
         this.blockSize = blockSize;
     }
 
@@ -52,6 +51,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, vertices.toArray(new Vec2[0]));
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -75,6 +75,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new TriangularBuildingBlock(body, mat, new Path2D[]{trianglePath});
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -108,6 +109,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new TriangularBuildingBlock(body, mat, trianglePaths);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -132,6 +134,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, vertices.toArray(new Vec2[0]));
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -179,6 +182,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -221,6 +225,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -262,6 +267,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -304,6 +310,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -353,6 +360,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -402,6 +410,7 @@ public class BuildingBlockFactory {
 
         BuildingBlock block = new RectangularBuildingBlock(body, mat, recs, outline);
         buildingBlockPool.add(block);
+        gameModel.fireBodyCreationNotification(block);
 
         return block;
     }
@@ -412,7 +421,7 @@ public class BuildingBlockFactory {
         boxBodyDef.allowSleep = true;
         boxBodyDef.position.set(pos.x, pos.y);
 
-        return world.createBody(boxBodyDef);
+        return gameModel.getWorld().createBody(boxBodyDef);
     }
 
     private void addShape(List<Vec2> vertices, Material mat, Body body) {

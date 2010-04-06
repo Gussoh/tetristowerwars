@@ -18,12 +18,12 @@ import org.tetristowerwars.model.material.SteelMaterial;
  * @author Reeen
  */
 public class BulletFactory {
-    private final World world;
     private final float blockSize;
+    private final GameModel gameModel;
 
-    public BulletFactory(World world, float blockSize) {
-        this.world = world;
+    public BulletFactory(GameModel gameModel, float blockSize) {
         this.blockSize = blockSize;
+        this.gameModel = gameModel;
     }
 
     public BulletBlock createBullet(CannonBlock cannon) {
@@ -35,7 +35,10 @@ public class BulletFactory {
 
         body.applyImpulse(new Vec2(-cannon.getForce(), cannon.getForce()), body.getPosition());
 
-        return new BulletBlock(body, cannon);
+        BulletBlock block = new BulletBlock(body, cannon);
+        gameModel.fireBodyCreationNotification(block);
+
+        return block;
     }
 
     private Body createBody(Vec2 pos) {
@@ -45,7 +48,7 @@ public class BulletFactory {
         boxBodyDef.position.set(pos.x, pos.y);
 
 
-        return world.createBody(boxBodyDef);
+        return gameModel.getWorld().createBody(boxBodyDef);
     }
 
     private void addShape(float radius, Material mat, Body body) {

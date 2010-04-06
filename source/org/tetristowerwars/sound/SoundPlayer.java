@@ -209,6 +209,11 @@ public class SoundPlayer implements GameModelListener {
         }
     }
 
+    @Override
+    public void onBlockCreation(Block block) {
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     class PlayThread extends Thread {
 
         byte tempBuffer[] = new byte[10000];
