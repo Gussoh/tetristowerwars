@@ -103,16 +103,11 @@ public class BackgroundRenderer {
 
         skyTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 0, 4);
-
-        
-        gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         
         cityTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 4, 4);
-        
 
         groundTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 8, 4);
-
     }
 }
