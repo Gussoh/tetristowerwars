@@ -278,7 +278,7 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onBlockDestruction(Block block) {
-        playSound(zap, 1);
+        playSound(zap, .6f);
     }
 
     @Override
