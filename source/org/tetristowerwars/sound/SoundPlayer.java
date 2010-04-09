@@ -223,7 +223,7 @@ public class SoundPlayer implements GameModelListener {
     }
 
     @Override
-    public void onLeaderChanged(Map scoreList) {
+    public void onLeaderChanged(ArrayList scoreList) {
     }
 
     class PlayThread extends Thread {

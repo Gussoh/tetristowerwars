@@ -447,7 +447,7 @@ public class GameModel {
             if (condition.getLeader() != leader) {
                 leader = condition.getLeader();
                 for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onLeaderChanged(condition.getScores());
+                    gameModelListener.onLeaderChanged(null);
                 }
             }
             if  (condition.gameIsOver()) {

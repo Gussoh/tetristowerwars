@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.model.winningcondition;
 
+import java.util.ArrayList;
 import java.util.Map;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -68,7 +69,7 @@ public class LimitedBlocksWinningCondition extends WinningCondition implements G
     }
 
     @Override
-    public void onLeaderChanged(Map scoreList) {
+    public void onLeaderChanged(ArrayList scoreList) {
     }
 
 }

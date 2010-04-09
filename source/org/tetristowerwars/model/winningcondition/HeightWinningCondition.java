@@ -5,7 +5,8 @@
 
 package org.tetristowerwars.model.winningcondition;
 
-import java.util.List;
+import java.util.ArrayList;
+import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
@@ -16,6 +17,11 @@ import org.tetristowerwars.model.WinningCondition;
  */
 public class HeightWinningCondition extends WinningCondition {
     private final float height;
+    private BuildingBlock highestBlock = null;
+    private long startTime;
+    private final long winningTimer = 5000;
+    private Player leader;
+    private float leaderScore;
 
     public HeightWinningCondition(GameModel model, float height) {
         super(model);
@@ -24,9 +30,17 @@ public class HeightWinningCondition extends WinningCondition {
 
     @Override
     public boolean gameIsOver() {
-        List<Player> players = model.getPlayers();
-        for (Player player : players) {
-            if (player.getTowerHeight() >= height) {
+        ArrayList<ScoreEntry<Player, Float>> scores = getScores();
+        leader = scores.get(0).getPlayer();
+        leaderScore = scores.get(0).getScore();
+
+        if (leaderScore >= height) {
+            BuildingBlock block = leader.getHighestBuilingBlockInTower();
+            if(highestBlock != block) {
+                highestBlock = block;
+                startTime = System.currentTimeMillis();
+            }
+            else if (System.currentTimeMillis() >= startTime+winningTimer && highestBlock == block) {
                 return true;
             }
         }

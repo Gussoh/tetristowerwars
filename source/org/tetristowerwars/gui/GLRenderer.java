@@ -296,6 +296,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     }
 
     @Override
-    public void onLeaderChanged(Map scoreList) {
+    public void onLeaderChanged(ArrayList scoreList) {
     }
 }

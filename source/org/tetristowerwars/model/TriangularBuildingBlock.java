@@ -26,6 +26,7 @@ public class TriangularBuildingBlock extends BuildingBlock {
         body.setMass(massData);
     }
 
+    //TODO: right now triangles must be symmetrical around the y-axis - fix so any orientation works!
     @Override
     protected void calcMassData() {
         massData.I = 0;
