@@ -14,7 +14,6 @@ import org.tetristowerwars.control.InputManager;
 import org.tetristowerwars.control.MouseInputManager;
 import org.tetristowerwars.control.TouchInputManager;
 import org.tetristowerwars.gui.Renderer;
-import org.tetristowerwars.gui.SwingRenderer;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
@@ -61,8 +60,8 @@ public class Main {
         Player player2 = gameModel.createPlayer("Player 2", 180, 260);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
-        cannonFactory.createBasicCannon(player1, new Vec2(80, 30));
-        cannonFactory.createBasicCannon(player2, new Vec2(180, 30));
+        cannonFactory.createBasicCannon(player1, new Vec2(80, 10));
+        cannonFactory.createBasicCannon(player2, new Vec2(180, 10));
 
         //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);

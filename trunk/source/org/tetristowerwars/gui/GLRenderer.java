@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.BulletRenderer;
+import org.tetristowerwars.gui.gl.CannonRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.model.Block;
@@ -49,6 +50,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private BackgroundRenderer backgroundRenderer;
     private JointRenderer jointRenderer;
     private BulletRenderer bulletRenderer;
+    private CannonRenderer cannonRenderer;
     private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
     private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -124,14 +126,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        // TODO: Remove debugGl after testing is done.
-        //drawable.setGL(new DebugGL(drawable.getGL()));
 
         GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         jointRenderer = new JointRenderer();
         try {
             bulletRenderer = new BulletRenderer(gl);
+            cannonRenderer = new CannonRenderer(gl);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -150,13 +151,15 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         gl.glEnable(GL_TEXTURE_2D);
         gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        
+
         // Draw background
         if (backgroundRenderer != null) {
             // This blend function is needed for photoshop-like blend.
             gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             backgroundRenderer.render(gl);
         }
+
+        cannonRenderer.render(gl, gameModel);
 
 
         // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
@@ -173,7 +176,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
 
         // Create render list based on texture name to avoid expense texture.bind operations.
-        // TODO: Sort by texture should improve speed, write vertex data to one buffer per texture instead?
         ArrayList<RectangularBuildingBlockRenderer> renderList = new ArrayList<RectangularBuildingBlockRenderer>(rectBlock2renderers.values());
         Collections.sort(renderList);
 
@@ -264,12 +266,10 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockCreation(Block block) {
-        
     }
 
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
-        
     }
 
     @Override

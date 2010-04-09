@@ -75,5 +75,4 @@ public class TouchInputManager extends InputManager implements TuioListener {
         pushInputEvent(evt);
     }
 
-    // TODO: Implement
 }
