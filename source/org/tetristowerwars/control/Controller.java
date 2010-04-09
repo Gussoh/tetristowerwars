@@ -46,7 +46,8 @@ public class Controller implements InputListener {
         if (collisionBlock instanceof BuildingBlock) {
             // Check if a building block joint already exists for this action id
             if (actionIdToJoint.containsKey(event.getActionId()) == true) {
-                throw new IllegalStateException();
+                // TODO: Do we really remove the old actionId? Workaround remove it.
+                performReleaseAction(event);
             }
 
             actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
@@ -60,12 +61,18 @@ public class Controller implements InputListener {
     @Override
     public void onInputDeviceReleased(InputEvent event) {
         renderer.removeCursorPoint(event.getActionId());
+        performReleaseAction(event);
+    }
+
+    private void performReleaseAction(InputEvent event) {
         // If a building block joint exists for this very id
-        if (actionIdToJoint.get(event.getActionId()) != null) {
-            gameModel.removeBuldingBlockJoint(actionIdToJoint.get(event.getActionId()));
-            actionIdToJoint.remove(event.getActionId());
+        BuildingBlockJoint bbj = actionIdToJoint.remove(event.getActionId());
+        if (bbj != null) {
+            gameModel.removeBuldingBlockJoint(bbj);
         }
     }
+
+
 
     @Override
     public void onInputDeviceDragged(InputEvent event) {

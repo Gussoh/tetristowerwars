@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.model;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -264,9 +262,9 @@ public class GameModel {
      * @param position the position in world coordinates.
      * @return One block found at those coordinates or null if nothing was found.
      */
-    public Block getBlockFromCoordinates(Point2D position) {
-        float x = (float) position.getX();
-        float y = (float) position.getY();
+    public Block getBlockFromCoordinates(Vec2 position) {
+        float x = position.x;
+        float y = position.y;
         Shape[] shapes = world.query(new AABB(new Vec2(x - 0.5f, y - 0.5f), new Vec2(x + 0.5f, y + 0.5f)), 1);
 
 
@@ -290,8 +288,8 @@ public class GameModel {
      * @param position The anchor point in world coordinates.
      * @return The new joint.
      */
-    public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Point2D position) {
-        BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, new Vec2((float) position.getX(), (float) position.getY()));
+    public BuildingBlockJoint createBuildingBlockJoint(BuildingBlock buildingBlock, Vec2 position) {
+        BuildingBlockJoint bbj = new BuildingBlockJoint(world, buildingBlock, position);
         buildingBlockJoints.add(bbj);
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onJointCreation(bbj);
@@ -307,9 +305,9 @@ public class GameModel {
      * @param buildingBlockJoint the joint to update.
      * @param endPosition The new end position in world coordinates.
      */
-    public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Point2D endPosition) {
+    public void moveBuildingBlockJoint(BuildingBlockJoint buildingBlockJoint, Vec2 endPosition) {
         if (buildingBlockJoints.contains(buildingBlockJoint)) {
-            buildingBlockJoint.updatePointerPosition(new Vec2((float) endPosition.getX(), (float) endPosition.getY()));
+            buildingBlockJoint.updatePointerPosition(endPosition);
         }
     }
 

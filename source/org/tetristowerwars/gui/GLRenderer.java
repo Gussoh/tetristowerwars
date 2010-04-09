@@ -8,7 +8,6 @@ import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,12 +23,14 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.BackgroundAnimationRenderer;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.BulletRenderer;
 import org.tetristowerwars.gui.gl.CannonRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
+import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -48,15 +49,14 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     private final GLCanvas glCanvas;
     private final JFrame frame;
-    private Map<Integer, Point> id2windowPoints = new LinkedHashMap<Integer, Point>();
-
+    private Map<Integer, Vec2> id2Pointers = new LinkedHashMap<Integer, Vec2>();
     private BackgroundRenderer backgroundRenderer;
     private JointRenderer jointRenderer;
     private BulletRenderer bulletRenderer;
     private CannonRenderer cannonRenderer;
+    private PointerRenderer pointerRenderer;
     private BackgroundAnimationRenderer animationRenderer;
     private BackgroundAnimationFactory animationFactory;
-
     private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
     private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -114,21 +114,20 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     }
 
     @Override
-    public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
+    public Vec2 convertWindowToWorldCoordinates(Point windowCoord) {
         AABB aabb = gameModel.getWorldBoundries();
-        Point2D point = new Point2D.Double((float) windowCoord.x * (aabb.upperBound.x / (float) glCanvas.getWidth()), (float) (glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float) glCanvas.getHeight()));
 
-        return point;
+        return new Vec2((float) windowCoord.x * (aabb.upperBound.x / (float) glCanvas.getWidth()), (float) (glCanvas.getHeight() - windowCoord.y) * (renderWorldHeight / (float) glCanvas.getHeight()));
     }
 
     @Override
     public void putCursorPoint(int id, Point point) {
-        id2windowPoints.put(id, point);
+        id2Pointers.put(id, convertWindowToWorldCoordinates(point));
     }
 
     @Override
     public void removeCursorPoint(int id) {
-        id2windowPoints.remove(id);
+        id2Pointers.remove(id);
     }
 
     @Override
@@ -140,13 +139,16 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         try {
             bulletRenderer = new BulletRenderer(gl);
             cannonRenderer = new CannonRenderer(gl);
+            pointerRenderer = new PointerRenderer(gl);
             animationRenderer = new BackgroundAnimationRenderer(gl);
             animationFactory = new BackgroundAnimationFactory(animationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        gl.glEnable(GL_TEXTURE_2D);
         gl.glEnableClientState(GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
         gl.glEnable(GL_BLEND);
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -165,13 +167,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        gl.glEnable(GL_TEXTURE_2D);
-        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         // Draw background
+        // This blend function is needed for photoshop-like blend.
+        gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
         if (backgroundRenderer != null) {
-            // This blend function is needed for photoshop-like blend.
-            gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             backgroundRenderer.render(gl);
         }
 
@@ -179,7 +180,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         animationRenderer.render(gl, elapsedTime);
 
         cannonRenderer.render(gl, gameModel);
-        
+
 
         // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
         // there is no need to iterate over player blocks
@@ -225,6 +226,10 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glColor4fv(jointColor, 0);
         jointRenderer.render(gl, gameModel.getBuildingBlockJoints());
 
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        pointerRenderer.render(gl, id2Pointers.values());
     }
 
     @Override

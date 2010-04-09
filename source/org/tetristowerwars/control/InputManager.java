@@ -5,7 +5,9 @@
 package org.tetristowerwars.control;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  *
@@ -14,7 +16,7 @@ import java.util.List;
 public abstract class InputManager {
 
     private final List<InputListener> inputListeners = new ArrayList<InputListener>();
-    private final List<InputEvent> events = new ArrayList<InputEvent>();
+    private final Queue<InputEvent> events = new LinkedList<InputEvent>();
 
     public void addInputListener(InputListener listener) {
         inputListeners.add(listener);
@@ -26,13 +28,14 @@ public abstract class InputManager {
 
     protected void pushInputEvent(InputEvent event) {
         synchronized (events) {
-            events.add(event);
+            events.offer(event);
         }
     }
 
     public void pumpEvents() {
         synchronized (events) {
-            for (InputEvent inputEvent : events) {
+            while (!events.isEmpty()) {
+                InputEvent inputEvent = events.poll();
                 switch (inputEvent.getType()) {
                     case InputEvent.PRESSED:
                         fireOnPressEvent(inputEvent);
@@ -46,7 +49,6 @@ public abstract class InputManager {
                 }
             }
 
-            events.clear();
         }
     }
 

@@ -5,6 +5,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.gui.gl.GLUtil;
 
 /**
  *
@@ -16,13 +17,15 @@ public class CannonBlock extends Block {
     private final int coolDown;
     private final long lastShot = 0;
     private float angleValue = 0;
-
-
-    public CannonBlock(Body body, int force, int coolDown, Player player) {
+    private float speedFactor = 1f;
+    private final boolean shootingToLeft;
+    
+    public CannonBlock(Body body, int force, int coolDown, Player player, boolean shootToLeft) {
         super(body);
         this.force = force;
         this.coolDown = coolDown;
         player.addCannon(this);
+        this.shootingToLeft = shootToLeft;
     }
 
     public int getForce() {
@@ -34,10 +37,15 @@ public class CannonBlock extends Block {
     }
 
     public float getAngleInRadians() {
-        return (float) Math.asin(angleValue);
+        return GLUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, (float)Math.PI * 0.5f);
+
     }
 
     public float getAngleInDegrees() {
-        return (float) Math.toDegrees(Math.asin(angleValue));
+        return GLUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, 90f);
+    }
+
+    public boolean isShootingToLeft() {
+        return shootingToLeft;
     }
 }
