@@ -50,8 +50,12 @@ public class GameModel {
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
+
+    private final float blockSize;
+
     private final ArrayList<WinningCondition> winningConditions = new ArrayList<WinningCondition>();
     private Player leader = null;
+
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -64,7 +68,8 @@ public class GameModel {
      */
     public GameModel(float worldWidth, float worldHeight, float groundLevel, float blockSize) {
 
-        // TODO: How is screen coordinates mapped to physics coordiantes?
+
+        this.blockSize = blockSize;
         worldBoundries = new AABB(new Vec2(0, 0), new Vec2(worldWidth, worldHeight));
         Vec2 gravity = new Vec2(0, -9.82f);
         world = new World(worldBoundries, gravity, true);
@@ -244,6 +249,12 @@ public class GameModel {
     public Set<BuildingBlock> getBuildingBlockPool() {
         return Collections.unmodifiableSet(buildingBlockPool);
     }
+
+    public float getBlockSize() {
+        return blockSize;
+    }
+
+
 
     /**
      * Returns the first (and hopefully only) block from the given input

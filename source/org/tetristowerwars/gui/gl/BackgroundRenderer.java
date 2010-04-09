@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
-import static javax.media.opengl.GL.*;
 
 
 /**
@@ -23,28 +22,33 @@ public class BackgroundRenderer {
     private final Texture skyTexture;
     private final Texture cityTexture;
     private final Texture groundTexture;
+    private final Texture bottomTexture;
     private final FloatBuffer vertexBuffer;
     private final FloatBuffer texCoordBuffer;
     private final FloatBuffer color;
     private static final float cityShrinkFactor = 10.0f;
+    private static final float bottomShrinkFactor = 10.0f;
 
     public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel) throws IOException {
         skyTexture = TextureIO.newTexture(new File("res/gfx/sky.png"), true);
         cityTexture = TextureIO.newTexture(new File("res/gfx/citysilhuette.png"), true);
         groundTexture = TextureIO.newTexture(new File("res/gfx/ground.png"), true);
+        bottomTexture = TextureIO.newTexture(new File("res/gfx/bottom.png"), true);
 
         color = BufferUtil.newFloatBuffer(4);
         color.put(new float[] {1.0f, 1.0f, 1.0f, 1.0f});
         color.rewind();
 
-        vertexBuffer = BufferUtil.newFloatBuffer(3 * 4 * 2); // 3 quads, 4 vertices each, 2 floats per vertex
-        texCoordBuffer = BufferUtil.newFloatBuffer(3 * 4 * 2);
+        vertexBuffer = BufferUtil.newFloatBuffer(4 * 4 * 2); // 4 quads, 4 vertices each, 2 floats per vertex
+        texCoordBuffer = BufferUtil.newFloatBuffer(4 * 4 * 2);
 
         float horizonHeight = groundLevel + 40;
 
         float cityRepeats = cityShrinkFactor * renderWorldWidth / cityTexture.getWidth();
+        float bottomRepeats = bottomShrinkFactor * renderWorldWidth / bottomTexture.getWidth();
 
         cityTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        bottomTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
 
         // remember counter-clockwise order
         // First the sky
@@ -89,7 +93,22 @@ public class BackgroundRenderer {
         vertexBuffer.put(new float[]{0.0f, horizonHeight}); // left-top
         texCoordBuffer.put(new float[]{0.0f, 0.0f});
 
-        // jogl seems to like rewinded buffers.
+
+        // Bottom / ground to stand on
+        vertexBuffer.put(new float[] {
+            0, groundLevel - 10,
+            renderWorldWidth, groundLevel - 10,
+            renderWorldWidth, groundLevel,
+            0, groundLevel
+        });
+
+        texCoordBuffer.put(new float[] {
+            0.0f, 1.0f,
+            bottomRepeats, 1.0f,
+            bottomRepeats, 0.0f,
+            0.0f, 0.0f
+        });
+        
         vertexBuffer.rewind();
         texCoordBuffer.rewind();
     }
@@ -109,5 +128,8 @@ public class BackgroundRenderer {
 
         groundTexture.bind();
         gl.glDrawArrays(GL.GL_QUADS, 8, 4);
+
+        bottomTexture.bind();
+        gl.glDrawArrays(GL.GL_QUADS, 12, 4);
     }
 }
