@@ -487,14 +487,26 @@ public class GameModel {
                 }
             }
 
-            if (userData1 instanceof BulletBlock || userData2 instanceof BulletBlock) {
+            if (userData1 instanceof BulletBlock) {
 
-                if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
-                    blocksToRemove.add((Block) userData1);
+                if (((BulletBlock) userData1).getCannon() == userData2) {
+                    return;
                 }
 
+                blocksToRemove.add((Block) userData1);
                 if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
                     blocksToRemove.add((Block) userData2);
+                }
+            }
+
+            if (userData2 instanceof BulletBlock) {
+                if (((BulletBlock) userData2).getCannon() == userData1) {
+                    return;
+                }
+
+                blocksToRemove.add((Block) userData2);
+                if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
+                    blocksToRemove.add((Block) userData1);
                 }
             }
         }

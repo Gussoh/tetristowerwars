@@ -9,7 +9,7 @@ import org.jbox2d.collision.CircleDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
+import org.tetristowerwars.gui.gl.GLUtil;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.SteelMaterial;
 
@@ -28,12 +28,23 @@ public class BulletFactory {
 
     public BulletBlock createBullet(CannonBlock cannon) {
 
-        Vec2 canPos = cannon.getBody().getPosition();
-        Body body = createBody(new Vec2(canPos.x-blockSize-1, canPos.y+blockSize+1));
+        float radians = cannon.getAngleInRadians();
 
-        addShape(blockSize/2, new SteelMaterial(), body);
+        if (cannon.isShootingToLeft()) {
+            radians = (float)Math.PI - radians;
+        }
+        Vec2 impulse = GLUtil.rotate(new Vec2(1, 0), -radians);
+        Vec2 pos = cannon.getBody().getPosition();
+        pos.x += impulse.x * blockSize * 2;
+        pos.y += impulse.y * blockSize * 2;
 
-        body.applyImpulse(new Vec2(-cannon.getForce(), cannon.getForce()), body.getPosition());
+        Body body = createBody(pos);
+        addShape(blockSize / 2, new SteelMaterial(), body);
+
+        impulse.x *= cannon.getForce();
+        impulse.y *= cannon.getForce();
+
+        body.applyImpulse(impulse, body.getPosition());
 
         BulletBlock block = new BulletBlock(body, cannon);
         gameModel.fireBodyCreationNotification(block);
@@ -56,7 +67,6 @@ public class BulletFactory {
         CircleDef shapeDef = new CircleDef();
         shapeDef.density = mat.getDensity();
         shapeDef.radius = radius;
-        shapeDef.localPosition = new Vec2(0,0); //????
         shapeDef.isSensor = false;
         shapeDef.friction = 0.8f;
         shapeDef.restitution = 0.1f;

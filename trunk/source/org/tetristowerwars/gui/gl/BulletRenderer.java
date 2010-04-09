@@ -41,6 +41,7 @@ public class BulletRenderer {
     public void render(GL gl, GameModel gameModel) {
         int numBullets = 0;
 
+        gl.glColor3f(1.0f, 1.0f, 1.0f);
         for (Player player : gameModel.getPlayers()) {
             numBullets += player.getBullets().size();
         }

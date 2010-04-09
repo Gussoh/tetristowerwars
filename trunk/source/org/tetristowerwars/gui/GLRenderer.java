@@ -179,7 +179,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         animationFactory.run(elapsedTime);
         animationRenderer.render(gl, elapsedTime);
 
-        cannonRenderer.render(gl, gameModel);
+        
 
 
         // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
@@ -208,8 +208,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             rbbr.render(gl);
         }
 
-        bulletRenderer.render(gl, gameModel);
-
+        
         // Render block outlines
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -223,11 +222,15 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         // Render joints between mouse/finger and block.
         // Blend function already set.
-        gl.glColor4fv(jointColor, 0);
         jointRenderer.render(gl, gameModel.getBuildingBlockJoints());
 
         gl.glEnable(GL_TEXTURE_2D);
         gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        bulletRenderer.render(gl, gameModel);
+
+        cannonRenderer.render(gl, gameModel);
+        
 
         pointerRenderer.render(gl, id2Pointers.values());
     }
