@@ -29,7 +29,7 @@ public class BackgroundRenderer {
     private static final float cityShrinkFactor = 10.0f;
     private static final float bottomShrinkFactor = 10.0f;
 
-    public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel) throws IOException {
+    public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel, float horizontLevel) throws IOException {
         skyTexture = TextureIO.newTexture(new File("res/gfx/sky.png"), true);
         cityTexture = TextureIO.newTexture(new File("res/gfx/citysilhuette.png"), true);
         groundTexture = TextureIO.newTexture(new File("res/gfx/ground.png"), true);
@@ -42,8 +42,6 @@ public class BackgroundRenderer {
         vertexBuffer = BufferUtil.newFloatBuffer(4 * 4 * 2); // 4 quads, 4 vertices each, 2 floats per vertex
         texCoordBuffer = BufferUtil.newFloatBuffer(4 * 4 * 2);
 
-        float horizonHeight = groundLevel + 40;
-
         float cityRepeats = cityShrinkFactor * renderWorldWidth / cityTexture.getWidth();
         float bottomRepeats = bottomShrinkFactor * renderWorldWidth / bottomTexture.getWidth();
 
@@ -53,10 +51,10 @@ public class BackgroundRenderer {
         // remember counter-clockwise order
         // First the sky
 
-        vertexBuffer.put(new float[]{0.0f, horizonHeight}); // left-bottom
+        vertexBuffer.put(new float[]{0.0f, horizontLevel}); // left-bottom
         texCoordBuffer.put(new float[]{0.0f, 1.0f});
 
-        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight}); // right-bottom
+        vertexBuffer.put(new float[]{renderWorldWidth, horizontLevel}); // right-bottom
         texCoordBuffer.put(new float[]{1.0f, 1.0f});
 
         vertexBuffer.put(new float[]{renderWorldWidth, renderWorldHeight}); // right-top
@@ -67,16 +65,16 @@ public class BackgroundRenderer {
 
         // City
 
-        vertexBuffer.put(new float[]{0.0f, horizonHeight}); // left-bottom
+        vertexBuffer.put(new float[]{0.0f, horizontLevel}); // left-bottom
         texCoordBuffer.put(new float[]{0.0f, 1.0f});
 
-        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight}); // right-bottom
+        vertexBuffer.put(new float[]{renderWorldWidth, horizontLevel}); // right-bottom
         texCoordBuffer.put(new float[]{cityRepeats, 1.0f});
 
-        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight + cityTexture.getHeight() / cityShrinkFactor}); // right-top
+        vertexBuffer.put(new float[]{renderWorldWidth, horizontLevel + cityTexture.getHeight() / cityShrinkFactor}); // right-top
         texCoordBuffer.put(new float[]{cityRepeats, 0.0f});
 
-        vertexBuffer.put(new float[]{0.0f, horizonHeight + cityTexture.getHeight() / cityShrinkFactor}); // left-top
+        vertexBuffer.put(new float[]{0.0f, horizontLevel + cityTexture.getHeight() / cityShrinkFactor}); // left-top
         texCoordBuffer.put(new float[]{0.0f, 0.0f});
 
 
@@ -87,10 +85,10 @@ public class BackgroundRenderer {
         vertexBuffer.put(new float[]{renderWorldWidth, 0.0f}); // right-bottom
         texCoordBuffer.put(new float[]{1.0f, 1.0f});
 
-        vertexBuffer.put(new float[]{renderWorldWidth, horizonHeight}); // right-top
+        vertexBuffer.put(new float[]{renderWorldWidth, horizontLevel}); // right-top
         texCoordBuffer.put(new float[]{1.0f, 0.0f});
 
-        vertexBuffer.put(new float[]{0.0f, horizonHeight}); // left-top
+        vertexBuffer.put(new float[]{0.0f, horizontLevel}); // left-top
         texCoordBuffer.put(new float[]{0.0f, 0.0f});
 
 
