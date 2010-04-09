@@ -5,7 +5,7 @@
 
 package org.tetristowerwars.model;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  *
@@ -26,5 +26,5 @@ public interface GameModelListener {
 
     public void onWinningConditionFulfilled(WinningCondition condition);
 
-    public void onLeaderChanged(Map scoreList);
+    public abstract void onLeaderChanged(ArrayList scoreList);
 }

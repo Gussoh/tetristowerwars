@@ -5,9 +5,9 @@
 
 package org.tetristowerwars.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -29,25 +29,51 @@ public abstract class WinningCondition {
 
     public Player getLeader() {
         List<Player> players = model.getPlayers();
-        Player winner = null;
+        Player leader = null;
         float highest = 0;
         for (Player player : players) {
             float pHeight = player.getTowerHeight();
             if(pHeight > highest) {
                 highest = pHeight;
-                winner = player;
+                leader = player;
             }
         }
-        return winner;
+        return leader;
     }
 
-    public Map getScores() {
-        TreeMap<Player, Float> scores = new TreeMap<Player, Float>();
+    public ArrayList getScores() {
+        ArrayList<ScoreEntry<Player, Float>> scores = new ArrayList<ScoreEntry<Player, Float>>();
         List<Player> players = model.getPlayers();
         for (Player player : players) {
-            scores.put(player, player.getTowerHeight());
+            scores.add(new ScoreEntry(player, player.getTowerHeight()));
         }
+        Collections.sort(scores);
+
         return scores;
+    }
+    
+    public class ScoreEntry<Player, Float> implements Comparable<ScoreEntry>{
+        private final Player player;
+        private final float score;
+
+        private ScoreEntry (Player player, float score) {
+            this.player = player;
+            this.score = score;
+
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public float getScore() {
+            return score;
+        }
+
+        @Override
+        public int compareTo(ScoreEntry e) {
+            return (int) (this.score - e.score);
+        }
     }
 
 }
