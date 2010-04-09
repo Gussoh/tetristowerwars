@@ -28,7 +28,7 @@ public class CannonFactory {
         this.blockSize = blockSize;
     }
 
-    public CannonBlock createBasicCannon(Player player, Vec2 pos) {
+    public CannonBlock createBasicCannon(Player player, Vec2 pos, boolean shootingToLeft) {
 
         Body body = createBody(new Vec2(pos.x, pos.y + blockSize * 2));
 
@@ -41,7 +41,7 @@ public class CannonFactory {
         addPolyShape(vertices1, body);
         addCircleShape(blockSize, new SteelMaterial(), body);
 
-        CannonBlock cannonBlock = new CannonBlock(body, 10000, 5, player);
+        CannonBlock cannonBlock = new CannonBlock(body, 10000, 5, player, shootingToLeft);
 
         return cannonBlock;
     }

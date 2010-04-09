@@ -6,7 +6,7 @@ package org.tetristowerwars.gui;
 
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.geom.Point2D;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.GameModel;
 
 /**
@@ -25,7 +25,7 @@ public abstract class Renderer {
 
     public abstract Component getMouseInputComponent();
 
-    public abstract Point2D convertWindowToWorldCoordinates(Point windowCoord);
+    public abstract Vec2 convertWindowToWorldCoordinates(Point windowCoord);
 
     /**
      *

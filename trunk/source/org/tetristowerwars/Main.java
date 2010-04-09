@@ -60,8 +60,8 @@ public class Main {
         Player player2 = gameModel.createPlayer("Player 2", 180, 260);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
-        cannonFactory.createBasicCannon(player1, new Vec2(80, 10));
-        cannonFactory.createBasicCannon(player2, new Vec2(180, 10));
+        cannonFactory.createBasicCannon(player1, new Vec2(80, 10), false);
+        cannonFactory.createBasicCannon(player2, new Vec2(180, 10), true);
 
         //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);

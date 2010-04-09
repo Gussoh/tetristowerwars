@@ -15,7 +15,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -91,8 +90,8 @@ public class SwingRenderer extends Renderer {
     }
 
     @Override
-    public Point2D convertWindowToWorldCoordinates(Point windowCoord) {
-        return new Point2D.Double(windowCoord.x / scale, (renderPanel.getHeight() - windowCoord.y) / scale);
+    public Vec2 convertWindowToWorldCoordinates(Point windowCoord) {
+        return new Vec2((float)(windowCoord.x / scale), (float) ((renderPanel.getHeight() - windowCoord.y) / scale));
     }
 
     @Override
