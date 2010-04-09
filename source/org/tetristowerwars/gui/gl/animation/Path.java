@@ -48,4 +48,8 @@ public class Path {
     public boolean isDone() {
         return travelTime - currentTime < 0.0001f;
     }
+
+    public boolean isLeftToright() {
+        return end.x - start.x > 0;
+    }
 }

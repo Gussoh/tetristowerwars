@@ -24,11 +24,13 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
+import org.tetristowerwars.gui.gl.BackgroundAnimationRenderer;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.BulletRenderer;
 import org.tetristowerwars.gui.gl.CannonRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
+import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -47,14 +49,19 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private final GLCanvas glCanvas;
     private final JFrame frame;
     private Map<Integer, Point> id2windowPoints = new LinkedHashMap<Integer, Point>();
+
     private BackgroundRenderer backgroundRenderer;
     private JointRenderer jointRenderer;
     private BulletRenderer bulletRenderer;
     private CannonRenderer cannonRenderer;
+    private BackgroundAnimationRenderer animationRenderer;
+    private BackgroundAnimationFactory animationFactory;
+
     private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
     private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
     private float[] jointColor = {0.0f, 0.0f, 0.0f, 1.0f};
+    private long lastTimeMillis;
 
     /**
      * 
@@ -133,6 +140,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         try {
             bulletRenderer = new BulletRenderer(gl);
             cannonRenderer = new CannonRenderer(gl);
+            animationRenderer = new BackgroundAnimationRenderer(gl);
+            animationFactory = new BackgroundAnimationFactory(animationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -141,10 +150,17 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glEnable(GL_BLEND);
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+        lastTimeMillis = System.currentTimeMillis();
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
+
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = currentTime - lastTimeMillis;
+        lastTimeMillis = currentTime;
+
         GL gl = drawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
@@ -159,8 +175,11 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             backgroundRenderer.render(gl);
         }
 
-        cannonRenderer.render(gl, gameModel);
+        animationFactory.run(elapsedTime);
+        animationRenderer.render(gl, elapsedTime);
 
+        cannonRenderer.render(gl, gameModel);
+        
 
         // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
         // there is no need to iterate over player blocks
@@ -230,7 +249,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
         try {
-            backgroundRenderer = new BackgroundRenderer(gl, aabb.upperBound.x, renderWorldHeight, gameModel.getGroundLevel());
+            backgroundRenderer = new BackgroundRenderer(gl, aabb.upperBound.x, renderWorldHeight, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
