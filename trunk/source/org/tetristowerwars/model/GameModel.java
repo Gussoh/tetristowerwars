@@ -451,7 +451,6 @@ public class GameModel {
                 }
             }
             if  (condition.gameIsOver()) {
-                System.out.println("GEJM ÖVER!");
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onWinningConditionFulfilled(condition);
                 }

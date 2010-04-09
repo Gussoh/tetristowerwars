@@ -65,7 +65,7 @@ public class Main {
 
         //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
-        //WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
+        WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
 
         for (;;) {
             ++kalle;
