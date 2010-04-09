@@ -59,7 +59,7 @@ public class CannonRenderer {
 
     public void render(GL gl, GameModel gameModel) {
         int numCannons = 0;
-
+        gl.glColor3f(1.0f, 1.0f, 1.0f);
         for (Player player : gameModel.getPlayers()) {
             numCannons += player.getCannons().size();
         }
@@ -82,6 +82,10 @@ public class CannonRenderer {
             for (CannonBlock cannonBlock : player.getCannons()) {
                 Vec2 pos = cannonBlock.getBody().getPosition();
                 float cannonAngle = cannonBlock.getAngleInRadians();
+
+                if (cannonBlock.isShootingToLeft()) {
+                    cannonAngle = (float)Math.PI - cannonAngle;
+                }
                 baseVertexBuffer.put(new float[]{
                             pos.x - blockSize, pos.y - blockSize * 2,
                             pos.x + blockSize, pos.y - blockSize * 2,
@@ -108,6 +112,7 @@ public class CannonRenderer {
                             0.0f, 0.0f, // Base ends
                         });
 
+                cannonAngle = (float) (-cannonAngle + Math.PI);
 
                 Vec2 leftBottom = GLUtil.rotate(new Vec2(-2 * blockSize + pos.x, -blockSize / 2 + pos.y), cannonAngle, pos);
                 Vec2 rightBottom = GLUtil.rotate(new Vec2(pos.x, -blockSize / 2 + pos.y), cannonAngle, pos);

@@ -19,7 +19,8 @@ public class JointRenderer {
    
 
     public void render(GL gl, Set<BuildingBlockJoint> blockJoints) {
-        
+
+        gl.glColor3f(1.0f, 0.0f, 0.0f);
         gl.glBegin(GL.GL_LINES);
 
         for (BuildingBlockJoint buildingBlockJoint : blockJoints) {
