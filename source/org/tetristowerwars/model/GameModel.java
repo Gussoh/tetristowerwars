@@ -50,12 +50,9 @@ public class GameModel {
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
-
     private final float blockSize;
-
     private final ArrayList<WinningCondition> winningConditions = new ArrayList<WinningCondition>();
     private Player leader = null;
-
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -139,12 +136,11 @@ public class GameModel {
 
             if (block instanceof BuildingBlock) {
                 BuildingBlock buildingBlock = (BuildingBlock) block;
-                if (!buildingBlockPool.remove(buildingBlock)) {
-                    for (Player player : players) {
-                        if (player.removeBuildingBlock(buildingBlock)) {
-                            break;
-                        }
-                    }
+                Player owner = buildingBlock.getOwner();
+                if (owner == null) {
+                    buildingBlockPool.remove(buildingBlock);
+                } else {
+                    owner.removeBuildingBlock(buildingBlock);
                 }
 
                 BuildingBlockJoint bbj;
@@ -155,7 +151,6 @@ public class GameModel {
                     gameModelListener.onBlockDestruction(buildingBlock);
                 }
                 world.destroyBody(buildingBlock.getBody());
-
 
             } else if (block instanceof BulletBlock) {
                 BulletBlock bulletBlock = (BulletBlock) block;
@@ -253,8 +248,6 @@ public class GameModel {
     public float getBlockSize() {
         return blockSize;
     }
-
-
 
     /**
      * Returns the first (and hopefully only) block from the given input
@@ -438,7 +431,7 @@ public class GameModel {
         return world;
     }
 
-     public void addWinningCondition(WinningCondition condition) {
+    public void addWinningCondition(WinningCondition condition) {
         winningConditions.add(condition);
     }
 
@@ -450,7 +443,7 @@ public class GameModel {
                     gameModelListener.onLeaderChanged(null);
                 }
             }
-            if  (condition.gameIsOver()) {
+            if (condition.gameIsOver()) {
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onWinningConditionFulfilled(condition);
                 }
@@ -472,16 +465,26 @@ public class GameModel {
             Object userData1 = point.shape1.getBody().getUserData();
             Object userData2 = point.shape2.getBody().getUserData();
 
+            float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
+            Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
+            float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
+
             if (userData1 instanceof Block && userData2 instanceof Block) {
-                float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
-                Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
-                float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
 
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
                 }
-            } else if (userData1 instanceof BulletBlock) {
-            } else if (userData2 instanceof BulletBlock) {
+            }
+
+            if (userData1 instanceof BulletBlock || userData2 instanceof BulletBlock) {
+
+                if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
+                    blocksToRemove.add((Block) userData1);
+                }
+
+                if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
+                    blocksToRemove.add((Block) userData2);
+                }
             }
         }
 
