@@ -37,6 +37,10 @@ public class CannonRenderer {
         topTexture = TextureIO.newTexture(new File("res/gfx/cannon_top.png"), true);
         pipeTexture = TextureIO.newTexture(new File("res/gfx/cannon_pipe.png"), true);
 
+        GLUtil.fixTextureParameters(baseTexture);
+        GLUtil.fixTextureParameters(topTexture);
+        GLUtil.fixTextureParameters(pipeTexture);
+
         baseVertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_PART * 2);
         baseTexCoordBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_PART * 2);
         topVertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_PART * 2);

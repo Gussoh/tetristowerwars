@@ -35,6 +35,11 @@ public class BackgroundRenderer {
         groundTexture = TextureIO.newTexture(new File("res/gfx/ground.png"), true);
         bottomTexture = TextureIO.newTexture(new File("res/gfx/bottom.png"), true);
 
+        GLUtil.fixTextureParameters(skyTexture);
+        GLUtil.fixTextureParameters(cityTexture);
+        GLUtil.fixTextureParameters(groundTexture);
+        GLUtil.fixTextureParameters(bottomTexture);
+
         color = BufferUtil.newFloatBuffer(4);
         color.put(new float[] {1.0f, 1.0f, 1.0f, 1.0f});
         color.rewind();
