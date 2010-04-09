@@ -44,7 +44,7 @@ public class GameModel {
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
-    private final List<Block> blocksToRemove = new ArrayList<Block>();
+    private final Set<Block> blocksToRemove = new LinkedHashSet<Block>();
     private float timeTakenToExecuteUpdateMs;
     private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
@@ -136,6 +136,7 @@ public class GameModel {
 
             if (block instanceof BuildingBlock) {
                 BuildingBlock buildingBlock = (BuildingBlock) block;
+
                 Player owner = buildingBlock.getOwner();
                 if (owner == null) {
                     buildingBlockPool.remove(buildingBlock);

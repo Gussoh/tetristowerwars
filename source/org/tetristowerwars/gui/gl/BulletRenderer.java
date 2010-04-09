@@ -34,6 +34,8 @@ public class BulletRenderer {
         texture = TextureIO.newTexture(new File("res/gfx/bullet.png"), true);
         vertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);
         texCoordBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);
+
+        GLUtil.fixTextureParameters(texture);
     }
 
     public void render(GL gl, GameModel gameModel) {

@@ -40,6 +40,10 @@ public class BackgroundAnimationRenderer {
         tank2Texture = TextureIO.newTexture(new File("res/gfx/decoration/tank2.png"), true);
         zeppelinTexture = TextureIO.newTexture(new File("res/gfx/decoration/zeppelin1.png"), true);
 
+        GLUtil.fixTextureParameters(tank1Texture);
+        GLUtil.fixTextureParameters(tank2Texture);
+        GLUtil.fixTextureParameters(zeppelinTexture);
+
         vertexBuffer = BufferUtil.newFloatBuffer(10 * NUM_VERTICES_PER_ANIMATION * 2);
         texCoordBuffer = BufferUtil.newFloatBuffer(10 * NUM_VERTICES_PER_ANIMATION * 2);
     }

@@ -5,8 +5,6 @@
 
 package org.tetristowerwars.gui.gl;
 
-import com.sun.opengl.util.BufferUtil;
-import java.nio.FloatBuffer;
 import java.util.Set;
 import javax.media.opengl.GL;
 import org.jbox2d.common.Vec2;

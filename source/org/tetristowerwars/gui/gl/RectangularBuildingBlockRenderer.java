@@ -100,6 +100,7 @@ public class RectangularBuildingBlockRenderer implements Comparable<RectangularB
                 tex = TextureIO.newTexture(new File("res/gfx/singleblocks/mosaic_orange.png"), true);
             }
             if (tex != null) {
+                GLUtil.fixTextureParameters(tex);
                 material2Texture.put(mat, tex);
             }
         } catch (IOException exception) {
