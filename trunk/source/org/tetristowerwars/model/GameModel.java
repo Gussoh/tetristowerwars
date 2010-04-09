@@ -16,6 +16,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -120,6 +121,12 @@ public class GameModel {
 
         if (numTimesStepped > 0) {
             postProcess();
+            for (Player player : players) {
+                for (CannonBlock cannonBlock : player.getCannons()) {
+                    cannonBlock.adjustPipe((float) numTimesStepped * 1f / 60f);
+                }
+            }
+
             timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
         }
 
@@ -262,8 +269,13 @@ public class GameModel {
         float y = (float) position.getY();
         Shape[] shapes = world.query(new AABB(new Vec2(x - 0.5f, y - 0.5f), new Vec2(x + 0.5f, y + 0.5f)), 1);
 
+
+
         if (shapes != null && shapes.length > 0) {
-            return (Block) shapes[0].getBody().getUserData();
+            Shape shape = shapes[0];
+            if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
+                return (Block) shape.getBody().getUserData();
+            }
         }
 
         return null;

@@ -15,7 +15,8 @@ public class CannonBlock extends Block {
     private final int force;
     private final int coolDown;
     private final long lastShot = 0;
-    
+    private float angleValue = 0;
+
 
     public CannonBlock(Body body, int force, int coolDown, Player player) {
         super(body);
@@ -26,5 +27,17 @@ public class CannonBlock extends Block {
 
     public int getForce() {
         return force;
+    }
+
+    protected void adjustPipe(float f) {
+        angleValue += f;
+    }
+
+    public float getAngleInRadians() {
+        return (float) Math.asin(angleValue);
+    }
+
+    public float getAngleInDegrees() {
+        return (float) Math.toDegrees(Math.asin(angleValue));
     }
 }
