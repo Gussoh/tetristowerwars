@@ -72,7 +72,7 @@ public abstract class WinningCondition {
 
         @Override
         public int compareTo(ScoreEntry e) {
-            return (int) (this.score - e.score);
+            return (int) (e.score - this.score);
         }
     }
 

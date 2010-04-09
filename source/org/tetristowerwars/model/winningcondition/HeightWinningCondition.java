@@ -25,7 +25,7 @@ public class HeightWinningCondition extends WinningCondition {
 
     public HeightWinningCondition(GameModel model, float height) {
         super(model);
-        this.height = height;
+        this.height = height+model.getGroundLevel();
     }
 
     @Override
@@ -43,6 +43,9 @@ public class HeightWinningCondition extends WinningCondition {
             else if (System.currentTimeMillis() >= startTime+winningTimer && highestBlock == block) {
                 return true;
             }
+        }
+        else {
+            highestBlock = null;
         }
         return false;
     }
