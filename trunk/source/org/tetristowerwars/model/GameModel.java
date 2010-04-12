@@ -265,14 +265,17 @@ public class GameModel {
     public Block getBlockFromCoordinates(Vec2 position) {
         float x = position.x;
         float y = position.y;
-        Shape[] shapes = world.query(new AABB(new Vec2(x - 0.5f, y - 0.5f), new Vec2(x + 0.5f, y + 0.5f)), 1);
+        Shape[] shapes = world.query(new AABB(new Vec2(x - 0.1f, y - 0.1f), new Vec2(x + 0.1f, y + 0.1f)), 3);
 
 
 
         if (shapes != null && shapes.length > 0) {
-            Shape shape = shapes[0];
-            if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
-                return (Block) shape.getBody().getUserData();
+            for (int i = 0; i < shapes.length && shapes[i] != null; i++) {
+                Shape shape = shapes[i];
+            
+                if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
+                    return (Block) shape.getBody().getUserData();
+                }
             }
         }
 
