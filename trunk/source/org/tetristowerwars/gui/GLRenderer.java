@@ -10,7 +10,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,7 +27,7 @@ import org.tetristowerwars.gui.gl.BackgroundAnimationRenderer;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.BulletRenderer;
 import org.tetristowerwars.gui.gl.CannonRenderer;
-import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
+
 import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer2;
@@ -59,7 +58,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private RectangularBuildingBlockRenderer2 rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer animationRenderer;
     private BackgroundAnimationFactory animationFactory;
-    private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
     
     private float[] ambientLight = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -265,7 +263,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
 
         /******************** Pointers rendered **********************/
-        pointerRenderer.render(gl, id2Pointers.values());
+        pointerRenderer.render(gl, id2Pointers, elapsedTime);
 
         if (frameCounter % 60 == 0) {
             System.out.println("Time to render: " + ((System.nanoTime() - performanceTimer) / 1000000f) + " ms");
@@ -318,10 +316,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockDestruction(Block block) {
-        if (block instanceof RectangularBuildingBlock) {
-            RectangularBuildingBlock rbb = (RectangularBuildingBlock) block;
-            rectBlock2renderers.remove(rbb);
-        }
     }
 
     @Override
