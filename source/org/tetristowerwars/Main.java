@@ -41,8 +41,9 @@ public class Main {
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
 
         float blockSize = 5;
+        boolean useLightingEffects = true;
         final GameModel gameModel = new GameModel(260, 480, 10, blockSize);
-        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, null);
+        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, useLightingEffects, null);
         //final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
@@ -65,7 +66,7 @@ public class Main {
 
         //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
-        WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
+        WinningCondition win3 = new HeightWinningCondition(gameModel, 100);
 
         for (;;) {
             ++kalle;

@@ -16,11 +16,13 @@ import org.tetristowerwars.model.BuildingBlockJoint;
  */
 public class JointRenderer {
 
-   
 
-    public void render(GL gl, Set<BuildingBlockJoint> blockJoints) {
+    private final float[] color = {1.0f, 0.0f, 0.0f, 0.5f};
 
-        gl.glColor3f(1.0f, 0.0f, 0.0f);
+    public void renderLines(GL gl, Set<BuildingBlockJoint> blockJoints) {
+
+        gl.glColor4fv(color, 0);
+        
         gl.glBegin(GL.GL_LINES);
 
         for (BuildingBlockJoint buildingBlockJoint : blockJoints) {

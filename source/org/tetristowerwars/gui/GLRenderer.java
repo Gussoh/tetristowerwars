@@ -31,6 +31,7 @@ import org.tetristowerwars.gui.gl.CannonRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
+import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer2;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -55,21 +56,34 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private BulletRenderer bulletRenderer;
     private CannonRenderer cannonRenderer;
     private PointerRenderer pointerRenderer;
+    private RectangularBuildingBlockRenderer2 rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer animationRenderer;
     private BackgroundAnimationFactory animationFactory;
     private LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer> rectBlock2renderers = new LinkedHashMap<RectangularBuildingBlock, RectangularBuildingBlockRenderer>();
     private float renderWorldHeight;
-    private float[] blockOutlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
-    private float[] jointColor = {0.0f, 0.0f, 0.0f, 1.0f};
+    
+    private float[] ambientLight = {0.2f, 0.2f, 0.2f, 1.0f};
+    private float[] mainLightColor = {1.0f, 0.9f, 0.9f, 1.0f};
+    //private float[] mainLightPosition = {0.0f, 0.7071f, 0.7071f, 0.0f};
+    private float[] mainLightPosition = {0.2f, 0.7f, 0.7f, 0.0f};
     private long lastTimeMillis;
+    private final boolean lightingEffects;
+    private final boolean sceneAntiAliasing;
+    private long frameCounter = 0;
 
     /**
      * 
      * @param gameModel The game model.
      * @param graphicsDevice The graphics device to use, or null to use the default device.
      */
-    public GLRenderer(GameModel gameModel, GraphicsDevice graphicsDevice) {
+    public GLRenderer(GameModel gameModel, boolean lightingEffects, GraphicsDevice graphicsDevice) {
         super(gameModel);
+
+        this.lightingEffects = lightingEffects;
+
+        // Anti-aliasing is needed when using lighting for good looking gfx :)
+        this.sceneAntiAliasing = lightingEffects;
+
         gameModel.addGameModelListener(this);
 
         GLCapabilities capabilities = new GLCapabilities();
@@ -78,7 +92,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setDoubleBuffered(true);
         capabilities.setHardwareAccelerated(true);
         capabilities.setStereo(false);
-        capabilities.setSampleBuffers(false);
+        capabilities.setSampleBuffers(sceneAntiAliasing);
         capabilities.setNumSamples(4);
 
         // Use 32-bit RGBA
@@ -137,21 +151,40 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         jointRenderer = new JointRenderer();
         try {
-            bulletRenderer = new BulletRenderer(gl);
-            cannonRenderer = new CannonRenderer(gl);
+            bulletRenderer = new BulletRenderer(gl, lightingEffects);
+            cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
             pointerRenderer = new PointerRenderer(gl);
             animationRenderer = new BackgroundAnimationRenderer(gl);
+            rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer2(gl, lightingEffects);
             animationFactory = new BackgroundAnimationFactory(animationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        gl.glEnable(GL_TEXTURE_2D);
-        gl.glEnableClientState(GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        gl.glEnable(GL_NORMALIZE);
 
         gl.glEnable(GL_BLEND);
-        gl.glEnable(GL_LINE_SMOOTH);
-        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+        if (!sceneAntiAliasing) {
+            gl.glEnable(GL_LINE_SMOOTH);
+            gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        }
+        
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, mainLightColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, mainLightColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, mainLightPosition, 0);
+
+        gl.glEnable(GL_LIGHT0);
+
+
+        gl.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight, 0);
+
+        //gl.glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+        // TODO: Check if we need to have specular color added in the fragment shader instead.
+        // This might be needed for good looking shiny effects when using textures.
+        //gl.glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+
 
         lastTimeMillis = System.currentTimeMillis();
     }
@@ -160,17 +193,24 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void display(GLAutoDrawable drawable) {
 
         long currentTime = System.currentTimeMillis();
+        long performanceTimer = System.nanoTime();
         long elapsedTime = currentTime - lastTimeMillis;
         lastTimeMillis = currentTime;
+        frameCounter++;
 
         GL gl = drawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
+        /**************** Textured objects rendered *************************/
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         // Draw background
         // This blend function is needed for photoshop-like blend.
         gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
 
         if (backgroundRenderer != null) {
             backgroundRenderer.render(gl);
@@ -179,60 +219,57 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         animationFactory.run(elapsedTime);
         animationRenderer.render(gl, elapsedTime);
 
-        
-
-
-        // Update block renderers if necessary. Since all new blocks belongs to the block pool first,
-        // there is no need to iterate over player blocks
-        for (BuildingBlock buildingBlock : gameModel.getBuildingBlockPool()) {
-            if (buildingBlock instanceof RectangularBuildingBlock) {
-                RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
-                if (!rectBlock2renderers.containsKey(rbb)) {
-                    RectangularBuildingBlockRenderer rbbr = new RectangularBuildingBlockRenderer(gl, rbb);
-                    rectBlock2renderers.put(rbb, rbbr);
-                }
-            }
+        /**************** Lighting affected building blocks rendered ****************/
+        if (lightingEffects) {
+            gl.glEnable(GL_LIGHTING);
+            gl.glEnableClientState(GL_NORMAL_ARRAY);
         }
+        // render building blocks, except outline
+        rectangularBuildingBlockRenderer.render(gl, gameModel);
 
-
-        // Create render list based on texture name to avoid expense texture.bind operations.
-        ArrayList<RectangularBuildingBlockRenderer> renderList = new ArrayList<RectangularBuildingBlockRenderer>(rectBlock2renderers.values());
-        Collections.sort(renderList);
-
-        String currentMaterialName = "";
-        for (RectangularBuildingBlockRenderer rbbr : renderList) {
-            if (!currentMaterialName.equals(rbbr.getMaterialName())) {
-                currentMaterialName = rbbr.getMaterialName();
-                rbbr.bindTexture();
-            }
-            rbbr.render(gl);
+        if (lightingEffects) {
+            gl.glDisableClientState(GL_NORMAL_ARRAY);
+            gl.glDisable(GL_LIGHTING);
         }
-
-        
+        /************* Line rendering begins *******************************/
         // Render block outlines
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
         // This blend function is needed for good looking anti-aliased lines.
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        gl.glColor4fv(blockOutlineColor, 0);
-        for (RectangularBuildingBlockRenderer rbbr : renderList) {
-            rbbr.renderLines(gl);
-        }
+
+        rectangularBuildingBlockRenderer.renderLines(gl);
 
         // Render joints between mouse/finger and block.
         // Blend function already set.
-        jointRenderer.render(gl, gameModel.getBuildingBlockJoints());
+        jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints());
 
+
+        /******************** Cannons and bullets rendered **********************/
         gl.glEnable(GL_TEXTURE_2D);
         gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+        if (lightingEffects) {
+            gl.glEnable(GL_LIGHTING);
+            gl.glEnableClientState(GL_NORMAL_ARRAY);
+        }
+
         bulletRenderer.render(gl, gameModel);
-
         cannonRenderer.render(gl, gameModel);
-        
 
+        if (lightingEffects) {
+            gl.glDisable(GL_LIGHTING);
+            gl.glDisableClientState(GL_NORMAL_ARRAY);
+        }
+
+
+        /******************** Pointers rendered **********************/
         pointerRenderer.render(gl, id2Pointers.values());
+
+        if (frameCounter % 60 == 0) {
+            System.out.println("Time to render: " + ((System.nanoTime() - performanceTimer) / 1000000f) + " ms");
+        }
     }
 
     @Override

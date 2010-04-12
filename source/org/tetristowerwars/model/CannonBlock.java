@@ -5,7 +5,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
-import org.tetristowerwars.gui.gl.GLUtil;
+import org.tetristowerwars.util.MathUtil;
 
 /**
  *
@@ -37,12 +37,12 @@ public class CannonBlock extends Block {
     }
 
     public float getAngleInRadians() {
-        return GLUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, (float)Math.PI * 0.5f);
+        return MathUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, (float)Math.PI * 0.5f);
 
     }
 
     public float getAngleInDegrees() {
-        return GLUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, 90f);
+        return MathUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, 90f);
     }
 
     public boolean isShootingToLeft() {
