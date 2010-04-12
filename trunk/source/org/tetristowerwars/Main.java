@@ -8,6 +8,7 @@ import TUIO.TuioClient;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.InputManager;
@@ -21,6 +22,7 @@ import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
 import org.tetristowerwars.model.winningcondition.LimitedBlocksWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
@@ -64,9 +66,17 @@ public class Main {
         cannonFactory.createBasicCannon(player1, new Vec2(80, 10), false);
         cannonFactory.createBasicCannon(player2, new Vec2(180, 10), true);
 
-        //WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
+        WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
+        //win1.setWinningCondition();
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
-        WinningCondition win3 = new HeightWinningCondition(gameModel, 100);
+        //win2.setWinningCondition();
+        WinningCondition win3 = new HeightWinningCondition(gameModel, 30);
+        //win3.setWinningCondition();
+        ArrayList conditions = new ArrayList();
+        conditions.add(win1);
+        conditions.add(win3);
+        //WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
+        //cwin.setWinningCondition();
 
         for (;;) {
             ++kalle;

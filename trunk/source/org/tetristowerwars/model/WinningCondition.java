@@ -18,10 +18,9 @@ public abstract class WinningCondition {
 
     public WinningCondition(GameModel model) {
         this.model = model;
-        setWinningCondition();
     }
 
-    protected void setWinningCondition() {
+    public void setWinningCondition() {
         model.addWinningCondition(this);
     }
 
