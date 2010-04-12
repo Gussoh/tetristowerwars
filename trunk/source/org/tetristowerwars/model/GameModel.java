@@ -267,8 +267,6 @@ public class GameModel {
         float y = position.y;
         Shape[] shapes = world.query(new AABB(new Vec2(x - 0.1f, y - 0.1f), new Vec2(x + 0.1f, y + 0.1f)), 3);
 
-
-
         if (shapes != null && shapes.length > 0) {
             for (int i = 0; i < shapes.length && shapes[i] != null; i++) {
                 Shape shape = shapes[i];

@@ -7,9 +7,9 @@ package org.tetristowerwars.model;
 
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.tetristowerwars.gui.gl.GLUtil;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.SteelMaterial;
 
@@ -28,18 +28,24 @@ public class BulletFactory {
 
     public BulletBlock createBullet(CannonBlock cannon) {
 
-        float radians = cannon.getAngleInRadians();
+        float cannonAngle = -cannon.getAngleInRadians();
 
-        if (cannon.isShootingToLeft()) {
-            radians = (float)Math.PI - radians;
+        if (!cannon.isShootingToLeft()) {
+            cannonAngle = (float)Math.PI - cannonAngle;
         }
-        Vec2 impulse = GLUtil.rotate(new Vec2(1, 0), -radians);
-        Vec2 pos = cannon.getBody().getPosition();
-        pos.x += impulse.x * blockSize * 2;
-        pos.y += impulse.y * blockSize * 2;
 
-        Body body = createBody(pos);
-        addShape(blockSize / 2, new SteelMaterial(), body);
+        XForm xf = new XForm();
+        xf.R.setAngle(cannonAngle);
+
+        Vec2 cannonPos = cannon.getBody().getPosition();
+
+
+        Vec2 impulse = XForm.mul(xf, new Vec2(-1, 0));
+        // Put the bullet a bit away from the tower body to avoid auto-translation by the physics engine.
+        Vec2 bulletPosition = new Vec2(cannonPos.x + impulse.x * blockSize * 2, cannonPos.y + impulse.y * blockSize * 2);
+        
+        Body body = createBody(bulletPosition);
+        addShape(blockSize * 0.5f, new SteelMaterial(), body);
 
         impulse.x *= cannon.getForce();
         impulse.y *= cannon.getForce();
@@ -57,7 +63,6 @@ public class BulletFactory {
         BodyDef boxBodyDef = new BodyDef();
         boxBodyDef.allowSleep = true;
         boxBodyDef.position.set(pos.x, pos.y);
-
 
         return gameModel.getWorld().createBody(boxBodyDef);
     }

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
+import static javax.media.opengl.GL.*;
 
 
 /**
@@ -120,19 +121,19 @@ public class BackgroundRenderer {
     public void render(GL gl) {
         gl.glColor4fv(color);
 
-        gl.glVertexPointer(2, GL.GL_FLOAT, 0, vertexBuffer);
-        gl.glTexCoordPointer(2, GL.GL_FLOAT, 0, texCoordBuffer);
+        gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+        gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
 
         skyTexture.bind();
-        gl.glDrawArrays(GL.GL_QUADS, 0, 4);
+        gl.glDrawArrays(GL_QUADS, 0, 4);
         
         cityTexture.bind();
-        gl.glDrawArrays(GL.GL_QUADS, 4, 4);
+        gl.glDrawArrays(GL_QUADS, 4, 4);
 
         groundTexture.bind();
-        gl.glDrawArrays(GL.GL_QUADS, 8, 4);
+        gl.glDrawArrays(GL_QUADS, 8, 4);
 
         bottomTexture.bind();
-        gl.glDrawArrays(GL.GL_QUADS, 12, 4);
+        gl.glDrawArrays(GL_QUADS, 12, 4);
     }
 }

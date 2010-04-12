@@ -158,7 +158,7 @@ public class BuildingBlockFactory {
         outline[8] = new Vec2(-blockSize * 0.5f, blockSize * 0.5f);
         outline[9] = new Vec2(-blockSize * 1.5f, blockSize * 0.5f);
         outline[10] = new Vec2(-blockSize * 1.5f, -blockSize * 0.5f);
-        outline[10] = new Vec2(-blockSize * 0.5f, -blockSize * 0.5f);
+        outline[11] = new Vec2(-blockSize * 0.5f, -blockSize * 0.5f);
 
         vertices1.add(new Vec2(-blockSize * 0.5f, -blockSize * 1.5f));
         vertices1.add(new Vec2(blockSize * 0.5f, -blockSize * 1.5f));
