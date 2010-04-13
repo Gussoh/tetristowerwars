@@ -80,7 +80,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
      * @param gameModel The game model.
      * @param graphicsDevice The graphics device to use, or null to use the default device.
      */
-    public GLRenderer(GameModel gameModel, boolean lightingEffects, GraphicsDevice graphicsDevice, boolean useAlternateComponent) {
+    public GLRenderer(GameModel gameModel, boolean lightingEffects, GraphicsDevice graphicsDevice) {
         super(gameModel);
 
         this.lightingEffects = lightingEffects;
@@ -109,6 +109,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         }
 
+        
         glCanvas = new GLCanvas(capabilities); //, null, null, graphicsDevice);
 
         glCanvas.addGLEventListener(this);
