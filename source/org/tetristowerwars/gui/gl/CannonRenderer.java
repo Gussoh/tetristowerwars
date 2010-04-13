@@ -191,6 +191,14 @@ public class CannonRenderer {
             }
 
         }
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        if (lightingEffects) {
+            gl.glEnable(GL_LIGHTING);
+            gl.glEnableClientState(GL_NORMAL_ARRAY);
+        }
 
         baseVertexBuffer.rewind();
         topVertexBuffer.rewind();
@@ -234,5 +242,13 @@ public class CannonRenderer {
         }
         topTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
+
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        if (lightingEffects) {
+            gl.glDisable(GL_LIGHTING);
+            gl.glDisableClientState(GL_NORMAL_ARRAY);
+        }
     }
 }

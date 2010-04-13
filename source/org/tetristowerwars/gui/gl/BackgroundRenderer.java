@@ -13,7 +13,6 @@ import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import static javax.media.opengl.GL.*;
 
-
 /**
  *
  * @author Andreas
@@ -42,7 +41,7 @@ public class BackgroundRenderer {
         GLUtil.fixTextureParameters(bottomTexture);
 
         color = BufferUtil.newFloatBuffer(4);
-        color.put(new float[] {1.0f, 1.0f, 1.0f, 1.0f});
+        color.put(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
         color.rewind();
 
         vertexBuffer = BufferUtil.newFloatBuffer(4 * 4 * 2); // 4 quads, 4 vertices each, 2 floats per vertex
@@ -65,7 +64,7 @@ public class BackgroundRenderer {
 
         vertexBuffer.put(new float[]{renderWorldWidth, renderWorldHeight}); // right-top
         texCoordBuffer.put(new float[]{1.0f, 0.0f});
-        
+
         vertexBuffer.put(new float[]{0.0f, renderWorldHeight}); // left-top
         texCoordBuffer.put(new float[]{0.0f, 0.0f});
 
@@ -99,26 +98,34 @@ public class BackgroundRenderer {
 
 
         // Bottom / ground to stand on
-        vertexBuffer.put(new float[] {
-            0, groundLevel - 10,
-            renderWorldWidth, groundLevel - 10,
-            renderWorldWidth, groundLevel,
-            0, groundLevel
-        });
+        vertexBuffer.put(new float[]{
+                    0, groundLevel - 10,
+                    renderWorldWidth, groundLevel - 10,
+                    renderWorldWidth, groundLevel,
+                    0, groundLevel
+                });
 
-        texCoordBuffer.put(new float[] {
-            0.0f, 1.0f,
-            bottomRepeats, 1.0f,
-            bottomRepeats, 0.0f,
-            0.0f, 0.0f
-        });
-        
+        texCoordBuffer.put(new float[]{
+                    0.0f, 1.0f,
+                    bottomRepeats, 1.0f,
+                    bottomRepeats, 0.0f,
+                    0.0f, 0.0f
+                });
+
         vertexBuffer.rewind();
         texCoordBuffer.rewind();
     }
 
-
     public void render(GL gl) {
+
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        // Draw background
+        // This blend function is needed for photoshop-like blend.
+        gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+
         gl.glColor4fv(color);
 
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
@@ -126,14 +133,32 @@ public class BackgroundRenderer {
 
         skyTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, 4);
-        
+
         cityTexture.bind();
         gl.glDrawArrays(GL_QUADS, 4, 4);
 
         groundTexture.bind();
         gl.glDrawArrays(GL_QUADS, 8, 4);
 
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+
+    public void renderBottom(GL gl) {
+
+        gl.glColor4fv(color);
+        gl.glDisable(GL_BLEND);
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
+        gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
+
         bottomTexture.bind();
         gl.glDrawArrays(GL_QUADS, 12, 4);
+
+        gl.glEnable(GL_BLEND);
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 }

@@ -34,12 +34,13 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
-        
-        renderer.putCursorPoint(event.getActionId(), event.getPosition());
 
-        Block collisionBlock;
 
-        if ((collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()))) == null) {
+
+        Block collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()));
+
+        if (collisionBlock == null) {
+            renderer.putCursorPoint(event.getActionId(), event.getPosition(), false);
             return;
         }
 
@@ -49,6 +50,8 @@ public class Controller implements InputListener {
                 // TODO: Do we really remove the old actionId? Workaround remove it.
                 performReleaseAction(event);
             }
+
+            renderer.putCursorPoint(event.getActionId(), event.getPosition(), true);
 
             actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
         } else if (collisionBlock instanceof CannonBlock) {
@@ -72,15 +75,16 @@ public class Controller implements InputListener {
         }
     }
 
-
-
     @Override
     public void onInputDeviceDragged(InputEvent event) {
-        renderer.putCursorPoint(event.getActionId(), event.getPosition());
+        boolean hit = false;
         // If a building block joint exists for this very id
         if (actionIdToJoint.get(event.getActionId()) != null) {
+            hit = true;
             gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
         }
+        
+        renderer.putCursorPoint(event.getActionId(), event.getPosition(), hit);
     }
 
     public void writeEvent(InputEvent event) {

@@ -41,7 +41,7 @@ public class PointerRenderer {
         colorBuffer = BufferUtil.newFloatBuffer(4 * NUM_VERTICES_PER_POINTER * 4);
     }
 
-    public void render(GL gl, Map<Integer, Vec2> pointers, float elapsedTime) {
+    public void render(GL gl, Map<Integer, Pointer> pointers, float elapsedTime) {
 
         int numCoords = pointers.size() * NUM_VERTICES_PER_POINTER;
 
@@ -59,20 +59,24 @@ public class PointerRenderer {
             }
         }
 
-        for (Map.Entry<Integer, Vec2> entry : pointers.entrySet()) {
-            Vec2 v = entry.getValue();
-
+        for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+            Vec2 v = entry.getValue().pos;
+            boolean hit = entry.getValue().hit;
             Path p = intensityPaths.get(entry.getKey());
 
             if (p == null) {
-                p = new Path(new Vec2(1.0f, 1.0f), new Vec2(0.5f, 0.0f), 300.0f);
+                float extraSize = hit ? 1.0f : 0.0f;
+                float startAlpha = hit ? 1.0f : 0.5f;
+                p = new Path(new Vec2(startAlpha, extraSize), new Vec2(0.5f, 0.0f), 300.0f);
                 intensityPaths.put(entry.getKey(), p);
             } else {
                 p.addTime(elapsedTime);
             }
 
-            float alpha = p.getCurrentPosition().x;
-            float r = POINTER_RADIUS + p.getCurrentPosition().y;
+            Vec2 temp = p.getCurrentPosition();
+
+            float alpha = temp.x;
+            float r = POINTER_RADIUS + temp.y;
 
 
 
@@ -90,23 +94,28 @@ public class PointerRenderer {
                         0.0f, 0.0f
                     });
 
-
-
+            float greenBlueColor;
+            if (entry.getValue().hit) {
+                greenBlueColor = 1.0f - p.getRatio();
+            } else {
+                greenBlueColor = 0.0f;
+            }
             colorBuffer.put(new float[]{
-                        1.0f, 0.0f, 0.0f, alpha,
-                        1.0f, 0.0f, 0.0f, alpha,
-                        1.0f, 0.0f, 0.0f, alpha,
-                        1.0f, 0.0f, 0.0f, alpha,});
+                        1.0f, greenBlueColor, greenBlueColor, alpha,
+                        1.0f, greenBlueColor, greenBlueColor, alpha,
+                        1.0f, greenBlueColor, greenBlueColor, alpha,
+                        1.0f, greenBlueColor, greenBlueColor, alpha
+                    });
         }
-
-
-
 
         vertexBuffer.rewind();
         texCoordBuffer.rewind();
         colorBuffer.rewind();
 
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glEnableClientState(GL_COLOR_ARRAY);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
@@ -115,6 +124,9 @@ public class PointerRenderer {
         texture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
 
+
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glDisableClientState(GL_COLOR_ARRAY);
     }
 }

@@ -11,12 +11,14 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.media.opengl.GL;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
+import org.tetristowerwars.gui.gl.animation.Path;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
@@ -41,8 +43,17 @@ public class RectangularBuildingBlockRenderer2 {
     private final float flatSquareRatio = 0.8f;
     private final boolean lightingEffects;
     private FloatBuffer lineVertexBuffer;
+    private FloatBuffer animationVertexBuffer;
+    private FloatBuffer animationColorBuffer;
     private int numLines;
+    private int numAnimationVertices;
     private final float[] outlineColor = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+    private final float[] overlayColor = new float[]{0.8f, 1.0f, 0.8f};
+
+    private final static float START_INTENSITY = 1.0f;
+    private final static float END_INTENSITY = 0.0f;
+    private final static float ANIMATION_TIME_MS = 750.0f;
+    private final Map<BuildingBlock, Path> animations = new LinkedHashMap<BuildingBlock, Path>();
 
     public RectangularBuildingBlockRenderer2(GL gl, boolean lightingEffects) throws IOException {
         this.lightingEffects = lightingEffects;
@@ -53,12 +64,14 @@ public class RectangularBuildingBlockRenderer2 {
             NUM_VERTICES_PER_SQUARE = 4;
         }
 
-        createBufferEntry(WoodMaterial.class, "res/gfx/singleblocks/tree01.png", new float[] {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
-        createBufferEntry(ConcreteMaterial.class, "res/gfx/singleblocks/patch_green.png", new float[] {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
-        createBufferEntry(AluminiumMaterial.class, "res/gfx/singleblocks/mosaic_orange.png", new float[] {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
-        createBufferEntry(SteelMaterial.class, "res/gfx/singleblocks/patch_blue.png", new float[] {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
+        createBufferEntry(WoodMaterial.class, "res/gfx/singleblocks/tree01.png", new float[]{1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
+        createBufferEntry(ConcreteMaterial.class, "res/gfx/singleblocks/patch_green.png", new float[]{1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
+        createBufferEntry(AluminiumMaterial.class, "res/gfx/singleblocks/mosaic_orange.png", new float[]{1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
+        createBufferEntry(SteelMaterial.class, "res/gfx/singleblocks/patch_blue.png", new float[]{1.0f, 1.0f, 1.0f, 1.0f}, 0.0f);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
+        animationVertexBuffer = BufferUtil.newFloatBuffer(4 * 2 * 20);
+        animationColorBuffer = BufferUtil.newFloatBuffer(4 * 4 * 20);
     }
 
     private void createBufferEntry(Class<? extends Material> materialClass, String textureFile, float[] materialColor, float shinyFactor) throws IOException {
@@ -93,12 +106,13 @@ public class RectangularBuildingBlockRenderer2 {
             }
         }
 
-
         int numVertices = numLines * 2;
 
         if (numVertices * 2 > lineVertexBuffer.capacity()) {
             lineVertexBuffer = BufferUtil.newFloatBuffer(numVertices * 2);
         }
+
+
     }
 
     private void countSquaresAndLines(Set<BuildingBlock> buildingBlocks) {
@@ -120,13 +134,14 @@ public class RectangularBuildingBlockRenderer2 {
                     topLeft.x, topLeft.y
                 });
 
-        bufferEntry.texCoordBuffer.put(new float[]{
-                    0.0f, 1.0f,
-                    1.0f, 1.0f,
-                    1.0f, 0.0f,
-                    0.0f, 0.0f
-                });
-
+        if (bufferEntry.texture != null) {
+            bufferEntry.texCoordBuffer.put(new float[]{
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.0f,
+                        0.0f, 0.0f
+                    });
+        }
         if (normal != null) {
             bufferEntry.normalBuffer.put(new float[]{
                         normal.x, normal.y, normal.z,
@@ -145,6 +160,7 @@ public class RectangularBuildingBlockRenderer2 {
                 BufferEntry bufferEntry = bufferEntries.get(rbb.getMaterial().getClass());
                 XForm xForm = rbb.getBody().getXForm();
                 Vec2[] outline = rbb.getOutline();
+                Path p = animations.get(buildingBlock);
 
                 for (Rectangle2D r : rbb.getRectangles()) {
 
@@ -193,6 +209,23 @@ public class RectangularBuildingBlockRenderer2 {
                     } else {
                         putDataIntoBuffers(bufferEntry, bl, br, tr, tl, null);
                     }
+
+                    if (p != null) {
+                        float intensity = p.getCurrentPosition().x;
+                        animationVertexBuffer.put(new float[] {
+                            bl.x, bl.y,
+                            br.x, br.y,
+                            tr.x, tr.y,
+                            tl.x, tl.y
+                        });
+
+                        animationColorBuffer.put(new float[] {
+                            overlayColor[0], overlayColor[1], overlayColor[2], intensity,
+                            overlayColor[0], overlayColor[1], overlayColor[2], intensity,
+                            overlayColor[0], overlayColor[1], overlayColor[2], intensity,
+                            overlayColor[0], overlayColor[1], overlayColor[2], intensity
+                        });
+                    }
                 }
 
                 Vec2 start = XForm.mul(xForm, outline[outline.length - 1]);
@@ -210,8 +243,9 @@ public class RectangularBuildingBlockRenderer2 {
         }
     }
 
-    public void render(GL gl, GameModel gameModel) {
+    public void render(GL gl, GameModel gameModel, float elapsedTime) {
         ensureBufferCapacity(gameModel);
+        updateAnimationsAndBufferCapacity(elapsedTime);
 
         createBufferData(gameModel.getBuildingBlockPool());
         for (Player player : gameModel.getPlayers()) {
@@ -219,6 +253,18 @@ public class RectangularBuildingBlockRenderer2 {
         }
 
         lineVertexBuffer.rewind();
+        animationVertexBuffer.rewind();
+        animationColorBuffer.rewind();
+
+        gl.glDisable(GL_BLEND);
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (lightingEffects) {
+            gl.glEnableClientState(GL_NORMAL_ARRAY);
+            gl.glEnable(GL_LIGHTING);
+        } 
+        
+
 
         for (BufferEntry bufferEntry : bufferEntries.values()) {
 
@@ -230,7 +276,7 @@ public class RectangularBuildingBlockRenderer2 {
             if (lightingEffects) {
                 bufferEntry.normalBuffer.rewind();
                 gl.glNormalPointer(GL_FLOAT, 0, bufferEntry.normalBuffer);
-                
+
                 gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bufferEntry.color, 0);
                 gl.glMaterialfv(GL_FRONT, GL_SPECULAR, bufferEntry.specular, 0);
             } else {
@@ -241,12 +287,66 @@ public class RectangularBuildingBlockRenderer2 {
             gl.glDrawArrays(GL_QUADS, 0, bufferEntry.numSquares * NUM_VERTICES_PER_SQUARE);
         }
 
+        gl.glEnable(GL_BLEND);
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (lightingEffects) {
+            gl.glDisableClientState(GL_NORMAL_ARRAY);
+            gl.glDisable(GL_LIGHTING);
+        }
     }
 
     public void renderLines(GL gl) {
+        
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         gl.glColor4fv(outlineColor, 0);
         gl.glVertexPointer(2, GL_FLOAT, 0, lineVertexBuffer);
         gl.glDrawArrays(GL_LINES, 0, numLines * 2);
+    }
+
+    public void renderOverlay(GL gl) {
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        gl.glEnableClientState(GL_COLOR_ARRAY);
+
+        gl.glVertexPointer(2, GL_FLOAT, 0, animationVertexBuffer);
+        gl.glColorPointer(4, GL_FLOAT, 0, animationColorBuffer);
+        gl.glDrawArrays(GL_QUADS, 0, numAnimationVertices);
+
+        gl.glDisableClientState(GL_COLOR_ARRAY);
+    }
+
+    public void addBuildingBlockOverlayAnimation(BuildingBlock bb) {
+        animations.put(bb, new Path(new Vec2(START_INTENSITY, 0), new Vec2(END_INTENSITY, 0), ANIMATION_TIME_MS));
+    }
+
+    private void updateAnimationsAndBufferCapacity(float elapsedTime) {
+
+        int numRects = 0;
+
+        for (Iterator<Map.Entry<BuildingBlock, Path>> it = animations.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<BuildingBlock, Path> entry = it.next();
+
+            Path p = entry.getValue();
+
+            if (p.isDone()) {
+                it.remove();
+            } else {
+                p.addTime(elapsedTime);
+                if (entry.getKey() instanceof RectangularBuildingBlock) {
+                    RectangularBuildingBlock rbb = (RectangularBuildingBlock) entry.getKey();
+                    numRects += rbb.getRectangles().length;
+                }
+            }
+        }
+
+
+        numAnimationVertices = numRects * 4;
+
+        if (numAnimationVertices * 2 > animationVertexBuffer.capacity()) {
+            animationVertexBuffer = BufferUtil.newFloatBuffer(numAnimationVertices * 2);
+            animationColorBuffer = BufferUtil.newFloatBuffer(numAnimationVertices * 4);
+        }
     }
 
     private class BufferEntry {
@@ -266,10 +366,14 @@ public class RectangularBuildingBlockRenderer2 {
             specular = new float[]{shinyFactor, shinyFactor, shinyFactor, 1.0f};
 
             vertexBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 2);
-            texCoordBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 2);
-            if (lightingEffects) {
+            if (texture != null) {
+                texCoordBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 2);
+            }
+
+            if (lightingEffects && materialColor != null) {
                 normalBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 3);
             }
+
         }
     }
 }
