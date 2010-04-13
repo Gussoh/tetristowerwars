@@ -207,9 +207,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         frameCounter++;
 
         GL gl = drawable.getGL();
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+
+       // gl.glClear(GL.GL_COLOR_BUFFER_BIT);  // Not needed since we draw a background
         gl.glLoadIdentity();
 
+        // background renderer depends on the shape of the window,
+        // in some cases display() might be called before reshape(), this check prevent us from failing.
         if (backgroundRenderer != null) {
             backgroundRenderer.render(gl);
         }

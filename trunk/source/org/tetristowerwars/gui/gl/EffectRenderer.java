@@ -68,7 +68,7 @@ public class EffectRenderer {
 
         frictionParticleEngine = new PointSourceParticleEngine();
         frictionParticleEngine.setTimeToLive(1000.0f, 2000.0f);
-        frictionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI);
+        frictionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
         frictionParticleEngine.setRotationSpeed(0, 0);
         frictionParticleEngine.setSpeed(1.0f, 10.0f);
         frictionParticleEngine.setStepFunction(new GravityStepFunction());
