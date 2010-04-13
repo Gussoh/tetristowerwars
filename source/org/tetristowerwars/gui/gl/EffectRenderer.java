@@ -45,7 +45,7 @@ public class EffectRenderer {
     private final static float END_LENGTH = 20.0f;
     private final static float ANIMATION_TIME_MS = 750.0f;
     private final static float EXPLOSION_PARTICLE_SIZE = 10.0f;
-    private final static float FRICTION_PARTICLE_SIZE = 0.25f;
+    private final static float FRICTION_PARTICLE_SIZE = 0.5f;
     private final Map<Path, Vec2> animations = new LinkedHashMap<Path, Vec2>();
 
     public EffectRenderer(GL gl) throws IOException {
@@ -59,11 +59,11 @@ public class EffectRenderer {
         particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
 
         explosionParticleEngine = new PointSourceParticleEngine();
-        explosionParticleEngine.setTimeToLive(2000.0f, 4000.0f);
+        explosionParticleEngine.setTimeToLive(1500.0f, 2000.0f);
         explosionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
         explosionParticleEngine.setRotationSpeed(0, 0);
         explosionParticleEngine.setSpeed(0.0f, 40.0f);
-        explosionParticleEngine.setStepFunction(new GravityStepFunction(new Vec2(0, 0), 0.8f));
+        explosionParticleEngine.setStepFunction(new GravityStepFunction(new Vec2(0, 0), 0.9f));
 
 
         frictionParticleEngine = new PointSourceParticleEngine();
@@ -166,7 +166,7 @@ public class EffectRenderer {
             float g = MathUtil.random(0.1f, 0.3f);
             float b = MathUtil.random(0.0f, 0.1f);
             float ttlRatio = particle.getTtlRatio();
-            float a = -MathUtil.lerp(ttlRatio, 0.5f, 1.0f, -1.0f, 0.0f);
+            float a = -MathUtil.lerp(ttlRatio, 0.6f, 1.0f, -1.0f, 0.0f);
 
             particleColorBuffer.put(new float[]{
                         r, g, b, a,
@@ -241,8 +241,8 @@ public class EffectRenderer {
         explosionParticleEngine.createParticles(100);
     }
 
-    public void createBlockCollisionEffect(Vec2 v) {
+    public void createBlockCollisionEffect(Vec2 v, int numParticles) {
         frictionParticleEngine.setPosition(v);
-        frictionParticleEngine.createParticles(10);
+        frictionParticleEngine.createParticles(numParticles);
     }
 }
