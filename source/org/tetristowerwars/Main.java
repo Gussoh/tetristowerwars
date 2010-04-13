@@ -43,7 +43,7 @@ public class Main {
         float blockSize = 5;
         boolean useLightingEffects = true;
         final GameModel gameModel = new GameModel(260, 480, 10, blockSize);
-        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, useLightingEffects, null, false);
+        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, useLightingEffects, null);
         //final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
         final TuioClient tuioClient = new TuioClient();
