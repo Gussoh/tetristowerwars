@@ -55,7 +55,7 @@ public class BackgroundAnimationRenderer {
 
         int numAnimations = 0;
         for (List<Animation> list : animations.values()) {
-            processAnimationIterator(list, timeElapsed);
+            processAnimation(list, timeElapsed);
             numAnimations += list.size();
         }
 
@@ -144,7 +144,7 @@ public class BackgroundAnimationRenderer {
         
     }
 
-    private void processAnimationIterator(List<Animation> list, float timeElapsed) {
+    private void processAnimation(List<Animation> list, float timeElapsed) {
         for (Iterator<Animation> it = list.iterator(); it.hasNext();) {
             Path path = it.next().path;
             path.addTime(timeElapsed);
@@ -152,6 +152,8 @@ public class BackgroundAnimationRenderer {
                 it.remove();
             }
         }
+        
+        
     }
 
     private class Animation {
@@ -163,6 +165,7 @@ public class BackgroundAnimationRenderer {
             this.path = path;
             this.width = width;
         }
+
     }
 
     private class TextureEntry {
