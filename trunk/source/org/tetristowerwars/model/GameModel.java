@@ -182,7 +182,7 @@ public class GameModel {
                 float blockX = buildingBlock.getBody().getPosition().x;
 
                 // Is the non-owned block inside a player area?
-                if (blockX >= player.getLeftLimit() + 2 && blockX <= player.getRightLimit() - 2) {
+                if (blockX >= player.getLeftLimit() + 0.5f && blockX <= player.getRightLimit() - 0.5f) {
                     it.remove();
 
                     if (getAttachedJoint(buildingBlock) != null) {
@@ -479,12 +479,12 @@ public class GameModel {
 
             float normalSpeed = Math.abs(Vec2.dot(point.normal, point.velocity));
             Vec2 tangent = new Vec2(point.normal.y, -point.normal.x);
-            float tangentSpeed = Math.abs(Vec2.dot(point.normal, tangent));
+            float tangentSpeed = Math.abs(Vec2.dot(tangent, point.velocity));
 
             if (userData1 instanceof Block && userData2 instanceof Block) {
 
                 for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed);
+                    gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed, point.position);
                 }
             }
 

@@ -22,6 +22,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -260,7 +261,7 @@ public class SoundPlayer implements GameModelListener {
     }
 
     @Override
-    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
+    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
         //System.out.println("collision: " + collisionSpeed);
         if (collisionSpeed > 1.0) {
             if (collisionSpeed > 10) {

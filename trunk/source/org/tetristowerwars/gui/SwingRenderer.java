@@ -95,7 +95,7 @@ public class SwingRenderer extends Renderer {
     }
 
     @Override
-    public void putCursorPoint(int id, Point point) {
+    public void putCursorPoint(int id, Point point, boolean hit) {
         cursorPoints.put(id, point);
     }
 

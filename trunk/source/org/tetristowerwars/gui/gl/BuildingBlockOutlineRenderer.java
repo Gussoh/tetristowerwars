@@ -8,7 +8,6 @@ package org.tetristowerwars.gui.gl;
 import com.sun.opengl.util.BufferUtil;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
-import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;

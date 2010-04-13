@@ -12,6 +12,8 @@ import org.jbox2d.common.XForm;
  */
 public class MathUtil {
 
+    public static final float PI = (float) Math.PI;
+
     public static float lerp(float value, float minIn, float maxIn, float minOut, float maxOut) {
         float lerpedValue = ((value - minIn) / (maxIn - minIn)) * (maxOut - minOut) + minOut;
 

@@ -6,7 +6,7 @@
 package org.tetristowerwars.model.winningcondition;
 
 import java.util.ArrayList;
-import java.util.Map;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -35,7 +35,7 @@ public class LimitedBlocksWinningCondition extends WinningCondition implements G
     }
 
     @Override
-    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed) {
+    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
     }
 
     @Override

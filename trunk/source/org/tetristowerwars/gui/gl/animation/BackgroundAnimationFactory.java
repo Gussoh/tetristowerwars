@@ -23,6 +23,9 @@ public class BackgroundAnimationFactory {
     private long createZeppelinAtThisTime = 5000;
     private final float worldWidth;
 
+    private final static int TANK_INTERVAL_MS = 20000;
+    private final static int ZEPPELIN_INTERVAL_MS = 32000;
+
     public BackgroundAnimationFactory(BackgroundAnimationRenderer animationRenderer, float groundLevel, float horizontLevel, float worldWidth) {
         this.animationRenderer = animationRenderer;
         this.groundLevel = groundLevel;
@@ -35,10 +38,10 @@ public class BackgroundAnimationFactory {
 
         if (totalElapsedTimeMs > createTanksAtThisTime) {
             createTankFormation();
-            createTanksAtThisTime += 20000;
+            createTanksAtThisTime += TANK_INTERVAL_MS;
         } else if (totalElapsedTimeMs > createZeppelinAtThisTime) {
             createZeppelin();
-            createZeppelinAtThisTime += 32000;
+            createZeppelinAtThisTime += ZEPPELIN_INTERVAL_MS;
         }
     }
 
@@ -55,14 +58,14 @@ public class BackgroundAnimationFactory {
 
         int numTanks = (int) (Math.random() * 5) + 3;
 
-        boolean zigzag = Math.random() < 0.5 ? true : false;
+        boolean zigzag = true;//Math.random() < 0.5 ? true : false;
 
         for (int i = 0; i < numTanks; i++) {
 
             float yPos = zigzag ? y + 2 * (i % 2) : y;
             float width = Math.abs(MathUtil.lerp(yPos, bottom, top, -30, -5));
 
-            Vec2 start = new Vec2(-width * i, yPos);
+            Vec2 start = new Vec2(-width * (i + 1), yPos);
             Vec2 end = new Vec2(worldWidth + width * (numTanks - i), yPos);
 
             float timeToFinish = MathUtil.lerp(y, bottom, top, 20000, 180000);
@@ -81,7 +84,7 @@ public class BackgroundAnimationFactory {
 
     private void createZeppelin() {
         float bottom = horizontLevel + 20;
-        float top = horizontLevel + 60;
+        float top = horizontLevel + 100;
 
         float y = MathUtil.random(bottom, top);
         float width = MathUtil.random(10, 25);

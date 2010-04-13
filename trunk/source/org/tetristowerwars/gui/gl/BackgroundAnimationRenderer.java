@@ -70,6 +70,12 @@ public class BackgroundAnimationRenderer {
         vertexBuffer.rewind();
         texCoordBuffer.rewind();
 
+        gl.glEnable(GL_TEXTURE_2D);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        // Draw background
+        // This blend function is needed for photoshop-like blend.
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
 
@@ -85,6 +91,9 @@ public class BackgroundAnimationRenderer {
 
         zeppelinTexture.bind();
         gl.glDrawArrays(GL_QUADS, startPos, zeppelinAnimations.size() * NUM_VERTICES_PER_ANIMATION);
+
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
     private void constructBuffers(List<Animation> animations, float heightRatio, boolean textureIsLeftToRight) {

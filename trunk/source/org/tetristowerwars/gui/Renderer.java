@@ -32,6 +32,6 @@ public abstract class Renderer {
      * @param id An id for the point.
      * @param point The point in window coordinates.
      */
-    public abstract void putCursorPoint(int id, Point point);
+    public abstract void putCursorPoint(int id, Point point, boolean hit);
     public abstract void removeCursorPoint(int id);
 }
