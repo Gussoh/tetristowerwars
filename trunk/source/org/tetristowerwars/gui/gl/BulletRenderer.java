@@ -101,10 +101,10 @@ public class BulletRenderer {
 
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl.glEnable(GL_TEXTURE_2D);
-        gl.glEnable(GL_TEXTURE_COORD_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         if (lightingEffects) {
-            gl.glEnable(GL_NORMAL_ARRAY);
+            gl.glEnableClientState(GL_NORMAL_ARRAY);
             gl.glEnable(GL_LIGHTING);
 
             normalBuffer.rewind();
@@ -121,12 +121,12 @@ public class BulletRenderer {
         texture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numBullets * NUM_VERTICES_PER_BULLET);
 
-        gl.glDisable(GL_TEXTURE_COORD_ARRAY);
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glDisable(GL_TEXTURE_2D);
 
         if (lightingEffects) {
             gl.glDisable(GL_LIGHTING);
-            gl.glDisable(GL_NORMAL_ARRAY);
+            gl.glDisableClientState(GL_NORMAL_ARRAY);
         }
     }
 }
