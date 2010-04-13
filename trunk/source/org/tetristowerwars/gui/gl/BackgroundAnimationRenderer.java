@@ -10,9 +10,12 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.media.opengl.GL;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.animation.Path;
@@ -24,25 +27,25 @@ import static javax.media.opengl.GL.*;
  */
 public class BackgroundAnimationRenderer {
 
-    private final Texture tank1Texture;
-    private final Texture tank2Texture;
-    private final Texture zeppelinTexture;
-    private final List<Animation> tank1Animations = new LinkedList<Animation>();
-    private final List<Animation> tank2Animations = new LinkedList<Animation>();
-    private final List<Animation> zeppelinAnimations = new LinkedList<Animation>();
+    private final Map<Integer, TextureEntry> textures = new HashMap<Integer, TextureEntry>();
+    private final Map<Integer, List<Animation>> animations = new LinkedHashMap<Integer, List<Animation>>();
+    
     private FloatBuffer vertexBuffer;
     private FloatBuffer texCoordBuffer;
-    public final static int TANK1 = 0, TANK2 = 1, ZEPPELIN = 2;
+    public final static int TANK1 = 0, TANK2 = 1, SCUD = 2, ZEPPELIN1 = 3, ZEPPELIN2 = 4, SPUTNIK = 5;
     public final static int NUM_VERTICES_PER_ANIMATION = 4;
 
     public BackgroundAnimationRenderer(GL gl) throws IOException {
-        tank1Texture = TextureIO.newTexture(new File("res/gfx/decoration/tank1.png"), true);
-        tank2Texture = TextureIO.newTexture(new File("res/gfx/decoration/tank2.png"), true);
-        zeppelinTexture = TextureIO.newTexture(new File("res/gfx/decoration/zeppelin1.png"), true);
-
-        GLUtil.fixTextureParameters(tank1Texture);
-        GLUtil.fixTextureParameters(tank2Texture);
-        GLUtil.fixTextureParameters(zeppelinTexture);
+        textures.put(TANK1, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/tank1.png"), true), true));
+        textures.put(TANK2, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/tank2.png"), true), true));
+        textures.put(SCUD, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/scud-grey.png"), true), false));
+        textures.put(ZEPPELIN1, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/zeppelin1.png"), true), false));
+        textures.put(ZEPPELIN2, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/zeppelin2.png"), true), false));
+        textures.put(SPUTNIK, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/sputnik.png"), true), true));
+        
+        for (TextureEntry entry : textures.values()) {
+            GLUtil.fixTextureParameters(entry.texture);
+        }
 
         vertexBuffer = BufferUtil.newFloatBuffer(10 * NUM_VERTICES_PER_ANIMATION * 2);
         texCoordBuffer = BufferUtil.newFloatBuffer(10 * NUM_VERTICES_PER_ANIMATION * 2);
@@ -50,22 +53,23 @@ public class BackgroundAnimationRenderer {
 
     public void render(GL gl, float timeElapsed) {
 
-        processAnimationIterator(tank1Animations.iterator(), timeElapsed);
-        processAnimationIterator(tank2Animations.iterator(), timeElapsed);
-        processAnimationIterator(zeppelinAnimations.iterator(), timeElapsed);
+        int numAnimations = 0;
+        for (List<Animation> list : animations.values()) {
+            processAnimationIterator(list, timeElapsed);
+            numAnimations += list.size();
+        }
 
-        int numAnimation = tank1Animations.size() + tank2Animations.size() + zeppelinAnimations.size();
 
-        int numCoords = numAnimation * NUM_VERTICES_PER_ANIMATION;
+        int numCoords = numAnimations * NUM_VERTICES_PER_ANIMATION;
 
         if (numCoords * 2 > vertexBuffer.capacity()) {
             vertexBuffer = BufferUtil.newFloatBuffer(numCoords * 2);
             texCoordBuffer = BufferUtil.newFloatBuffer(numCoords * 2);
         }
 
-        constructBuffers(tank1Animations, 0.5f, true);
-        constructBuffers(tank2Animations, 0.5f, true);
-        constructBuffers(zeppelinAnimations, 0.5f, false);
+        for (Map.Entry<Integer, List<Animation>> entry : animations.entrySet()) {
+            constructBuffers(entry.getValue(), textures.get(entry.getKey()));
+        }
 
         vertexBuffer.rewind();
         texCoordBuffer.rewind();
@@ -81,28 +85,27 @@ public class BackgroundAnimationRenderer {
 
         int startPos = 0;
 
-        tank1Texture.bind();
-        gl.glDrawArrays(GL_QUADS, startPos, tank1Animations.size() * NUM_VERTICES_PER_ANIMATION);
-        startPos += tank1Animations.size() * NUM_VERTICES_PER_ANIMATION;
-
-        tank2Texture.bind();
-        gl.glDrawArrays(GL_QUADS, startPos, tank2Animations.size() * NUM_VERTICES_PER_ANIMATION);
-        startPos += tank2Animations.size() * NUM_VERTICES_PER_ANIMATION;
-
-        zeppelinTexture.bind();
-        gl.glDrawArrays(GL_QUADS, startPos, zeppelinAnimations.size() * NUM_VERTICES_PER_ANIMATION);
+        for (Map.Entry<Integer, List<Animation>> entry : animations.entrySet()) {
+            int image = entry.getKey();
+            List<Animation> list = entry.getValue();
+            
+            Texture texture = textures.get(image).texture;
+            texture.bind();
+            gl.glDrawArrays(GL_QUADS, startPos, list.size() * NUM_VERTICES_PER_ANIMATION);
+            startPos += list.size() * NUM_VERTICES_PER_ANIMATION;
+        }
 
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
-    private void constructBuffers(List<Animation> animations, float heightRatio, boolean textureIsLeftToRight) {
+    private void constructBuffers(List<Animation> animations, TextureEntry textureEntry) {
         for (Animation animation : animations) {
 
             Vec2 pos = animation.path.getCurrentPosition();
             float halfWidth = animation.width * 0.5f;
-            float halfHeight = halfWidth * heightRatio;
-            boolean hMirror = !(animation.path.isLeftToright() ^ textureIsLeftToRight);
+            float halfHeight = halfWidth / textureEntry.texture.getAspectRatio();
+            boolean hMirror = !(animation.path.isLeftToright() ^ textureEntry.isGoingRight);
 
             vertexBuffer.put(new float[]{
                         pos.x - halfWidth, pos.y - halfHeight,
@@ -129,21 +132,20 @@ public class BackgroundAnimationRenderer {
     }
 
     public void addAnimation(Path path, float width, int image) {
-        switch (image) {
-            case TANK1:
-                tank1Animations.add(new Animation(path, width));
-                break;
-            case TANK2:
-                tank2Animations.add(new Animation(path, width));
-                break;
-            case ZEPPELIN:
-                zeppelinAnimations.add(new Animation(path, width));
-                break;
+
+        List<Animation> list = animations.get(image);
+
+        if (list == null) {
+            list = new LinkedList<Animation>();
+            animations.put(image, list);
         }
+
+        list.add(new Animation(path, width));
+        
     }
 
-    private void processAnimationIterator(Iterator<Animation> it, float timeElapsed) {
-        while (it.hasNext()) {
+    private void processAnimationIterator(List<Animation> list, float timeElapsed) {
+        for (Iterator<Animation> it = list.iterator(); it.hasNext();) {
             Path path = it.next().path;
             path.addTime(timeElapsed);
             if (path.isDone()) {
@@ -160,6 +162,16 @@ public class BackgroundAnimationRenderer {
         public Animation(Path path, float width) {
             this.path = path;
             this.width = width;
+        }
+    }
+
+    private class TextureEntry {
+        private final Texture texture;
+        private final boolean isGoingRight;
+
+        public TextureEntry(Texture texture, boolean isGoingRight) {
+            this.texture = texture;
+            this.isGoingRight = isGoingRight;
         }
     }
 }

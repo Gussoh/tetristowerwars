@@ -58,7 +58,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private BulletRenderer bulletRenderer;
     private CannonRenderer cannonRenderer;
     private PointerRenderer pointerRenderer;
-    private EffectRenderer borderRenderer;
+    private EffectRenderer effectRenderer;
     private RectangularBuildingBlockRenderer2 rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
@@ -73,6 +73,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private final boolean lightingEffects;
     private final boolean sceneAntiAliasing;
     private long frameCounter = 0;
+    private long performanceTimer = 0;
 
     /**
      * 
@@ -152,13 +153,14 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void init(GLAutoDrawable drawable) {
 
         GL gl = drawable.getGL();
+        gl.setSwapInterval(1);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         jointRenderer = new JointRenderer();
         try {
             bulletRenderer = new BulletRenderer(gl, lightingEffects);
             cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
             pointerRenderer = new PointerRenderer(gl);
-            borderRenderer = new EffectRenderer(gl);
+            effectRenderer = new EffectRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer2(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
@@ -199,7 +201,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void display(GLAutoDrawable drawable) {
 
         long currentTime = System.currentTimeMillis();
-        long performanceTimer = System.nanoTime();
+        long startTime = System.nanoTime();
         long elapsedTime = currentTime - lastTimeMillis;
         lastTimeMillis = currentTime;
         frameCounter++;
@@ -238,8 +240,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         // Render the light effect of the players border when a block changes owner
         gl.glLineWidth(lineWidthFactor * 2.0f);
-        borderRenderer.render(gl, gameModel, elapsedTime);
-        borderRenderer.renderParticles(gl, elapsedTime);
+        effectRenderer.render(gl, gameModel, elapsedTime);
+        effectRenderer.renderParticles(gl, elapsedTime);
 
 
         backgroundRenderer.renderBottom(gl);
@@ -247,10 +249,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Render the mouse/finger circles.
         pointerRenderer.render(gl, id2Pointers, elapsedTime);
 
-        gl.glFlush();
         
+
+        performanceTimer += System.nanoTime() - startTime;
         if (frameCounter % 60 == 0) {
-            System.out.println("Time to render: " + ((System.nanoTime() - performanceTimer) / 1000000f) + " ms");
+            System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
+            performanceTimer = 0;
         }
     }
 
@@ -294,8 +298,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
         
-        if (tangentSpeed > 5.0f) {
-            borderRenderer.createBlockCollisionEffect(contactPoint);
+        if (tangentSpeed > 4.0f) {
+            effectRenderer.createBlockCollisionEffect(contactPoint, (int)tangentSpeed);
         }
     }
 
@@ -306,7 +310,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onBlockDestruction(Block block) {
         if (block instanceof BulletBlock) {
-            borderRenderer.createParticleExplosionEffect(block.getBody().getPosition());
+            effectRenderer.createParticleExplosionEffect(block.getBody().getPosition());
         }
     }
 
@@ -327,9 +331,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         rectangularBuildingBlockRenderer.addBuildingBlockOverlayAnimation(block);
         if (Math.abs(v.x - leftLimit) < Math.abs(v.x - rightLimit)) {
             // Its the left limit!!
-            borderRenderer.createBorderLitAnimation(new Vec2(leftLimit, v.y));
+            effectRenderer.createBorderLitAnimation(new Vec2(leftLimit, v.y));
         } else {
-            borderRenderer.createBorderLitAnimation(new Vec2(rightLimit, v.y));
+            effectRenderer.createBorderLitAnimation(new Vec2(rightLimit, v.y));
         }
     }
 
