@@ -13,5 +13,5 @@ import java.util.LinkedList;
  */
 public abstract class ParticleStepFunction {
 
-    public abstract void step(LinkedList<Particle> particles, float timeElapsedMs);
+    public abstract void step(Particle p, float timeElapsedS);
 }

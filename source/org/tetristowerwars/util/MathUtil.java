@@ -15,7 +15,7 @@ public class MathUtil {
     public static final float PI = (float) Math.PI;
 
     public static float lerp(float value, float minIn, float maxIn, float minOut, float maxOut) {
-        float lerpedValue = ((value - minIn) / (maxIn - minIn)) * (maxOut - minOut) + minOut;
+        float lerpedValue = lerpNoCap(value, minIn, maxIn, minOut, maxOut);
 
         if (lerpedValue > maxOut) {
             return maxOut;
@@ -26,8 +26,13 @@ public class MathUtil {
         }
     }
 
+    public static float lerpNoCap(float value, float minIn, float maxIn, float minOut, float maxOut) {
+        float ratio = ((value - minIn) / (maxIn - minIn));
+        return (1 - ratio) * minOut + ratio * maxOut;
+    }
+
     public static float lerp(float ratio, float min, float max) {
-        return ratio * (max - min) + min;
+        return (1 - ratio) * min + ratio * max;
     }
 
     public static float random(float min, float max) {
