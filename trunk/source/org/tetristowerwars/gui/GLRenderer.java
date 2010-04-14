@@ -4,8 +4,11 @@
  */
 package org.tetristowerwars.gui;
 
+import com.sun.opengl.util.GLUT;
+import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -34,6 +37,7 @@ import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.gui.gl.Pointer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer2;
+import org.tetristowerwars.gui.gl.TextInformationRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -59,6 +63,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private CannonRenderer cannonRenderer;
     private PointerRenderer pointerRenderer;
     private EffectRenderer effectRenderer;
+    private TextInformationRenderer textInformationRenderer;
     private RectangularBuildingBlockRenderer2 rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
@@ -162,6 +167,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
             pointerRenderer = new PointerRenderer(gl);
             effectRenderer = new EffectRenderer(gl);
+            textInformationRenderer = new TextInformationRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer2(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
@@ -231,6 +237,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Render block outlines
         gl.glLineWidth(lineWidthFactor * gameModel.getBlockSize());
         rectangularBuildingBlockRenderer.renderLines(gl);
+        GLUT glut = new GLUT();
 
         // Render the joints between mouse/finger and block.
         gl.glLineWidth(lineWidthFactor * 10.0f);
@@ -253,13 +260,14 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Render the mouse/finger circles.
         pointerRenderer.render(gl, id2Pointers, elapsedTime);
 
-        
+        textInformationRenderer.render(drawable, gameModel, renderWorldHeight);
 
         performanceTimer += System.nanoTime() - startTime;
         if (frameCounter % 60 == 0) {
             System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
             performanceTimer = 0;
         }
+        
     }
 
     @Override
