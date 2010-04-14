@@ -72,4 +72,9 @@ public class LimitedBlocksWinningCondition extends WinningCondition implements G
     public void onLeaderChanged(ArrayList scoreList) {
     }
 
+    @Override
+    public String getStatusMessage() {
+        return "Number of blocks left: " + (maxBlocks - numBlocks);
+    }
+
 }

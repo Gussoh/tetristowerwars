@@ -64,6 +64,15 @@ public class CompoundWinningCondition extends WinningCondition {
         return logicType;
     }
 
+    @Override
+    public String getStatusMessage() {
+        String status = "";
+        for (WinningCondition winningCondition : conditions) {
+            status.concat(winningCondition.getStatusMessage()).concat("\n");
+        }
+        return status;
+    }
+
     /**
      * Can be either AND or OR.
      */
