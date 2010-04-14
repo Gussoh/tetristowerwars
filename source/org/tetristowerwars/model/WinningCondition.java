@@ -26,6 +26,8 @@ public abstract class WinningCondition {
 
     public abstract boolean gameIsOver();
 
+    public abstract String getStatusMessage();
+
     public Player getLeader() {
         List<Player> players = model.getPlayers();
         Player leader = null;

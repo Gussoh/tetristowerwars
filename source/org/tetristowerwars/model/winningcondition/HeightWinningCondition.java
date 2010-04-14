@@ -50,4 +50,11 @@ public class HeightWinningCondition extends WinningCondition {
         return false;
     }
 
+    @Override
+    public String getStatusMessage() {
+        ArrayList<ScoreEntry<Player, Float>> scores = getScores();
+        leaderScore = scores.get(0).getScore();
+        return (height - leaderScore) + "m left to win!";
+    }
+
 }

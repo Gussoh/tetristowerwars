@@ -31,4 +31,10 @@ public class TimedWinningCondition extends WinningCondition {
         return System.currentTimeMillis() > endTime;
     }
 
+    @Override
+    public String getStatusMessage() {
+        long time = endTime - System.currentTimeMillis();
+        return "Time remaining: " + time/1000;
+    }
+
 }
