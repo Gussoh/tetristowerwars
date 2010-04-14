@@ -17,6 +17,8 @@ import javax.media.opengl.GL;
 import static javax.media.opengl.GL.*;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.animation.Path;
+import org.tetristowerwars.gui.gl.particle.ColorStepFunction;
+import org.tetristowerwars.gui.gl.particle.FadeOutStepFunction;
 import org.tetristowerwars.gui.gl.particle.GravityStepFunction;
 import org.tetristowerwars.gui.gl.particle.Particle;
 import org.tetristowerwars.gui.gl.particle.PointSourceParticleEngine;
@@ -59,19 +61,19 @@ public class EffectRenderer {
         particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
 
         explosionParticleEngine = new PointSourceParticleEngine();
-        explosionParticleEngine.setTimeToLive(1500.0f, 2000.0f);
+        explosionParticleEngine.setTimeToLive(1.5f, 2.0f);
         explosionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
         explosionParticleEngine.setRotationSpeed(0, 0);
         explosionParticleEngine.setSpeed(0.0f, 40.0f);
-        explosionParticleEngine.setStepFunction(new GravityStepFunction(new Vec2(0, 0), 0.9f));
+        explosionParticleEngine.addStepFunction(new FadeOutStepFunction(0.6f));
 
 
         frictionParticleEngine = new PointSourceParticleEngine();
-        frictionParticleEngine.setTimeToLive(1000.0f, 2000.0f);
+        frictionParticleEngine.setTimeToLive(1.0f, 2.0f);
         frictionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
         frictionParticleEngine.setRotationSpeed(0, 0);
         frictionParticleEngine.setSpeed(1.0f, 10.0f);
-        frictionParticleEngine.setStepFunction(new GravityStepFunction());
+        frictionParticleEngine.addStepFunction(new GravityStepFunction());
 
     }
 
@@ -132,8 +134,8 @@ public class EffectRenderer {
 
     public void renderParticles(GL gl, float elapsedTime) {
 
-        explosionParticleEngine.update(elapsedTime);
-        frictionParticleEngine.update(elapsedTime);
+        explosionParticleEngine.update(elapsedTime * 0.001f);
+        frictionParticleEngine.update(elapsedTime * 0.001f);
         int numVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
 
         if (numVertices * 2 > particleTexCoordBuffer.capacity()) {

@@ -16,28 +16,32 @@ public class Particle {
     protected Vec2 velocity = new Vec2();
     protected float angle;
     protected float rotSpeed;
-    protected float ttlMs;
-    protected float ageMs;
+    protected float ttlS;
+    protected float ageS;
+    protected float ttlRatio;
+    protected Color startColor, currentColor;
 
     protected Particle() {
         angle = 0;
         rotSpeed = 0;
-        ttlMs = 0;
-        ageMs = 0;
+        ttlS = 0;
+        ageS = 0;
     }
 
-    protected Particle(Vec2 position, Vec2 velocity, float angle, float rotSpeed, float ttlMs) {
+    protected Particle(Vec2 position, Vec2 velocity, float angle, float rotSpeed, float ttlS, Color color) {
         this.position.x = position.x;
         this.position.y = position.y;
         this.velocity.x = velocity.x;
         this.velocity.y = velocity.y;
         this.angle = angle;
-        this.ttlMs = ttlMs;
-        this.ageMs = 0;
+        this.ttlS = ttlS;
+        this.ageS = 0;
+        this.startColor = new Color(color);
+        this.currentColor = new Color(color);
     }
 
-    public float getAgeMs() {
-        return ageMs;
+    public float getAgeS() {
+        return ageS;
     }
 
     public float getAngle() {
@@ -52,16 +56,23 @@ public class Particle {
         return rotSpeed;
     }
 
-    public float getTtlMs() {
-        return ttlMs;
+    public float getTtlS() {
+        return ttlS;
     }
 
     public Vec2 getVelocity() {
         return velocity;
     }
 
-
     public float getTtlRatio() {
-        return ageMs / ttlMs;
+        return ttlRatio;
+    }
+
+    public Color getCurrentColor() {
+        return currentColor;
+    }
+
+    public Color getStartColor() {
+        return startColor;
     }
 }
