@@ -458,8 +458,8 @@ public class GameModel {
 
     public boolean checkWinningConditions() {
         for (WinningCondition condition : winningConditions) {
-            if (condition.getLeader() != leader) {
-                leader = condition.getLeader();
+            if (condition.getLeader().getPlayer() != leader) {
+                leader = condition.getLeader().getPlayer();
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onLeaderChanged(null);
                 }

@@ -14,6 +14,7 @@ import javax.media.opengl.GLDrawable;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
+import org.tetristowerwars.model.WinningCondition.MessageEntry;
 
 /**
  *
@@ -38,12 +39,15 @@ public class TextInformationRenderer {
 
         for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
 
-            String message = winningCondition.getStatusMessage();
+            List<MessageEntry> message = winningCondition.getStatusMessage();
 
-            if (message != null && message.length() > 0) {
-                winningConditionTexts.add(new TextEntry(message));
+            if (message != null) {
+                for (MessageEntry messageEntry : message) {
+                    if (messageEntry.getPlayer() == null) {
+                        winningConditionTexts.add(new TextEntry(messageEntry.getText()));
+                    }
+                }
             }
-
         }
         renderText(winningConditionTexts, renderWorldHeight, centerXPos, true, true);
 
@@ -55,6 +59,17 @@ public class TextInformationRenderer {
             texts.add(new TextEntry(player.getName()));
             texts.add(new TextEntry("Tower height: " + Math.round(player.getTowerHeight()) + " m"));
             texts.add(new TextEntry("Blocks: " + player.getBuildingBlocks().size()));
+
+            for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
+                List<MessageEntry> message = winningCondition.getStatusMessage();
+                if (message != null) {
+                    for (MessageEntry messageEntry : message) {
+                        if (messageEntry.getPlayer() == player) {
+                            texts.add(new TextEntry(messageEntry.getText()));
+                        }
+                    }
+                }
+            }
 
             renderText(texts, renderWorldHeight, playerCenterPos, false, true);
         }

@@ -6,75 +6,44 @@
 package org.tetristowerwars.model.winningcondition;
 
 import java.util.ArrayList;
-import org.jbox2d.common.Vec2;
-import org.tetristowerwars.model.Block;
-import org.tetristowerwars.model.BuildingBlock;
-import org.tetristowerwars.model.BuildingBlockJoint;
+import java.util.List;
 import org.tetristowerwars.model.GameModel;
-import org.tetristowerwars.model.GameModelListener;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
 
 /**
  *
  * @author Reeen
  */
-public class LimitedBlocksWinningCondition extends WinningCondition implements GameModelListener {
+public class LimitedBlocksWinningCondition extends WinningCondition {
     private final int maxBlocks;
-    private int numBlocks;
 
     public LimitedBlocksWinningCondition(GameModel model, int maxBlocks) {
         super(model);
         this.maxBlocks = maxBlocks;
-        model.addGameModelListener(this);
     }
 
     @Override
     public boolean gameIsOver() {
-        //TODO: which pieces to count? Global? Player?
-       return numBlocks >= maxBlocks;
+       //TODO: which pieces to count? Global? Player?
+       for (Player player : model.getPlayers()) {
+           if (player.getBuildingBlocks().size() > maxBlocks) {
+               return true;
+           }
+       }
+       return false;
     }
 
     @Override
-    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
-    }
+    public List<MessageEntry> getStatusMessage() {
+        ArrayList<MessageEntry> messages = new ArrayList<MessageEntry>();
 
-    @Override
-    public void onJointCreation(BuildingBlockJoint blockJoint) {
-    }
-
-    @Override
-    public void onBlockDestruction(Block block) {
-        if (block instanceof BuildingBlock) {
-            numBlocks--;
+        for (Player player : model.getPlayers()) {
+            int blocksLeft = maxBlocks - player.getBuildingBlocks().size();
+            MessageType type = blocksLeft < 10 ? MessageType.CRITICAL : MessageType.NORMAL;
+            messages.add(new MessageEntry(blocksLeft + " blocks left", type, player));
         }
-    }
-
-    @Override
-    public void onJointDestruction(BuildingBlockJoint blockJoint) {
-    }
-
-    @Override
-    public void onBlockCreation(Block block) {
-        if (block instanceof BuildingBlock) {
-            numBlocks++;
-        }
-    }
-
-    @Override
-    public void onBuildingBlockOwnerChanged(BuildingBlock block) {
-    }
-
-    @Override
-    public void onWinningConditionFulfilled(WinningCondition condition) {
-    }
-
-    @Override
-    public void onLeaderChanged(ArrayList scoreList) {
-    }
-
-    @Override
-    public String getStatusMessage() {
-        return "Number of blocks left: " + (maxBlocks - numBlocks);
+        return messages;
     }
 
 }

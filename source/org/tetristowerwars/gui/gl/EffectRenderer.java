@@ -87,14 +87,15 @@ public class EffectRenderer {
 
 
         smokeParticleEngine = new PointSourceParticleEngine();
-        smokeParticleEngine.setTimeToLive(3.0f, 5.0f);
+        smokeParticleEngine.setTimeToLive(5.0f, 10.0f);
         smokeParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
         smokeParticleEngine.setRotationSpeed(0, 0);
-        smokeParticleEngine.setSpeed(0, 40.0f);
-        smokeParticleEngine.setColor(new Color(0.0f, 0.0f, 0.0f, 0.2f), new Color(0.3f, 0.3f, 0.3f, 0.3f), true);
-        smokeParticleEngine.setRadius(10.0f, 15.0f);
+        smokeParticleEngine.setSpeed(0, 7.0f);
+        smokeParticleEngine.setColor(new Color(0.0f, 0.0f, 0.0f, 0.3f), new Color(0.3f, 0.3f, 0.3f, 0.5f), true);
+        smokeParticleEngine.setRadius(20.0f, 30.0f);
         smokeParticleEngine.addStepFunction(new FadeOutStepFunction(0.5f));
-        smokeParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
+        //smokeParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
+        smokeParticleEngine.addStepFunction(new GravityStepFunction(1.5f));
     }
 
     public void render(GL gl, GameModel gameModel, float elapsedTime) {
@@ -248,6 +249,6 @@ public class EffectRenderer {
 
     public void createSmokeEffect(Vec2 v) {
         smokeParticleEngine.setPosition(v);
-        smokeParticleEngine.createParticles(20);
+        smokeParticleEngine.createParticles(10);
     }
 }
