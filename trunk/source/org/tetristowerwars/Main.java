@@ -19,9 +19,7 @@ import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
 import org.tetristowerwars.model.WinningCondition;
-import org.tetristowerwars.model.material.ConcreteMaterial;
-import org.tetristowerwars.model.material.SteelMaterial;
-import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
@@ -92,31 +90,31 @@ public class Main {
             if (gameModel.getBuildingBlockPool().size() < 10) {
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createRightSBlock(new Vec2(120, 400), new SteelMaterial());
+                    gameModel.getBuildingBlockFactory().createRightSBlock(new Vec2(120, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLeftSBlock(new Vec2(130, 400), new SteelMaterial());
+                    gameModel.getBuildingBlockFactory().createLeftSBlock(new Vec2(130, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLineBlock(new Vec2(140, 400), new WoodMaterial());
+                    gameModel.getBuildingBlockFactory().createLineBlock(new Vec2(140, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createRightLBlock(new Vec2(100, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createRightLBlock(new Vec2(100, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLeftLBlock(new Vec2(110, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createLeftLBlock(new Vec2(110, 400), Material.createRandomMaterial());
                 }
 
                 if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createSquareBlock(new Vec2(140, 400), new ConcreteMaterial());
+                    gameModel.getBuildingBlockFactory().createSquareBlock(new Vec2(140, 400), Material.createRandomMaterial());
                 }
 
             }

@@ -22,6 +22,8 @@ public class CannonFactory {
 
     private final GameModel gameModel;
     private float blockSize;
+    private static final float CANNON_COOLDOWN = 5.0f;
+    private static final float CANNON_FORCE = 8000f;
 
     public CannonFactory(GameModel gameModel, float blockSize) {
         this.gameModel = gameModel;
@@ -41,7 +43,7 @@ public class CannonFactory {
         addPolyShape(vertices1, body);
         addCircleShape(blockSize, new SteelMaterial(), body);
 
-        CannonBlock cannonBlock = new CannonBlock(body, 10000, 5, player, shootingToLeft);
+        CannonBlock cannonBlock = new CannonBlock(body, CANNON_FORCE, CANNON_COOLDOWN, player, shootingToLeft, gameModel.getBulletFactory());
 
         return cannonBlock;
     }

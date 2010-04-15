@@ -15,6 +15,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -45,6 +46,7 @@ public class GameModel {
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
+    private final Set<BuildingBlock> potientialBulletBlock = new LinkedHashSet<BuildingBlock>();
     private float timeTakenToExecuteUpdateMs;
     private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
@@ -174,13 +176,11 @@ public class GameModel {
                 }
             }
         }
-        
-
 
         for (Player player : players) {
 
             for (CannonBlock cannonBlock : player.getCannons()) {
-                cannonBlock.adjustPipe(1f / 60f);
+                cannonBlock.update(1f / 60f);
             }
 
             // Check if non-owned blocks has passed into a player area and should be
@@ -330,7 +330,27 @@ public class GameModel {
             for (GameModelListener gameModelListener : gameModelListeners) {
                 gameModelListener.onJointDestruction(buildingBlockJoint);
             }
+            BuildingBlock bb = buildingBlockJoint.getBuildingBlock();
+            XForm xForm = bb.getBody().getXForm();
             buildingBlockJoint.destroy();
+
+            for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
+                AABB aabb = new AABB();
+                s.computeAABB(aabb, xForm);
+                Shape foundShapes[] = world.query(aabb, 10);
+
+                for (Shape shape : foundShapes) {
+                    Object userData = shape.getBody().getUserData();
+                    if (userData instanceof CannonBlock) {
+                        CannonBlock cannonBlock = (CannonBlock) userData;
+                        cannonBlock.shoot(bb.getMaterial());
+                        blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                        return;
+                    }
+                }
+            }
+
+
         }
     }
 
@@ -575,6 +595,22 @@ public class GameModel {
                 return ((BulletBlock) userData1).getCannon() != userData2;
             } else if (userData2 instanceof BulletBlock) {
                 return ((BulletBlock) userData2).getCannon() != userData1;
+            }
+
+            if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {
+                BuildingBlock buildingBlock = (BuildingBlock) userData2;
+                BuildingBlockJoint bbj = getAttachedJoint(buildingBlock);
+                if (bbj != null) {
+                    potientialBulletBlock.add(buildingBlock);
+                    return false;
+                }
+            } else if (userData2 instanceof CannonBlock && userData1 instanceof BuildingBlock) {
+                BuildingBlock buildingBlock = (BuildingBlock) userData1;
+                BuildingBlockJoint bbj = getAttachedJoint(buildingBlock);
+                if (bbj != null) {
+                    potientialBulletBlock.add(buildingBlock);
+                    return false;
+                }
             }
 
             return true;

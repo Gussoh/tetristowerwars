@@ -19,4 +19,9 @@ public class GLUtil {
         texture.setTexParameteri(GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
     }
 
+    static void mirrorTexture(Texture texture) {
+        texture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_MIRRORED_REPEAT);
+        texture.setTexParameteri(GL.GL_TEXTURE_WRAP_T, GL.GL_MIRRORED_REPEAT);
+    }
+
 }

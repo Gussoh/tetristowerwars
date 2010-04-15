@@ -5,6 +5,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.util.MathUtil;
 
 /**
@@ -13,28 +14,31 @@ import org.tetristowerwars.util.MathUtil;
  */
 public class CannonBlock extends Block {
 
-    private final int force;
-    private final int coolDown;
+    private final float force;
+    private final float coolDown;
+    private float remainingCoolDown;
     private final long lastShot = 0;
     private float angleValue = 0;
     private float speedFactor = 1f;
     private final boolean shootingToLeft;
+    private boolean cannonLoaded = false;
+    private float timeUntilShooting = 0;
+    private Material shotMaterial;
+    private final BulletFactory bulletFactory;
     
-    public CannonBlock(Body body, int force, int coolDown, Player player, boolean shootToLeft) {
+    public CannonBlock(Body body, float force, float coolDown, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
         super(body);
         this.force = force;
         this.coolDown = coolDown;
         player.addCannon(this);
         this.shootingToLeft = shootToLeft;
+        this.bulletFactory = bulletFactory;
     }
 
-    public int getForce() {
+    public float getForce() {
         return force;
     }
 
-    protected void adjustPipe(float f) {
-        angleValue += f;
-    }
 
     public float getAngleInRadians() {
         return MathUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, (float)Math.PI * 0.5f);
@@ -47,5 +51,40 @@ public class CannonBlock extends Block {
 
     public boolean isShootingToLeft() {
         return shootingToLeft;
+    }
+
+    protected void shoot(Material material) {
+        shotMaterial = material;
+        cannonLoaded = true;
+        timeUntilShooting = 3.0f;
+    }
+
+    public boolean isCannonLoaded() {
+        return cannonLoaded;
+    }
+
+    public float getTimeUntilShooting() {
+        return timeUntilShooting;
+    }
+    public float getRemainingCoolDown() {
+        return remainingCoolDown;
+    }
+
+    public void update(float timeElapsedS) {
+        angleValue += timeElapsedS;
+
+        if (cannonLoaded) {
+            timeUntilShooting -= timeElapsedS;
+
+            if (timeUntilShooting < 0) {
+                timeUntilShooting = 0;
+                bulletFactory.createBullet(this);
+                cannonLoaded = false;
+                remainingCoolDown = coolDown;
+            }
+        } else {
+            remainingCoolDown -= timeElapsedS;
+            remainingCoolDown = Math.max(0, remainingCoolDown);
+        }
     }
 }

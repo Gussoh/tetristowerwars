@@ -18,10 +18,5 @@ public class WoodMaterial extends Material{
         return 0.85f; //Oak
     }
 
-    @Override
-    public Color getColor() {
-        return Color.GREEN;
-
-    }
-
+ 
 }
