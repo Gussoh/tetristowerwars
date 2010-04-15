@@ -25,10 +25,10 @@ public class ColorStepFunction extends ParticleStepFunction {
     public void step(Particle p, float timeElapsedMs) {
         if (p.ttlRatio > startAtLifeRatio) {
             float ratio = (p.ttlRatio - startAtLifeRatio) / (1.0f - startAtLifeRatio);
-            p.currentColor.r = MathUtil.lerp(ratio, p.startColor.r, endColor.r);
-            p.currentColor.g = MathUtil.lerp(ratio, p.startColor.g, endColor.g);
-            p.currentColor.b = MathUtil.lerp(ratio, p.startColor.b, endColor.b);
-            p.currentColor.a = MathUtil.lerp(ratio, p.startColor.a, endColor.a);
+            p.currentColor.r = MathUtil.lerpNoCap(ratio, p.startColor.r, endColor.r);
+            p.currentColor.g = MathUtil.lerpNoCap(ratio, p.startColor.g, endColor.g);
+            p.currentColor.b = MathUtil.lerpNoCap(ratio, p.startColor.b, endColor.b);
+            p.currentColor.a = MathUtil.lerpNoCap(ratio, p.startColor.a, endColor.a);
         }
     }
 }

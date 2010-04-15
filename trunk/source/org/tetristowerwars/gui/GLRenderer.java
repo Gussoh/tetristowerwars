@@ -5,10 +5,8 @@
 package org.tetristowerwars.gui;
 
 import com.sun.opengl.util.GLUT;
-import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -36,7 +34,7 @@ import org.tetristowerwars.gui.gl.CannonRenderer;
 import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.gui.gl.Pointer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
-import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer2;
+import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.TextInformationRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
@@ -64,12 +62,11 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private PointerRenderer pointerRenderer;
     private EffectRenderer effectRenderer;
     private TextInformationRenderer textInformationRenderer;
-    private RectangularBuildingBlockRenderer2 rectangularBuildingBlockRenderer;
+    private RectangularBuildingBlockRenderer rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
     private float renderWorldHeight;
     private float lineWidthFactor = 1.0f;
-    
     private float[] ambientLight = {0.2f, 0.2f, 0.2f, 1.0f};
     private float[] mainLightColor = {1.0f, 0.9f, 0.9f, 1.0f};
     //private float[] mainLightPosition = {0.0f, 0.7071f, 0.7071f, 0.0f};
@@ -83,6 +80,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     /**
      * 
      * @param gameModel The game model.
+     * @param lightingEffects Enables lighting effects which gives the scene a 3D effect.
      * @param graphicsDevice The graphics device to use, or null to use the default device.
      */
     public GLRenderer(GameModel gameModel, boolean lightingEffects, GraphicsDevice graphicsDevice) {
@@ -114,7 +112,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         }
 
-        
+
         glCanvas = new GLCanvas(capabilities); //, null, null, graphicsDevice);
 
         glCanvas.addGLEventListener(this);
@@ -169,7 +167,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             effectRenderer = new EffectRenderer(gl);
             textInformationRenderer = new TextInformationRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
-            rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer2(gl, lightingEffects);
+            rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
@@ -179,11 +177,11 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         gl.glEnable(GL_BLEND);
 
-        
+
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        
-        
+
+
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, mainLightColor, 0);
         gl.glLightfv(GL_LIGHT0, GL_SPECULAR, mainLightColor, 0);
@@ -215,7 +213,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         GL gl = drawable.getGL();
 
-       // gl.glClear(GL.GL_COLOR_BUFFER_BIT);  // Not needed since we draw a background
+        // gl.glClear(GL.GL_COLOR_BUFFER_BIT);  // Not needed since we draw a background
         gl.glLoadIdentity();
 
         // background renderer depends on the shape of the window,
@@ -227,13 +225,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Update and render tanks, zeppelins, etc.
         backgroundAnimationFactory.run(elapsedTime);
         backgroundAnimationRenderer.render(gl, elapsedTime);
-        
+
 
         // render building blocks, except outline
         rectangularBuildingBlockRenderer.render(gl, gameModel, elapsedTime);
-         // Render the light effect when a block changes owner
+        // Render the light effect when a block changes owner
         rectangularBuildingBlockRenderer.renderOverlay(gl);
-        
+
         // Render block outlines
         gl.glLineWidth(lineWidthFactor * gameModel.getBlockSize());
         rectangularBuildingBlockRenderer.renderLines(gl);
@@ -247,7 +245,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         bulletRenderer.render(gl, gameModel);
         cannonRenderer.render(gl, gameModel);
 
-       
+
 
         // Render the light effect of the players border when a block changes owner
         gl.glLineWidth(lineWidthFactor * 2.0f);
@@ -267,7 +265,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
             performanceTimer = 0;
         }
-        
+
     }
 
     @Override
@@ -299,7 +297,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         // Scale linewidth with some nice constant
         lineWidthFactor = (float) width * 0.0004f;
-        
+
     }
 
     @Override
@@ -309,9 +307,10 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
-        
+
         if (tangentSpeed > 4.0f) {
-            effectRenderer.createBlockCollisionEffect(contactPoint, (int)tangentSpeed);
+            int numParticles = Math.min((int) tangentSpeed, 10);
+            effectRenderer.createFrictionEffect(contactPoint, numParticles);
         }
     }
 
@@ -322,7 +321,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onBlockDestruction(Block block) {
         if (block instanceof BulletBlock) {
-            effectRenderer.createParticleExplosionEffect(block.getBody().getPosition());
+            effectRenderer.createExplosionEffect(block.getBody().getPosition());
+            effectRenderer.createSmokeEffect(block.getBody().getPosition());
         }
     }
 

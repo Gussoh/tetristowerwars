@@ -25,6 +25,8 @@ public class PointSourceParticleEngine extends ParticleEngine {
     protected Color minColor = new Color();
     protected Color maxColor = new Color();
     private boolean lockedColorRatio;
+    private float minRadius;
+    private float maxRadius;
 
     public void setDirection(float direction, float spread) {
         this.startDirection = direction;
@@ -40,6 +42,11 @@ public class PointSourceParticleEngine extends ParticleEngine {
         this.maxSpeed = maxSpeed;
     }
 
+
+    public void setRadius(float minRadius, float maxRadius) {
+        this.minRadius = minRadius;
+        this.maxRadius = maxRadius;
+    }
     /**
      *
      * @param minRotSpeed in radians per second
@@ -69,27 +76,28 @@ public class PointSourceParticleEngine extends ParticleEngine {
             float speed = MathUtil.random(minSpeed, maxSpeed);
             float rotSpeed = MathUtil.random(minRotSpeed, maxRotSpeed);
             float ttlMs = MathUtil.random(minTtlMs, maxTtlMs);
+            float radius = MathUtil.random(minRadius, maxRadius);
 
             Color color;
 
             if (lockedColorRatio) {
                 float ratio = (float) Math.random();
-                float r = MathUtil.lerp(ratio, minColor.r, maxColor.r);
-                float g = MathUtil.lerp(ratio, minColor.g, maxColor.g);
-                float b = MathUtil.lerp(ratio, minColor.b, maxColor.b);
-                float a = MathUtil.lerp(ratio, minColor.a, maxColor.a);
+                float r = MathUtil.lerpNoCap(ratio, minColor.r, maxColor.r);
+                float g = MathUtil.lerpNoCap(ratio, minColor.g, maxColor.g);
+                float b = MathUtil.lerpNoCap(ratio, minColor.b, maxColor.b);
+                float a = MathUtil.lerpNoCap(ratio, minColor.a, maxColor.a);
                 color = new Color(r, g, b, a);
             } else {
-                float r = MathUtil.lerp((float) Math.random(), minColor.r, maxColor.r);
-                float g = MathUtil.lerp((float) Math.random(), minColor.r, maxColor.r);
-                float b = MathUtil.lerp((float) Math.random(), minColor.r, maxColor.r);
-                float a = MathUtil.lerp((float) Math.random(), minColor.r, maxColor.r);
+                float r = MathUtil.lerpNoCap((float) Math.random(), minColor.r, maxColor.r);
+                float g = MathUtil.lerpNoCap((float) Math.random(), minColor.g, maxColor.g);
+                float b = MathUtil.lerpNoCap((float) Math.random(), minColor.b, maxColor.b);
+                float a = MathUtil.lerpNoCap((float) Math.random(), minColor.a, maxColor.a);
                 color = new Color(r, g, b, a);
             }
 
             Vec2 velocity = new Vec2((float) Math.cos(direction) * speed, (float) Math.sin(direction) * speed);
 
-            particles.add(new Particle(position, velocity, initialAngle, rotSpeed, ttlMs, color));
+            particles.add(new Particle(position, radius, velocity, initialAngle, rotSpeed, ttlMs, color));
         }
     }
 }

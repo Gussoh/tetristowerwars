@@ -36,7 +36,7 @@ import static javax.media.opengl.GL.*;
  *
  * @author Andreas
  */
-public class RectangularBuildingBlockRenderer2 {
+public class RectangularBuildingBlockRenderer {
 
     private final Map<Class<? extends Material>, BufferEntry> bufferEntries = new LinkedHashMap<Class<? extends Material>, BufferEntry>();
     private final int NUM_VERTICES_PER_SQUARE;
@@ -55,7 +55,7 @@ public class RectangularBuildingBlockRenderer2 {
     private final static float ANIMATION_TIME_MS = 750.0f;
     private final Map<BuildingBlock, Path> animations = new LinkedHashMap<BuildingBlock, Path>();
 
-    public RectangularBuildingBlockRenderer2(GL gl, boolean lightingEffects) throws IOException {
+    public RectangularBuildingBlockRenderer(GL gl, boolean lightingEffects) throws IOException {
         this.lightingEffects = lightingEffects;
 
         if (lightingEffects) {
@@ -175,11 +175,10 @@ public class RectangularBuildingBlockRenderer2 {
                     Vec2 tl = XForm.mul(xForm, new Vec2(minX, maxY));
 
                     if (lightingEffects) {
-                        float internalMinX = MathUtil.lerp(1f - flatSquareRatio, minX, maxX);
-                        float internalMinY = MathUtil.lerp(1f - flatSquareRatio, minY, maxY);
-                        float internalMaxX = MathUtil.lerp(flatSquareRatio, minX, maxX);
-                        float internalMaxY = MathUtil.lerp(flatSquareRatio, minY, maxY);
-
+                        float internalMinX = MathUtil.lerpNoCap(1f - flatSquareRatio, minX, maxX);
+                        float internalMinY = MathUtil.lerpNoCap(1f - flatSquareRatio, minY, maxY);
+                        float internalMaxX = MathUtil.lerpNoCap(flatSquareRatio, minX, maxX);
+                        float internalMaxY = MathUtil.lerpNoCap(flatSquareRatio, minY, maxY);
 
                         // create the Middle
                         Vec2 ibl = XForm.mul(xForm, new Vec2(internalMinX, internalMinY));

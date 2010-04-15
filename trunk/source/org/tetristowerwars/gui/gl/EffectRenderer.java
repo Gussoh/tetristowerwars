@@ -17,11 +17,14 @@ import javax.media.opengl.GL;
 import static javax.media.opengl.GL.*;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.animation.Path;
+import org.tetristowerwars.gui.gl.particle.Color;
 import org.tetristowerwars.gui.gl.particle.ColorStepFunction;
 import org.tetristowerwars.gui.gl.particle.FadeOutStepFunction;
 import org.tetristowerwars.gui.gl.particle.GravityStepFunction;
 import org.tetristowerwars.gui.gl.particle.Particle;
+import org.tetristowerwars.gui.gl.particle.ParticleEngine;
 import org.tetristowerwars.gui.gl.particle.PointSourceParticleEngine;
+import org.tetristowerwars.gui.gl.particle.VelocityDampStepFunction;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.util.MathUtil;
 
@@ -38,6 +41,7 @@ public class EffectRenderer {
     private FloatBuffer particleColorBuffer;
     private final PointSourceParticleEngine explosionParticleEngine;
     private final PointSourceParticleEngine frictionParticleEngine;
+    private final PointSourceParticleEngine smokeParticleEngine;
     private final Texture particleTexture;
     private final static int NUM_VERTICES_PER_LINE = 2;
     private final static int NUM_VERTICES_PER_PARTICLE = 4;
@@ -46,8 +50,6 @@ public class EffectRenderer {
     private final static float START_LENGTH = 20.0f;
     private final static float END_LENGTH = 20.0f;
     private final static float ANIMATION_TIME_MS = 750.0f;
-    private final static float EXPLOSION_PARTICLE_SIZE = 10.0f;
-    private final static float FRICTION_PARTICLE_SIZE = 0.5f;
     private final Map<Path, Vec2> animations = new LinkedHashMap<Path, Vec2>();
 
     public EffectRenderer(GL gl) throws IOException {
@@ -62,19 +64,37 @@ public class EffectRenderer {
 
         explosionParticleEngine = new PointSourceParticleEngine();
         explosionParticleEngine.setTimeToLive(1.5f, 2.0f);
-        explosionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
+        explosionParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
         explosionParticleEngine.setRotationSpeed(0, 0);
         explosionParticleEngine.setSpeed(0.0f, 40.0f);
-        explosionParticleEngine.addStepFunction(new FadeOutStepFunction(0.6f));
+        explosionParticleEngine.setColor(new Color(0.6f, 0.3f, 0.0f, 0.3f), new Color(1.0f, 0.6f, 0.2f, 0.6f), false);
+        explosionParticleEngine.setRadius(10.0f, 12.0f);
+        explosionParticleEngine.addStepFunction(new FadeOutStepFunction(0.4f));
+        //explosionParticleEngine.addStepFunction(new ColorStepFunction(0.6f, new Color(0, 0, 0, 0)));
+        explosionParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
 
 
         frictionParticleEngine = new PointSourceParticleEngine();
         frictionParticleEngine.setTimeToLive(1.0f, 2.0f);
-        frictionParticleEngine.setDirection(MathUtil.PI * 0.5f, MathUtil.PI * 2.0f);
+        frictionParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
         frictionParticleEngine.setRotationSpeed(0, 0);
         frictionParticleEngine.setSpeed(1.0f, 10.0f);
+        frictionParticleEngine.setColor(new Color(0.6f, 0.3f, 0.0f, 0.6f), new Color(1.0f, 0.6f, 0.2f, 1.0f), false);
+        frictionParticleEngine.setRadius(0.3f, 0.6f);
         frictionParticleEngine.addStepFunction(new GravityStepFunction());
+        frictionParticleEngine.addStepFunction(new FadeOutStepFunction(0.3f));
+        //frictionParticleEngine.addStepFunction(new ColorStepFunction(0.6f, new Color(0, 0, 0, 0)));
 
+
+        smokeParticleEngine = new PointSourceParticleEngine();
+        smokeParticleEngine.setTimeToLive(3.0f, 5.0f);
+        smokeParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
+        smokeParticleEngine.setRotationSpeed(0, 0);
+        smokeParticleEngine.setSpeed(0, 40.0f);
+        smokeParticleEngine.setColor(new Color(0.0f, 0.0f, 0.0f, 0.2f), new Color(0.3f, 0.3f, 0.3f, 0.3f), true);
+        smokeParticleEngine.setRadius(10.0f, 15.0f);
+        smokeParticleEngine.addStepFunction(new ColorStepFunction(0.5f, new Color(0, 0, 0, 0)));
+        smokeParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
     }
 
     public void render(GL gl, GameModel gameModel, float elapsedTime) {
@@ -132,90 +152,64 @@ public class EffectRenderer {
         gl.glDisableClientState(GL_COLOR_ARRAY);
     }
 
+    public void createBufferData(ParticleEngine particleEngine) {
+
+        for (Particle particle : particleEngine.getParticles()) {
+            Vec2 pos = particle.getPosition();
+            float radius = particle.getRadius();
+            float lx = pos.x - radius;
+            float rx = pos.x + radius;
+            float by = pos.y - radius;
+            float ty = pos.y + radius;
+            particleVertexBuffer.put(new float[]{
+                        lx, by,
+                        rx, by,
+                        rx, ty,
+                        lx, ty
+                    });
+
+            particleTexCoordBuffer.put(new float[]{
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.0f,
+                        0.0f, 0.0f
+                    });
+
+            Color c = particle.getCurrentColor();
+
+            particleColorBuffer.put(new float[]{
+                        c.r, c.g, c.b, c.a,
+                        c.r, c.g, c.b, c.a,
+                        c.r, c.g, c.b, c.a,
+                        c.r, c.g, c.b, c.a
+                    });
+        }
+    }
+
     public void renderParticles(GL gl, float elapsedTime) {
 
         explosionParticleEngine.update(elapsedTime * 0.001f);
         frictionParticleEngine.update(elapsedTime * 0.001f);
-        int numVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
+        smokeParticleEngine.update(elapsedTime * 0.001f);
 
-        if (numVertices * 2 > particleTexCoordBuffer.capacity()) {
-            particleVertexBuffer = BufferUtil.newFloatBuffer(numVertices * 2);
-            particleTexCoordBuffer = BufferUtil.newFloatBuffer(numVertices * 2);
-            particleColorBuffer = BufferUtil.newFloatBuffer(numVertices * 4);
+        int numLightVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
+        int numSolidVertices = (smokeParticleEngine.getParticles().size() * NUM_VERTICES_PER_PARTICLE);
+        int totalNumVertices = numLightVertices + numSolidVertices;
+        if (totalNumVertices * 2 > particleTexCoordBuffer.capacity()) {
+            particleVertexBuffer = BufferUtil.newFloatBuffer(totalNumVertices * 2);
+            particleTexCoordBuffer = BufferUtil.newFloatBuffer(totalNumVertices * 2);
+            particleColorBuffer = BufferUtil.newFloatBuffer(totalNumVertices * 4);
         }
 
-        for (Particle particle : explosionParticleEngine.getParticles()) {
-            Vec2 p = particle.getPosition();
-            float lx = p.x - EXPLOSION_PARTICLE_SIZE;
-            float rx = p.x + EXPLOSION_PARTICLE_SIZE;
-            float by = p.y - EXPLOSION_PARTICLE_SIZE;
-            float ty = p.y + EXPLOSION_PARTICLE_SIZE;
-            particleVertexBuffer.put(new float[]{
-                        lx, by,
-                        rx, by,
-                        rx, ty,
-                        lx, ty
-                    });
-
-            particleTexCoordBuffer.put(new float[]{
-                        0.0f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.0f,
-                        0.0f, 0.0f
-                    });
-
-            float r = MathUtil.random(0.7f, 0.9f);
-            float g = MathUtil.random(0.1f, 0.3f);
-            float b = MathUtil.random(0.0f, 0.1f);
-            float ttlRatio = particle.getTtlRatio();
-            float a = -MathUtil.lerp(ttlRatio, 0.6f, 1.0f, -1.0f, 0.0f);
-
-            particleColorBuffer.put(new float[]{
-                        r, g, b, a,
-                        r, g, b, a,
-                        r, g, b, a,
-                        r, g, b, a,});
-        }
-
-        for (Particle particle : frictionParticleEngine.getParticles()) {
-            Vec2 p = particle.getPosition();
-            float lx = p.x - FRICTION_PARTICLE_SIZE;
-            float rx = p.x + FRICTION_PARTICLE_SIZE;
-            float by = p.y - FRICTION_PARTICLE_SIZE;
-            float ty = p.y + FRICTION_PARTICLE_SIZE;
-            particleVertexBuffer.put(new float[]{
-                        lx, by,
-                        rx, by,
-                        rx, ty,
-                        lx, ty
-                    });
-
-            particleTexCoordBuffer.put(new float[]{
-                        0.0f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.0f,
-                        0.0f, 0.0f
-                    });
-
-            float r = 0.9f;
-            float g = 0.5f;
-            float b = 0.2f;
-            float ttlRatio = particle.getTtlRatio();
-            float a = -MathUtil.lerp(ttlRatio, 0.5f, 1.0f, -1.0f, 0.0f);
-
-            particleColorBuffer.put(new float[]{
-                        r, g, b, a,
-                        r, g, b, a,
-                        r, g, b, a,
-                        r, g, b, a,});
-        }
+        createBufferData(smokeParticleEngine);
+        createBufferData(explosionParticleEngine);
+        createBufferData(frictionParticleEngine);
 
         particleVertexBuffer.rewind();
         particleTexCoordBuffer.rewind();
         particleColorBuffer.rewind();
 
         particleTexture.bind();
-        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         gl.glEnable(GL_TEXTURE_2D);
         gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glEnableClientState(GL_COLOR_ARRAY);
@@ -224,7 +218,11 @@ public class EffectRenderer {
         gl.glTexCoordPointer(2, GL_FLOAT, 0, particleTexCoordBuffer);
         gl.glColorPointer(4, GL_FLOAT, 0, particleColorBuffer);
 
-        gl.glDrawArrays(GL_QUADS, 0, numVertices);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glDrawArrays(GL_QUADS, 0, numSolidVertices);
+
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        gl.glDrawArrays(GL_QUADS, numSolidVertices, numLightVertices);
 
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -238,13 +236,18 @@ public class EffectRenderer {
 
     }
 
-    public void createParticleExplosionEffect(Vec2 v) {
+    public void createExplosionEffect(Vec2 v) {
         explosionParticleEngine.setPosition(v);
-        explosionParticleEngine.createParticles(100);
+        explosionParticleEngine.createParticles(50);
     }
 
-    public void createBlockCollisionEffect(Vec2 v, int numParticles) {
+    public void createFrictionEffect(Vec2 v, int numParticles) {
         frictionParticleEngine.setPosition(v);
         frictionParticleEngine.createParticles(numParticles);
+    }
+
+    public void createSmokeEffect(Vec2 v) {
+        smokeParticleEngine.setPosition(v);
+        smokeParticleEngine.createParticles(20);
     }
 }

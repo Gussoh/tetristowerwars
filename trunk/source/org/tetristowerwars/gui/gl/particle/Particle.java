@@ -12,27 +12,23 @@ import org.jbox2d.common.Vec2;
  */
 public class Particle {
 
-    protected Vec2 position = new Vec2();
-    protected Vec2 velocity = new Vec2();
+    protected Vec2 position;
+    protected final Vec2 startVelocity;
+    protected Vec2 velocity;
     protected float angle;
     protected float rotSpeed;
-    protected float ttlS;
+    protected final float ttlS;
     protected float ageS;
     protected float ttlRatio;
-    protected Color startColor, currentColor;
+    protected final Color startColor;
+    protected Color currentColor;
+    protected float radius;
 
-    protected Particle() {
-        angle = 0;
-        rotSpeed = 0;
-        ttlS = 0;
-        ageS = 0;
-    }
-
-    protected Particle(Vec2 position, Vec2 velocity, float angle, float rotSpeed, float ttlS, Color color) {
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.velocity.x = velocity.x;
-        this.velocity.y = velocity.y;
+    protected Particle(Vec2 position, float radius, Vec2 velocity, float angle, float rotSpeed, float ttlS, Color color) {
+        this.position = new Vec2(position.x, position.y);
+        this.radius = radius;
+        this.velocity = new Vec2(velocity.x, velocity.y);
+        this.startVelocity = new Vec2(velocity.x, velocity.y);
         this.angle = angle;
         this.ttlS = ttlS;
         this.ageS = 0;
@@ -74,5 +70,9 @@ public class Particle {
 
     public Color getStartColor() {
         return startColor;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

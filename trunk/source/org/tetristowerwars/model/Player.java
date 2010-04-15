@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
@@ -158,7 +157,7 @@ public class Player {
         return towerHeight;
     }
 
-    protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock) {
+    protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock, float groundLevel) {
 
         towerBodies.add(groundBlock.getBody());
 
@@ -224,9 +223,10 @@ public class Player {
 
         if (highestConnectedBody.getUserData() instanceof BuildingBlock) {
             highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
-            towerHeight = highestPositionInBody;
+            towerHeight = highestPositionInBody - groundLevel;
         } else {
             highestBuilingBlockInTower = null;
+            towerHeight = 0;
         }
 
     }
