@@ -93,7 +93,7 @@ public class EffectRenderer {
         smokeParticleEngine.setSpeed(0, 40.0f);
         smokeParticleEngine.setColor(new Color(0.0f, 0.0f, 0.0f, 0.2f), new Color(0.3f, 0.3f, 0.3f, 0.3f), true);
         smokeParticleEngine.setRadius(10.0f, 15.0f);
-        smokeParticleEngine.addStepFunction(new ColorStepFunction(0.5f, new Color(0, 0, 0, 0)));
+        smokeParticleEngine.addStepFunction(new FadeOutStepFunction(0.5f));
         smokeParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
     }
 
