@@ -18,9 +18,5 @@ public class SteelMaterial extends Material {
         return 7.8f;
     }
 
-    @Override
-    public Color getColor() {
-        return Color.ORANGE;
-    }
-
+  
 }

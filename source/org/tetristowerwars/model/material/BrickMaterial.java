@@ -5,22 +5,15 @@
 
 package org.tetristowerwars.model.material;
 
-import java.awt.Color;
-
 /**
  *
- * @author Reeen
+ * @author Andreas
  */
-public class ConcreteMaterial extends Material{
+public class BrickMaterial extends Material {
 
     @Override
     public float getDensity() {
-        return 3f;
-    }
-
-    @Override
-    public Color getColor() {
-        return Color.GRAY;
+        return 2.0f;
     }
 
 }

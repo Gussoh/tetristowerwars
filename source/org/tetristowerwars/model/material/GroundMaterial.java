@@ -18,9 +18,4 @@ public class GroundMaterial extends Material{
         return 1000f;
     }
 
-    @Override
-    public Color getColor() {
-        return Color.BLACK;
-    }
-
 }
