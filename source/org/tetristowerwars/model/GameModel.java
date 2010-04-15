@@ -231,7 +231,7 @@ public class GameModel {
 
 
         for (Player player : players) {
-            player.calcHighestBuildingBlockInTower(groundBlock);
+            player.calcHighestBuildingBlockInTower(groundBlock, groundLevel);
         }
     }
 
@@ -463,6 +463,10 @@ public class GameModel {
             }
         }
         return false;
+    }
+
+    public List<WinningCondition> getWinningConditions() {
+        return Collections.unmodifiableList(winningConditions);
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {

@@ -13,6 +13,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLDrawable;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
+import org.tetristowerwars.model.WinningCondition;
 
 /**
  *
@@ -31,15 +32,30 @@ public class TextInformationRenderer {
 
         textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.8f);
         textRenderer.begin3DRendering();
+
+        List<TextEntry> winningConditionTexts = new LinkedList<TextEntry>();
+        float centerXPos = gameModel.getWorldBoundries().upperBound.x * 0.5f;
+
+        for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
+
+            String message = winningCondition.getStatusMessage();
+
+            if (message != null && message.length() > 0) {
+                winningConditionTexts.add(new TextEntry(message));
+            }
+
+        }
+        renderText(winningConditionTexts, renderWorldHeight, centerXPos, true, true);
+
         for (Player player : gameModel.getPlayers()) {
             float playerCenterPos = (player.getRightLimit() + player.getLeftLimit()) * 0.5f;
-            
+
             List<TextEntry> texts = new LinkedList<TextEntry>();
 
             texts.add(new TextEntry(player.getName()));
             texts.add(new TextEntry("Tower height: " + Math.round(player.getTowerHeight()) + " m"));
             texts.add(new TextEntry("Blocks: " + player.getBuildingBlocks().size()));
-            
+
             renderText(texts, renderWorldHeight, playerCenterPos, false, true);
         }
         textRenderer.end3DRendering();

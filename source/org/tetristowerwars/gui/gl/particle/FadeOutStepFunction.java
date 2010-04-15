@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.gui.gl.particle;
 
-import java.util.LinkedList;
 import org.tetristowerwars.util.MathUtil;
 
 /**
