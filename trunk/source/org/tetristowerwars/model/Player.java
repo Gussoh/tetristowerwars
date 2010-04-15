@@ -153,6 +153,10 @@ public class Player {
         return highestBuilingBlockInTower;
     }
 
+    /**
+     * The tower height in meters from the ground level.
+     * @return the tower height.
+     */
     public float getTowerHeight() {
         return towerHeight;
     }

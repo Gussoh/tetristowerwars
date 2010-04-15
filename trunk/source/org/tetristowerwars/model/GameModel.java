@@ -23,6 +23,7 @@ import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.contacts.ContactResult;
+import org.tetristowerwars.util.MutableEntry;
 
 /**
  *
@@ -43,7 +44,7 @@ public class GameModel {
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
-    private final Set<Block> blocksToRemove = new LinkedHashSet<Block>();
+    private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private float timeTakenToExecuteUpdateMs;
     private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
@@ -111,6 +112,7 @@ public class GameModel {
                 buildingBlockJoint.dampAngularVelocity();
             }
             world.step(constantStepTimeS, ITERATIONS_PER_STEP);
+            postProcess();
             numTimesStepped++;
             stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
         }
@@ -118,12 +120,7 @@ public class GameModel {
         lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
 
         if (numTimesStepped > 0) {
-            postProcess();
-            for (Player player : players) {
-                for (CannonBlock cannonBlock : player.getCannons()) {
-                    cannonBlock.adjustPipe((float) numTimesStepped * 1f / 60f);
-                }
-            }
+
 
             timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
         }
@@ -137,42 +134,54 @@ public class GameModel {
     private void postProcess() {
 
         // blocksToRemove will now contain all blocks that are outside the world.
-        for (Block block : blocksToRemove) {
+        for (Iterator<MutableEntry<Block, Integer>> it = blocksToRemove.iterator(); it.hasNext();) {
+            MutableEntry<Block, Integer> mutableEntry = it.next();
+            Block block = mutableEntry.getKey();
 
-            if (block instanceof BuildingBlock) {
-                BuildingBlock buildingBlock = (BuildingBlock) block;
-
-                Player owner = buildingBlock.getOwner();
-                if (owner == null) {
-                    buildingBlockPool.remove(buildingBlock);
-                } else {
-                    owner.removeBuildingBlock(buildingBlock);
-                }
-
-                BuildingBlockJoint bbj;
-                while ((bbj = getAttachedJoint(buildingBlock)) != null) {
-                    removeBuldingBlockJoint(bbj);
-                }
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onBlockDestruction(buildingBlock);
-                }
-                world.destroyBody(buildingBlock.getBody());
-
-            } else if (block instanceof BulletBlock) {
-                BulletBlock bulletBlock = (BulletBlock) block;
-                bulletBlock.getOwner().removeBullet(bulletBlock);
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onBlockDestruction(bulletBlock);
-                }
-                world.destroyBody(bulletBlock.getBody());
+            int delay = mutableEntry.getValue();
+            if (delay > 0) {
+                mutableEntry.setValue(delay - 1);
             } else {
-                System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
+                it.remove();
+                if (block instanceof BuildingBlock) {
+                    BuildingBlock buildingBlock = (BuildingBlock) block;
+
+                    Player owner = buildingBlock.getOwner();
+                    if (owner == null) {
+                        buildingBlockPool.remove(buildingBlock);
+                    } else {
+                        owner.removeBuildingBlock(buildingBlock);
+                    }
+
+                    BuildingBlockJoint bbj;
+                    while ((bbj = getAttachedJoint(buildingBlock)) != null) {
+                        removeBuldingBlockJoint(bbj);
+                    }
+                    for (GameModelListener gameModelListener : gameModelListeners) {
+                        gameModelListener.onBlockDestruction(buildingBlock);
+                    }
+                    world.destroyBody(buildingBlock.getBody());
+
+                } else if (block instanceof BulletBlock) {
+                    BulletBlock bulletBlock = (BulletBlock) block;
+                    bulletBlock.getOwner().removeBullet(bulletBlock);
+                    for (GameModelListener gameModelListener : gameModelListeners) {
+                        gameModelListener.onBlockDestruction(bulletBlock);
+                    }
+                    world.destroyBody(bulletBlock.getBody());
+                } else {
+                    System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
+                }
             }
         }
-        blocksToRemove.clear();
+        
 
 
         for (Player player : players) {
+
+            for (CannonBlock cannonBlock : player.getCannons()) {
+                cannonBlock.adjustPipe(1f / 60f);
+            }
 
             // Check if non-owned blocks has passed into a player area and should be
             // owned by a player or if it should be destroyed.
@@ -270,7 +279,7 @@ public class GameModel {
         if (shapes != null && shapes.length > 0) {
             for (int i = 0; i < shapes.length && shapes[i] != null; i++) {
                 Shape shape = shapes[i];
-            
+
                 if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
                     return (Block) shape.getBody().getUserData();
                 }
@@ -498,9 +507,9 @@ public class GameModel {
                     return;
                 }
 
-                blocksToRemove.add((Block) userData1);
+                blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
                 if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
-                    blocksToRemove.add((Block) userData2);
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
                 }
             }
 
@@ -509,9 +518,9 @@ public class GameModel {
                     return;
                 }
 
-                blocksToRemove.add((Block) userData2);
+                blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
                 if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
-                    blocksToRemove.add((Block) userData1);
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
                 }
             }
         }
@@ -553,7 +562,7 @@ public class GameModel {
             Object userdata = bodyOutsideWorld.getUserData();
 
             if (userdata instanceof Block) {
-                blocksToRemove.add((Block) userdata);
+                blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userdata, 0));
             }
         }
 
