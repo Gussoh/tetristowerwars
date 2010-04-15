@@ -79,10 +79,15 @@ public class Main {
             ++kalle;
             Thread.yield();
 
-            mouseInputManager.pumpEvents();
-            touchInputManager.pumpEvents();
+            if (gameModel.checkWinningConditions()) {
+                mouseInputManager.clearEvents();
+                touchInputManager.clearEvents();
+            } else {
+                mouseInputManager.pumpEvents();
+                touchInputManager.pumpEvents();
+            }
 
-            if (!gameModel.checkWinningConditions() && gameModel.update() > 0) {
+            if (gameModel.update() > 0) {
                 //renderer.renderFrame();
                 glRenderer.renderFrame();
             }

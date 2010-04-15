@@ -32,11 +32,11 @@ public class CannonFactory {
 
     public CannonBlock createBasicCannon(Player player, Vec2 pos, boolean shootingToLeft) {
 
-        Body body = createBody(new Vec2(pos.x, pos.y + blockSize * 2));
+        Body body = createBody(new Vec2(pos.x, pos.y + blockSize * 4));
 
         List<Vec2> vertices1 = new ArrayList<Vec2>(4);
-        vertices1.add(new Vec2(-blockSize, -blockSize * 2));
-        vertices1.add(new Vec2(blockSize, -blockSize * 2));
+        vertices1.add(new Vec2(-blockSize, -blockSize * 4));
+        vertices1.add(new Vec2(blockSize, -blockSize * 4));
         vertices1.add(new Vec2(blockSize, 0));
         vertices1.add(new Vec2(-blockSize, 0));
 

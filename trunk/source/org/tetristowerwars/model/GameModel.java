@@ -494,6 +494,10 @@ public class GameModel {
         return false;
     }
 
+    public Player getLeader() {
+        return leader;
+    }
+
     public List<WinningCondition> getWinningConditions() {
         return Collections.unmodifiableList(winningConditions);
     }
