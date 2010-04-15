@@ -22,6 +22,7 @@ import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.ConcreteMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.sound.SoundPlayer;
@@ -68,13 +69,13 @@ public class Main {
         //win1.setWinningCondition();
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
         //win2.setWinningCondition();
-        WinningCondition win3 = new HeightWinningCondition(gameModel, 30);
+        WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
         //win3.setWinningCondition();
         ArrayList conditions = new ArrayList();
         conditions.add(win1);
         conditions.add(win3);
-        //WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
-        //cwin.setWinningCondition();
+        WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
+        cwin.setWinningCondition();
 
         for (;;) {
             ++kalle;

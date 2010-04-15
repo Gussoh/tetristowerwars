@@ -5,6 +5,7 @@
 
 package org.tetristowerwars.model.winningcondition;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.WinningCondition;
@@ -65,12 +66,12 @@ public class CompoundWinningCondition extends WinningCondition {
     }
 
     @Override
-    public String getStatusMessage() {
-        String status = "";
+    public List<MessageEntry> getStatusMessage() {
+        ArrayList<MessageEntry> messages = new ArrayList<MessageEntry>();
         for (WinningCondition winningCondition : conditions) {
-            status.concat(winningCondition.getStatusMessage()).concat("\n");
+            messages.addAll(winningCondition.getStatusMessage());
         }
-        return status;
+        return messages;
     }
 
     /**

@@ -26,23 +26,14 @@ public abstract class WinningCondition {
 
     public abstract boolean gameIsOver();
 
-    public abstract String getStatusMessage();
+    public abstract List<MessageEntry> getStatusMessage();
 
-    public Player getLeader() {
-        List<Player> players = model.getPlayers();
-        Player leader = null;
-        float highest = 0;
-        for (Player player : players) {
-            float pHeight = player.getTowerHeight();
-            if(pHeight > highest) {
-                highest = pHeight;
-                leader = player;
-            }
-        }
-        return leader;
+    public ScoreEntry<Player, Float> getLeader() {
+        List<ScoreEntry<Player, Float>> scores = getScores();
+        return scores.get(0);
     }
 
-    public ArrayList getScores() {
+    public List<ScoreEntry<Player, Float>> getScores() {
         ArrayList<ScoreEntry<Player, Float>> scores = new ArrayList<ScoreEntry<Player, Float>>();
         List<Player> players = model.getPlayers();
         for (Player player : players) {
@@ -60,7 +51,6 @@ public abstract class WinningCondition {
         private ScoreEntry (Player player, float score) {
             this.player = player;
             this.score = score;
-
         }
 
         public Player getPlayer() {
@@ -77,4 +67,37 @@ public abstract class WinningCondition {
         }
     }
 
+    public class MessageEntry {
+        private final String text;
+        private final MessageType type;
+        private final Player player;
+
+        /**
+         *
+         * @param text The message
+         * @param type For formatting
+         * @param player Null for a general message
+         */
+        public MessageEntry (String text, MessageType type, Player player) {
+            this.text = text;
+            this.type = type;
+            this.player = player;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public MessageType getType() {
+            return type;
+        }
+    }
+
+    public enum MessageType {
+        NORMAL, CRITICAL
+    }
 }

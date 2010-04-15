@@ -5,6 +5,8 @@
 
 package org.tetristowerwars.model.winningcondition;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.WinningCondition;
 
@@ -32,9 +34,12 @@ public class TimedWinningCondition extends WinningCondition {
     }
 
     @Override
-    public String getStatusMessage() {
+    public List<MessageEntry> getStatusMessage() {
         long time = endTime - System.currentTimeMillis();
-        return "Time remaining: " + time/1000;
+        ArrayList<MessageEntry> message = new ArrayList<MessageEntry>(1);
+        MessageType type = time < 10000 ? MessageType.CRITICAL : MessageType.NORMAL;
+        message.add(new MessageEntry("Time remaining: " + Math.max(Math.round(time/1000), 0), type, null));
+        return message;
     }
 
 }
