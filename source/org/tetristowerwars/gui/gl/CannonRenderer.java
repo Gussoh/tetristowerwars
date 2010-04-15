@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
+import org.jbox2d.collision.PolygonShape;
+import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.tetristowerwars.model.CannonBlock;
@@ -108,18 +110,32 @@ public class CannonRenderer {
         for (Player player : gameModel.getPlayers()) {
             for (CannonBlock cannonBlock : player.getCannons()) {
                 Vec2 pos = cannonBlock.getBody().getPosition();
+                PolygonShape ps = null;
+                for (Shape shape = cannonBlock.getBody().getShapeList(); shape != null; shape = shape.getNext()) {
+                    if (shape instanceof PolygonShape) {
+                        ps = (PolygonShape) shape;
+                    }
+                }
+                
+                if (ps == null) {
+                    System.out.println("WARNING: cannon did not contain a polygonShape");
+                    continue;
+                }
+                Vec2[] vertices = ps.getVertices();
+
+
 
                 baseVertexBuffer.put(new float[]{
-                            pos.x - blockSize, pos.y - blockSize * 2,
-                            pos.x + blockSize, pos.y - blockSize * 2,
-                            pos.x + blockSize, pos.y,
-                            pos.x - blockSize, pos.y
+                            pos.x + vertices[0].x, pos.y + vertices[0].y,
+                            pos.x + vertices[1].x, pos.y + vertices[1].y,
+                            pos.x + vertices[2].x, pos.y + vertices[2].y,
+                            pos.x + vertices[3].x, pos.y + vertices[3].y
                         });
                 topVertexBuffer.put(new float[]{
-                            pos.x - blockSize, pos.y,
-                            pos.x + blockSize, pos.y,
-                            pos.x + blockSize, pos.y + blockSize,
-                            pos.x - blockSize, pos.y + blockSize
+                            pos.x + vertices[3].x, pos.y + vertices[3].y,
+                            pos.x + vertices[2].x, pos.y + vertices[2].y,
+                            pos.x + vertices[2].x, pos.y + vertices[2].y + blockSize,
+                            pos.x + vertices[3].x, pos.y + vertices[3].y + blockSize
                         });
 
                 baseTexCoordBuffer.put(new float[]{

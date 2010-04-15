@@ -7,6 +7,7 @@ package org.tetristowerwars.gui.gl;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -16,16 +17,22 @@ import java.util.Map;
 import javax.media.opengl.GL;
 import static javax.media.opengl.GL.*;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.tetristowerwars.gui.gl.animation.Path;
 import org.tetristowerwars.gui.gl.particle.Color;
-import org.tetristowerwars.gui.gl.particle.ColorStepFunction;
 import org.tetristowerwars.gui.gl.particle.FadeOutStepFunction;
 import org.tetristowerwars.gui.gl.particle.GravityStepFunction;
 import org.tetristowerwars.gui.gl.particle.Particle;
 import org.tetristowerwars.gui.gl.particle.ParticleEngine;
 import org.tetristowerwars.gui.gl.particle.PointSourceParticleEngine;
 import org.tetristowerwars.gui.gl.particle.VelocityDampStepFunction;
+import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.RectangularBuildingBlock;
+import org.tetristowerwars.model.material.BrickMaterial;
+import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
+import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.util.MathUtil;
 
 /**
@@ -42,6 +49,7 @@ public class EffectRenderer {
     private final PointSourceParticleEngine explosionParticleEngine;
     private final PointSourceParticleEngine frictionParticleEngine;
     private final PointSourceParticleEngine smokeParticleEngine;
+    private final PointSourceParticleEngine dustParticleEngine;
     private final Texture particleTexture;
     private final static int NUM_VERTICES_PER_LINE = 2;
     private final static int NUM_VERTICES_PER_PARTICLE = 4;
@@ -96,6 +104,15 @@ public class EffectRenderer {
         smokeParticleEngine.addStepFunction(new FadeOutStepFunction(0.5f));
         //smokeParticleEngine.addStepFunction(new VelocityDampStepFunction(1.5f));
         smokeParticleEngine.addStepFunction(new GravityStepFunction(1.5f));
+
+        dustParticleEngine = new PointSourceParticleEngine();
+        dustParticleEngine.setTimeToLive(4.0f, 5.0f);
+        dustParticleEngine.setDirection(0, MathUtil.PI);
+        dustParticleEngine.setRotationSpeed(0, 0);
+        dustParticleEngine.setSpeed(0, 4.0f);
+        dustParticleEngine.setRadius(1.0f, 3.0f);
+        dustParticleEngine.addStepFunction(new GravityStepFunction());
+        dustParticleEngine.addStepFunction(new FadeOutStepFunction(0.9f));
     }
 
     public void render(GL gl, GameModel gameModel, float elapsedTime) {
@@ -187,14 +204,16 @@ public class EffectRenderer {
         }
     }
 
-    public void renderParticles(GL gl, float elapsedTime) {
+    public void renderParticles(GL gl, float elapsedTimeMs) {
 
-        explosionParticleEngine.update(elapsedTime * 0.001f);
-        frictionParticleEngine.update(elapsedTime * 0.001f);
-        smokeParticleEngine.update(elapsedTime * 0.001f);
+        float elapsedTimeS = elapsedTimeMs * 0.001f;
+        explosionParticleEngine.update(elapsedTimeS);
+        frictionParticleEngine.update(elapsedTimeS);
+        smokeParticleEngine.update(elapsedTimeS);
+        dustParticleEngine.update(elapsedTimeS);
 
         int numLightVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
-        int numSolidVertices = (smokeParticleEngine.getParticles().size() * NUM_VERTICES_PER_PARTICLE);
+        int numSolidVertices = ((smokeParticleEngine.getParticles().size() + dustParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE);
         int totalNumVertices = numLightVertices + numSolidVertices;
         if (totalNumVertices * 2 > particleTexCoordBuffer.capacity()) {
             particleVertexBuffer = BufferUtil.newFloatBuffer(totalNumVertices * 2);
@@ -202,6 +221,7 @@ public class EffectRenderer {
             particleColorBuffer = BufferUtil.newFloatBuffer(totalNumVertices * 4);
         }
 
+        createBufferData(dustParticleEngine);
         createBufferData(smokeParticleEngine);
         createBufferData(explosionParticleEngine);
         createBufferData(frictionParticleEngine);
@@ -250,5 +270,36 @@ public class EffectRenderer {
     public void createSmokeEffect(Vec2 v) {
         smokeParticleEngine.setPosition(v);
         smokeParticleEngine.createParticles(10);
+    }
+
+    public void createBuildingBlockDestructionEffect(BuildingBlock buildingBlock) {
+        if (buildingBlock instanceof RectangularBuildingBlock) {
+            RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
+            Class<? extends Material> materialClass = rbb.getMaterial().getClass();
+            if (materialClass == WoodMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.8f, 0.6f, 0.4f, 1.0f), new Color(1.0f, 0.8f, 0.6f, 1.0f), true);
+            } else if (materialClass == BrickMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.6f, 0.1f, 0.0f, 1.0f), new Color(0.8f, 0.2f, 0.0f, 1.0f), false);
+            } else if (materialClass == SteelMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.1f, 0.1f, 0.1f, 1.0f), new Color(0.3f, 0.3f, 0.3f, 1.0f), true);
+            } else {
+                return;
+            }
+
+            XForm xForm = rbb.getBody().getXForm();
+            for (Rectangle2D rect : rbb.getRectangles()) {
+                createDustAt(XForm.mul(xForm, new Vec2((float) rect.getCenterX(), (float) rect.getCenterY())));
+                createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMinX(), (float) rect.getMinY())));
+                createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMinX(), (float) rect.getMaxY())));
+                createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMaxX(), (float) rect.getMinY())));
+                createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMaxX(), (float) rect.getMaxY())));
+
+            }
+        }
+    }
+
+    private void createDustAt(Vec2 pos) {
+        dustParticleEngine.setPosition(pos);
+        dustParticleEngine.createParticles(4);
     }
 }

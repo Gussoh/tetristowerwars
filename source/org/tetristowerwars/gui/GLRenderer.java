@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
@@ -76,6 +77,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private final boolean sceneAntiAliasing;
     private long frameCounter = 0;
     private long performanceTimer = 0;
+    private Semaphore renderingSemaphore = new Semaphore(0);
 
     /**
      * 
@@ -128,6 +130,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void renderFrame() {
+        renderingSemaphore.release();
         glCanvas.display();
     }
 
@@ -205,6 +208,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void display(GLAutoDrawable drawable) {
 
+        if (!renderingSemaphore.tryAcquire()) {
+            return;
+        }
         long currentTime = System.currentTimeMillis();
         long startTime = System.nanoTime();
         long elapsedTime = currentTime - lastTimeMillis;
@@ -323,6 +329,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         if (block instanceof BulletBlock) {
             effectRenderer.createExplosionEffect(block.getBody().getPosition());
             effectRenderer.createSmokeEffect(block.getBody().getPosition());
+        } else if (block instanceof BuildingBlock) {
+            effectRenderer.createBuildingBlockDestructionEffect((BuildingBlock) block);
         }
     }
 

@@ -69,4 +69,8 @@ public abstract class InputManager {
             inputListener.onInputDeviceDragged(event);
         }
     }
+
+    public void clearEvents() {
+        events.clear();
+    }
 }
