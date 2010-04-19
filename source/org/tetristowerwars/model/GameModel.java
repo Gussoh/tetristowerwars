@@ -520,31 +520,31 @@ public class GameModel {
 
             if (userData1 instanceof Block && userData2 instanceof Block) {
 
+                if (userData1 instanceof BulletBlock) {
+
+                    if (((BulletBlock) userData1).getCannon() == userData2 || ((Block) userData2).getOwner() == null) {
+                        return;
+                    }
+
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
+                    if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
+                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
+                    }
+                }
+
+                if (userData2 instanceof BulletBlock) {
+                    if (((BulletBlock) userData2).getCannon() == userData1 || ((Block) userData1).getOwner() == null) {
+                        return;
+                    }
+
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
+                    if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
+                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
+                    }
+                }
+
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed, point.position);
-                }
-            }
-
-            if (userData1 instanceof BulletBlock) {
-
-                if (((BulletBlock) userData1).getCannon() == userData2) {
-                    return;
-                }
-
-                blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
-                if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
-                }
-            }
-
-            if (userData2 instanceof BulletBlock) {
-                if (((BulletBlock) userData2).getCannon() == userData1) {
-                    return;
-                }
-
-                blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
-                if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
                 }
             }
         }
@@ -596,9 +596,9 @@ public class GameModel {
             Object userData2 = shape2.getBody().getUserData();
 
             if (userData1 instanceof BulletBlock) {
-                return ((BulletBlock) userData1).getCannon() != userData2;
+                return ((BulletBlock) userData1).getCannon() != userData2 && ((Block) userData2).getOwner() != null;
             } else if (userData2 instanceof BulletBlock) {
-                return ((BulletBlock) userData2).getCannon() != userData1;
+                return ((BulletBlock) userData2).getCannon() != userData1 && ((Block) userData1).getOwner() != null;
             }
 
             if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {

@@ -67,27 +67,27 @@ public class BuildingBlockJoint {
     }
 
     protected void updatePointerPosition(Vec2 position) {
-        boolean goingDown = false;
-        if (position.y < pointerPosition.y) {
-            goingDown = true;
-        }
-        pointerPosition = position;
-
-        if (goingDown) {
-            targetPosition = new Vec2(position.x, position.y - Math.min(jointOffset, maxJointOffset));
-        } else {
-            jointOffset = MathUtil.vecLength(pointerPosition, targetPosition);
-            if (jointOffset < maxJointOffset) {
-                targetPosition = new Vec2(position.x, position.y - jointOffset);
-            } else if (jointOffset >= maxJointOffset) {
-                targetPosition = new Vec2(position.x, position.y - maxJointOffset);
-            }
-        }
-        joint.setTarget(targetPosition);
+//        boolean goingDown = false;
+//        if (position.y < pointerPosition.y) {
+//            goingDown = true;
+//        }
+//        pointerPosition = position;
+//
+//        if (goingDown) {
+//            targetPosition = new Vec2(position.x, position.y - Math.min(jointOffset, maxJointOffset));
+//        } else {
+//            jointOffset = MathUtil.vecLength(pointerPosition, targetPosition);
+//            if (jointOffset < maxJointOffset) {
+//                targetPosition = new Vec2(position.x, position.y - jointOffset);
+//            } else if (jointOffset >= maxJointOffset) {
+//                targetPosition = new Vec2(position.x, position.y - maxJointOffset);
+//            }
+//        }
+//        joint.setTarget(targetPosition);
 
         //previous code
-        //pointerPosition = new Vec2(position.x, position.y);
-        //joint.setTarget(pointerPosition);
+        pointerPosition = new Vec2(position.x, position.y);
+        joint.setTarget(pointerPosition);
     }
 
     public void destroy() {
