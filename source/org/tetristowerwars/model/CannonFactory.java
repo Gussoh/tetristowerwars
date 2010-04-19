@@ -23,7 +23,7 @@ public class CannonFactory {
     private final GameModel gameModel;
     private float blockSize;
     private static final float CANNON_COOLDOWN = 5.0f;
-    private static final float CANNON_FORCE = 8000f;
+    private static final float CANNON_FORCE = 1500f;
 
     public CannonFactory(GameModel gameModel, float blockSize) {
         this.gameModel = gameModel;

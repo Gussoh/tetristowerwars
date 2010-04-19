@@ -36,7 +36,11 @@ public class CannonBlock extends Block {
     }
 
     public float getForce() {
-        return force;
+        if (shotMaterial == null) {
+            return force;
+        } else {
+            return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 10.0f, 0.7f, 6.0f);
+        }
     }
 
 
