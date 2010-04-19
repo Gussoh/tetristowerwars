@@ -56,7 +56,7 @@ public class Controller implements InputListener {
             actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
         } else if (collisionBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
-            gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
+            //gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
         } else if (collisionBlock instanceof BulletBlock) {
         }
     }
