@@ -78,7 +78,7 @@ public class CannonBlock extends Block {
 
             if (timeUntilShooting < 0) {
                 timeUntilShooting = 0;
-                bulletFactory.createBullet(this);
+                bulletFactory.createBullet(this, shotMaterial);
                 cannonLoaded = false;
                 remainingCoolDown = coolDown;
             }
