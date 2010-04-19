@@ -28,27 +28,27 @@ public abstract class WinningCondition {
 
     public abstract List<MessageEntry> getStatusMessage();
 
-    public ScoreEntry<Player, Float> getLeader() {
-        List<ScoreEntry<Player, Float>> scores = getScores();
+    public ScoreEntry getLeader() {
+        List<ScoreEntry> scores = getScores();
         return scores.get(0);
     }
 
-    public List<ScoreEntry<Player, Float>> getScores() {
-        ArrayList<ScoreEntry<Player, Float>> scores = new ArrayList<ScoreEntry<Player, Float>>();
+    public List<ScoreEntry> getScores() {
+        ArrayList<ScoreEntry> scores = new ArrayList<ScoreEntry>();
         List<Player> players = model.getPlayers();
         for (Player player : players) {
-            scores.add(new ScoreEntry(player, player.getTowerHeight()));
+            scores.add(new ScoreEntry(player, (int) Math.ceil(player.getTowerHeight())));
         }
         Collections.sort(scores);
 
         return scores;
     }
     
-    public class ScoreEntry<Player, Float> implements Comparable<ScoreEntry>{
+    public class ScoreEntry implements Comparable<ScoreEntry>{
         private final Player player;
-        private final float score;
+        private final int score;
 
-        private ScoreEntry (Player player, float score) {
+        private ScoreEntry (Player player, int score) {
             this.player = player;
             this.score = score;
         }
@@ -57,13 +57,13 @@ public abstract class WinningCondition {
             return player;
         }
 
-        public float getScore() {
+        public int getScore() {
             return score;
         }
 
         @Override
         public int compareTo(ScoreEntry e) {
-            return (int) (e.score - this.score);
+            return e.score - this.score;
         }
     }
 
