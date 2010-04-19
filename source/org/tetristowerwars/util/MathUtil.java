@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.util;
 
+import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 
 /**
@@ -40,5 +41,17 @@ public class MathUtil {
     public static Vec3 rotateNormal(XForm T, Vec3 v) {
         return new Vec3(T.R.col1.x * v.x + T.R.col2.x * v.y,
                 T.R.col1.y * v.x + T.R.col2.y * v.y, v.z);
+    }
+
+    public static float vecLength(Vec2 a, Vec2 b) {
+        float x = Math.abs(a.x - b.x);
+        float y = Math.abs(a.y - b.y);
+
+        double x2 = Math.pow(x, 2);
+        double y2 = Math.pow(y, 2);
+
+        double length =  Math.sqrt(x2 + y2);
+
+        return (float) length;
     }
 }

@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.model;
 
+import org.tetristowerwars.util.MathUtil;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -17,15 +17,20 @@ import org.jbox2d.dynamics.joints.MouseJointDef;
  * @author Andreas
  */
 public class BuildingBlockJoint {
+
     private final BuildingBlock buildingBlock;
     private final MouseJoint joint;
     private final World world;
-    private Vec2 position;
+    private Vec2 pointerPosition;
+    private Vec2 targetPosition;
+    private float jointOffset = 0;
+    private float maxJointOffset = 20; //TODO: good value?
 
     protected BuildingBlockJoint(World world, BuildingBlock buildingBlock, Vec2 position) {
         this.buildingBlock = buildingBlock;
         this.world = world;
-        this.position = position;
+        this.pointerPosition = position;
+        targetPosition = position.clone();
 
         Body blockBody = buildingBlock.getBody();
 
@@ -38,7 +43,7 @@ public class BuildingBlockJoint {
         mouseJointDef.body2 = blockBody;
         mouseJointDef.maxForce = 5000; // TODO: Is this a good value?
         mouseJointDef.dampingRatio = 1f;
-        
+
         mouseJointDef.target.set(position.x, position.y);
 
         joint = (MouseJoint) world.createJoint(mouseJointDef);
@@ -58,12 +63,31 @@ public class BuildingBlockJoint {
     }
 
     public Vec2 getPointerPosition() {
-        return position;
+        return pointerPosition;
     }
 
     protected void updatePointerPosition(Vec2 position) {
-        this.position = position;
-        joint.setTarget(position);
+        boolean goingDown = false;
+        if (position.y < pointerPosition.y) {
+            goingDown = true;
+        }
+        pointerPosition = position;
+
+        if (goingDown) {
+            targetPosition = new Vec2(position.x, position.y - Math.min(jointOffset, maxJointOffset));
+        } else {
+            jointOffset = MathUtil.vecLength(pointerPosition, targetPosition);
+            if (jointOffset < maxJointOffset) {
+                targetPosition = new Vec2(position.x, position.y - jointOffset);
+            } else if (jointOffset >= maxJointOffset) {
+                targetPosition = new Vec2(position.x, position.y - maxJointOffset);
+            }
+        }
+        joint.setTarget(targetPosition);
+
+        //previous code
+        //pointerPosition = new Vec2(position.x, position.y);
+        //joint.setTarget(pointerPosition);
     }
 
     public void destroy() {
@@ -76,4 +100,4 @@ public class BuildingBlockJoint {
 
         b.setAngularVelocity(b.getAngularVelocity() * 0.999f);
     }
-}
+  }
