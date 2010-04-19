@@ -67,7 +67,7 @@ public class Main {
         //win1.setWinningCondition();
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
         //win2.setWinningCondition();
-        WinningCondition win3 = new HeightWinningCondition(gameModel, 50);
+        WinningCondition win3 = new HeightWinningCondition(gameModel, 100);
         //win3.setWinningCondition();
         ArrayList conditions = new ArrayList();
         conditions.add(win1);
@@ -92,7 +92,7 @@ public class Main {
                 glRenderer.renderFrame();
             }
 
-            if (gameModel.getBuildingBlockPool().size() < 10) {
+            if (gameModel.getBuildingBlockPool().size() < 3) {
 
                 if (kalle % 50 == 0) {
                     gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), Material.createRandomMaterial());

@@ -595,9 +595,9 @@ public class GameModel {
             Object userData1 = shape1.getBody().getUserData();
             Object userData2 = shape2.getBody().getUserData();
 
-            if (userData1 instanceof BulletBlock) {
+            if (userData1 instanceof BulletBlock && userData2 instanceof Block) {
                 return ((BulletBlock) userData1).getCannon() != userData2 && ((Block) userData2).getOwner() != null;
-            } else if (userData2 instanceof BulletBlock) {
+            } else if (userData2 instanceof BulletBlock && userData1 instanceof Block) {
                 return ((BulletBlock) userData2).getCannon() != userData1 && ((Block) userData1).getOwner() != null;
             }
 
