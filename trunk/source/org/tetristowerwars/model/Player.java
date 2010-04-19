@@ -155,6 +155,7 @@ public class Player {
 
     /**
      * The tower height in meters from the ground level.
+     * Returns the exact height as seen by the physics engine!
      * @return the tower height.
      */
     public float getTowerHeight() {

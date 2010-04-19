@@ -18,25 +18,21 @@ import org.tetristowerwars.model.WinningCondition;
  */
 public class HeightWinningCondition extends WinningCondition {
 
-    private final float height;
+    private final int height;
     private BuildingBlock highestBlock = null;
     private long startTime;
     private final long winningTimer = 5000;
     private Player leader;
-    private float leaderHeight;
-    private final NumberFormat numForm;
+    private int leaderHeight;
 
-    public HeightWinningCondition(GameModel model, float height) {
+    public HeightWinningCondition(GameModel model, int height) {
         super(model);
         this.height = height;
-        numForm = NumberFormat.getNumberInstance();
-        numForm.setMaximumFractionDigits(1);
-        numForm.setMinimumFractionDigits(1);
     }
 
     @Override
     public boolean gameIsOver() {
-        ScoreEntry<Player, Float> score = getLeader();
+        ScoreEntry score = getLeader();
         leader = score.getPlayer();
         leaderHeight = score.getScore();
 
@@ -57,9 +53,9 @@ public class HeightWinningCondition extends WinningCondition {
     @Override
     public List<MessageEntry> getStatusMessage() {
         ArrayList<MessageEntry> message = new ArrayList<MessageEntry>();
-        for (ScoreEntry<Player, Float> scoreEntry : getScores()) {
+        for (ScoreEntry scoreEntry : getScores()) {
             MessageType type = height - scoreEntry.getScore() < 20 ? MessageType.CRITICAL : MessageType.NORMAL;
-            message.add(new MessageEntry(numForm.format(Math.max(height - scoreEntry.getScore(), 0)) + "m left to win!", type, scoreEntry.getPlayer()));
+            message.add(new MessageEntry(Math.max(height - scoreEntry.getScore(), 0) + "m left to win!", type, scoreEntry.getPlayer()));
         }
         return message;
     }
