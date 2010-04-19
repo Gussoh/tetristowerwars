@@ -26,7 +26,7 @@ public class BulletFactory {
         this.gameModel = gameModel;
     }
 
-    public BulletBlock createBullet(CannonBlock cannon) {
+    public BulletBlock createBullet(CannonBlock cannon, Material material) {
 
         float cannonAngle = -cannon.getAngleInRadians();
 
@@ -45,7 +45,7 @@ public class BulletFactory {
         Vec2 bulletPosition = new Vec2(cannonPos.x + impulse.x * blockSize * 2, cannonPos.y + impulse.y * blockSize * 2);
         
         Body body = createBody(bulletPosition);
-        addShape(blockSize * 0.5f, new SteelMaterial(), body);
+        addShape(blockSize * 0.5f, material, body);
 
         impulse.x *= cannon.getForce();
         impulse.y *= cannon.getForce();
