@@ -6,6 +6,7 @@ package org.tetristowerwars.control;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -35,7 +36,9 @@ public class Controller implements InputListener {
     @Override
     public void onInputDevicePressed(InputEvent event) {
 
-
+        if (actionIdToJoint.containsKey(event.getActionId()) == true) {
+            return; // Ignore TUIO bugs where an ID can appear twice on the screen
+        }
 
         Block collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()));
 
@@ -46,10 +49,10 @@ public class Controller implements InputListener {
 
         if (collisionBlock instanceof BuildingBlock) {
             // Check if a building block joint already exists for this action id
-            if (actionIdToJoint.containsKey(event.getActionId()) == true) {
-                // TODO: Do we really remove the old actionId? Workaround remove it.
-                performReleaseAction(event);
-            }
+           /* if (actionIdToJoint.containsKey(event.getActionId()) == true) {
+            // TODO: Do we really remove the old actionId? Workaround remove it.
+            performReleaseAction(event);
+            }*/
 
             renderer.putCursorPoint(event.getActionId(), event.getPosition(), true);
 
@@ -63,12 +66,12 @@ public class Controller implements InputListener {
 
     @Override
     public void onInputDeviceReleased(InputEvent event) {
-        renderer.removeCursorPoint(event.getActionId());
         performReleaseAction(event);
     }
 
     private void performReleaseAction(InputEvent event) {
         // If a building block joint exists for this very id
+        renderer.removeCursorPoint(event.getActionId());
         BuildingBlockJoint bbj = actionIdToJoint.remove(event.getActionId());
         if (bbj != null) {
             gameModel.removeBuldingBlockJoint(bbj);
@@ -81,9 +84,15 @@ public class Controller implements InputListener {
         // If a building block joint exists for this very id
         if (actionIdToJoint.get(event.getActionId()) != null) {
             hit = true;
-            gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
+            BuildingBlockJoint bbj = actionIdToJoint.get(event.getActionId());
+            Vec2 newPointerPosition = renderer.convertWindowToWorldCoordinates(event.getPosition());
+            if (newPointerPosition.sub(bbj.getPointerPosition()).length() > 40) {
+                performReleaseAction(event);
+            } else {
+                gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
+            }
         }
-        
+
         renderer.putCursorPoint(event.getActionId(), event.getPosition(), hit);
     }
 

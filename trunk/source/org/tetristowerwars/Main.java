@@ -15,15 +15,20 @@ import org.tetristowerwars.control.InputManager;
 import org.tetristowerwars.control.MouseInputManager;
 import org.tetristowerwars.control.TouchInputManager;
 import org.tetristowerwars.gui.Renderer;
+import org.tetristowerwars.model.BuildingBlockFactory;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
 import org.tetristowerwars.model.WinningCondition;
+import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
+import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.sound.SoundPlayer;
+import org.tetristowerwars.util.MathUtil;
 
 /**
  *
@@ -31,7 +36,10 @@ import org.tetristowerwars.sound.SoundPlayer;
  */
 public class Main {
 
-    static int kalle = 0;
+    public static final float LEFT_BORDER = 80;
+    public static final float RIGHT_BORDER = 160;
+    public static final float WORLD_WIDTH = 240;
+    public static final float GROUND_HEIGHT = 10;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -41,7 +49,7 @@ public class Main {
 
         float blockSize = 5;
         boolean useLightingEffects = true;
-        final GameModel gameModel = new GameModel(260, 480, 10, blockSize);
+        final GameModel gameModel = new GameModel(WORLD_WIDTH, 480, GROUND_HEIGHT, blockSize);
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, useLightingEffects, null);
         //final Renderer renderer = new SwingRenderer(gameModel);
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
@@ -56,12 +64,12 @@ public class Main {
 
         tuioClient.connect();
 
-        Player player1 = gameModel.createPlayer("Player 1", 0, 80);
-        Player player2 = gameModel.createPlayer("Player 2", 180, 260);
+        Player player1 = gameModel.createPlayer("Player 1", 0, LEFT_BORDER);
+        Player player2 = gameModel.createPlayer("Player 2", RIGHT_BORDER, WORLD_WIDTH);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
-        cannonFactory.createBasicCannon(player1, new Vec2(80, 10), false);
-        cannonFactory.createBasicCannon(player2, new Vec2(180, 10), true);
+        cannonFactory.createBasicCannon(player1, new Vec2(LEFT_BORDER, GROUND_HEIGHT), false);
+        cannonFactory.createBasicCannon(player2, new Vec2(RIGHT_BORDER, GROUND_HEIGHT), true);
 
         WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
         //win1.setWinningCondition();
@@ -76,7 +84,6 @@ public class Main {
         cwin.setWinningCondition();
 
         for (;;) {
-            ++kalle;
             Thread.yield();
 
             if (gameModel.checkWinningConditions()) {
@@ -88,41 +95,34 @@ public class Main {
             }
 
             if (gameModel.update() > 0) {
-                //renderer.renderFrame();
                 glRenderer.renderFrame();
             }
 
-            if (gameModel.getBuildingBlockPool().size() < 3) {
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createPyramidBlock(new Vec2(120, 400), Material.createRandomMaterial());
+            if (gameModel.getBuildingBlockPool().size() <= 1) {
+                for (int i = 0; i < 7; i++) {
+                    createRandomBuildingBlock(gameModel, LEFT_BORDER, RIGHT_BORDER);
                 }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createRightSBlock(new Vec2(120, 400), Material.createRandomMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLeftSBlock(new Vec2(130, 400), Material.createRandomMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLineBlock(new Vec2(140, 400), Material.createRandomMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createRightLBlock(new Vec2(100, 400), Material.createRandomMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createLeftLBlock(new Vec2(110, 400), Material.createRandomMaterial());
-                }
-
-                if (kalle % 50 == 0) {
-                    gameModel.getBuildingBlockFactory().createSquareBlock(new Vec2(140, 400), Material.createRandomMaterial());
-                }
-
             }
         }
+    }
+
+    public static void createRandomBuildingBlock(GameModel gameModel, float left, float right) {
+
+        BuildingBlockFactory bbf = gameModel.getBuildingBlockFactory();
+        double randomValue = Math.random() * 3;
+
+        Vec2 pos = new Vec2(MathUtil.random(left, right), gameModel.getWorldBoundries().upperBound.y - gameModel.getBlockSize() * 5);
+        Material material;
+
+
+        if (randomValue < 1.0) {
+            material = new WoodMaterial();
+        } else if (randomValue < 2.0) {
+            material = new BrickMaterial();
+        } else {
+            material = new SteelMaterial();
+        }
+
+        bbf.createRandomRectangularBuildingBlock(pos, material);
     }
 }

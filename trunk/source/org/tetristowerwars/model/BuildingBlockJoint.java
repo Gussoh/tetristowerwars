@@ -90,9 +90,11 @@ public class BuildingBlockJoint {
         joint.setTarget(pointerPosition);
     }
 
-    public void destroy() {
+    public void destroy(boolean isLastJoint) {
         world.destroyJoint(joint);
-        buildingBlock.getBody().setMass(buildingBlock.getOriginalMassData());
+        if (isLastJoint) {
+            buildingBlock.getBody().setMass(buildingBlock.getOriginalMassData());
+        }
     }
 
     protected void dampAngularVelocity() {
