@@ -44,6 +44,7 @@ import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
+import org.tetristowerwars.model.Player;
 import static javax.media.opengl.GL.*;
 import org.tetristowerwars.model.WinningCondition;
 
@@ -167,7 +168,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             bulletRenderer = new BulletRenderer(gl, lightingEffects);
             cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
             pointerRenderer = new PointerRenderer(gl);
-            effectRenderer = new EffectRenderer(gl);
+            effectRenderer = new EffectRenderer(gl, gameModel);
             textInformationRenderer = new TextInformationRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer(gl, lightingEffects);
@@ -232,7 +233,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         backgroundAnimationFactory.run(elapsedTime);
         backgroundAnimationRenderer.render(gl, elapsedTime);
 
-
         // render building blocks, except outline
         rectangularBuildingBlockRenderer.render(gl, gameModel, elapsedTime);
         // Render the light effect when a block changes owner
@@ -241,24 +241,30 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Render block outlines
         gl.glLineWidth(lineWidthFactor * gameModel.getBlockSize());
         rectangularBuildingBlockRenderer.renderLines(gl);
-        GLUT glut = new GLUT();
 
         // Render the joints between mouse/finger and block.
         gl.glLineWidth(lineWidthFactor * 10.0f);
         jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints());
 
 
-        bulletRenderer.render(gl, gameModel);
+        
         cannonRenderer.render(gl, gameModel);
 
-
-
         // Render the light effect of the players border when a block changes owner
+
+        for (Player player : gameModel.getPlayers()) {
+            for (BulletBlock bulletBlock : player.getBullets()) {
+                effectRenderer.createBulletTrailEffect(bulletBlock);
+            }
+        }
+
         gl.glLineWidth(lineWidthFactor * 2.0f);
         effectRenderer.render(gl, gameModel, elapsedTime);
         effectRenderer.renderParticles(gl, elapsedTime);
 
+        bulletRenderer.render(gl, gameModel);
 
+        
         backgroundRenderer.renderBottom(gl);
 
         // Render the mouse/finger circles.
