@@ -94,6 +94,11 @@ public class BuildingBlockJoint {
         world.destroyJoint(joint);
         if (isLastJoint) {
             buildingBlock.getBody().setMass(buildingBlock.getOriginalMassData());
+            float angVel = buildingBlock.getBody().getAngularVelocity();
+            Vec2 vel = buildingBlock.getBody().getLinearVelocity();
+
+            buildingBlock.getBody().setAngularVelocity(angVel * 0.1f);
+            buildingBlock.getBody().setLinearVelocity(new Vec2(vel.x * 0.1f, vel.y * 0.1f));
         }
     }
 
