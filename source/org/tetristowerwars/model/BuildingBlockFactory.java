@@ -173,7 +173,7 @@ public class BuildingBlockFactory {
         addShape(vertices1, mat, body);
         addShape(vertices2, mat, body);
 
-        Rectangle2D[] recs = new Rectangle2D[4];
+        Rectangle2D[] recs = new Rectangle2D[5];
         recs[0] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize * 1.5f, blockSize, blockSize);
         recs[1] = new Rectangle2D.Float(-blockSize * 1.5f, -blockSize * 0.5f, blockSize, blockSize);
         recs[2] = new Rectangle2D.Float(-blockSize * 0.5f, -blockSize * 0.5f, blockSize, blockSize);
@@ -413,6 +413,28 @@ public class BuildingBlockFactory {
         gameModel.fireBodyCreationNotification(block);
 
         return block;
+    }
+
+    public BuildingBlock createRandomRectangularBuildingBlock(Vec2 pos, Material mat) {
+        double randomValue = Math.random() * 8;
+
+        if (randomValue < 1.0) {
+            return createCrossBlock(pos, mat);
+        } else if (randomValue < 2.0) {
+            return createLeftLBlock(pos, mat);
+        } else if (randomValue < 3.0) {
+            return createLeftSBlock(pos, mat);
+        } else if (randomValue < 4.0) {
+            return createLineBlock(pos, mat);
+        } else if (randomValue < 5.0) {
+            return createPyramidBlock(pos, mat);
+        } else if (randomValue < 6.0) {
+            return createRightLBlock(pos, mat);
+        } else if (randomValue < 7.0) {
+            return createRightSBlock(pos, mat);
+        } else {
+            return createSquareBlock(pos, mat);
+        }
     }
 
     private Body createBody(Vec2 pos) {

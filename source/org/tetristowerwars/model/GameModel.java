@@ -334,7 +334,8 @@ public class GameModel {
             }
             BuildingBlock bb = buildingBlockJoint.getBuildingBlock();
             XForm xForm = bb.getBody().getXForm();
-            buildingBlockJoint.destroy();
+            boolean isLastJointForThisBlock = getAttachedJoint(bb) == null;
+            buildingBlockJoint.destroy(isLastJointForThisBlock);
 
             //Cannon-loading code
             for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
@@ -431,7 +432,8 @@ public class GameModel {
 
     /**
      * Iterate over all joints to find out if this body is attached to a joint.
-     * Since we almost never have more than 2 joints,
+     * Note that a body might be attached to several joints. This function only
+     * returns the first joint found.
      *
      * @param buildingBlock The block to use in the search.
      * @return The joint this building block is attached to, or null if joint is found.
@@ -529,8 +531,7 @@ public class GameModel {
             if (userData1 instanceof Block && userData2 instanceof Block) {
 
                 if (userData1 instanceof BulletBlock) {
-
-                    if (((BulletBlock) userData1).getCannon() == userData2 || ((Block) userData2).getOwner() == null) {
+                    if (!shouldBulletCollide((BulletBlock) userData1, (Block) userData2)) {
                         return;
                     }
 
@@ -541,7 +542,7 @@ public class GameModel {
                 }
 
                 if (userData2 instanceof BulletBlock) {
-                    if (((BulletBlock) userData2).getCannon() == userData1 || ((Block) userData1).getOwner() == null) {
+                    if (!shouldBulletCollide((BulletBlock) userData2, (Block) userData1)) {
                         return;
                     }
 
@@ -598,31 +599,41 @@ public class GameModel {
             }
         }
 
+        private boolean shouldBulletCollide(BulletBlock bullet, Block otherBlock) {
+            if (bullet.getCannon() == otherBlock) {
+                return false;
+            } else if (otherBlock.getOwner() == null && otherBlock != groundBlock) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        private boolean shouldBuildingBlockCollideWithCannon(BuildingBlock bb) {
+            BuildingBlockJoint bbj = getAttachedJoint(bb);
+            if (bbj != null) {
+                potientialBulletBlock.add(bb);
+                return false;
+            }
+
+            return true;
+        }
+
         @Override
         public boolean shouldCollide(Shape shape1, Shape shape2) {
             Object userData1 = shape1.getBody().getUserData();
             Object userData2 = shape2.getBody().getUserData();
 
             if (userData1 instanceof BulletBlock && userData2 instanceof Block) {
-                return ((BulletBlock) userData1).getCannon() != userData2 && ((Block) userData2).getOwner() != null;
+                return shouldBulletCollide((BulletBlock) userData1, (Block) userData2);
             } else if (userData2 instanceof BulletBlock && userData1 instanceof Block) {
-                return ((BulletBlock) userData2).getCannon() != userData1 && ((Block) userData1).getOwner() != null;
+                return shouldBulletCollide((BulletBlock) userData2, (Block) userData1);
             }
 
             if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {
-                BuildingBlock buildingBlock = (BuildingBlock) userData2;
-                BuildingBlockJoint bbj = getAttachedJoint(buildingBlock);
-                if (bbj != null) {
-                    potientialBulletBlock.add(buildingBlock);
-                    return false;
-                }
+                return shouldBuildingBlockCollideWithCannon((BuildingBlock) userData2);
             } else if (userData2 instanceof CannonBlock && userData1 instanceof BuildingBlock) {
-                BuildingBlock buildingBlock = (BuildingBlock) userData1;
-                BuildingBlockJoint bbj = getAttachedJoint(buildingBlock);
-                if (bbj != null) {
-                    potientialBulletBlock.add(buildingBlock);
-                    return false;
-                }
+                return shouldBuildingBlockCollideWithCannon((BuildingBlock) userData1);
             }
 
             return true;
