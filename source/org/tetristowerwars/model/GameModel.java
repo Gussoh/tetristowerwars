@@ -322,7 +322,9 @@ public class GameModel {
     }
 
     /**
-     * Removes a joint from the game world.
+     * Removes a joint from the game world.<p>
+     * If the BuildingBlock attached to the joint is overlapping a
+     * CannonBlock when the joint is removed, an attempt to load the cannon is made.
      * @param buildingBlockJoint the joint to remove
      */
     public void removeBuldingBlockJoint(BuildingBlockJoint buildingBlockJoint) {
@@ -334,6 +336,7 @@ public class GameModel {
             XForm xForm = bb.getBody().getXForm();
             buildingBlockJoint.destroy();
 
+            //Cannon-loading code
             for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
                 AABB aabb = new AABB();
                 s.computeAABB(aabb, xForm);
@@ -343,8 +346,13 @@ public class GameModel {
                     Object userData = shape.getBody().getUserData();
                     if (userData instanceof CannonBlock) {
                         CannonBlock cannonBlock = (CannonBlock) userData;
-                        cannonBlock.shoot(bb.getMaterial());
-                        blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                        if  (cannonBlock.getRemainingCoolDown() == 0) {
+                            cannonBlock.shoot(bb.getMaterial());
+                            blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                        }
+                        else {
+                            //TODO: Graphical feedback of cooldown
+                        }
                         return;
                     }
                 }
