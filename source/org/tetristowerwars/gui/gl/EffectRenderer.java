@@ -27,6 +27,7 @@ import org.tetristowerwars.gui.gl.particle.ParticleEngine;
 import org.tetristowerwars.gui.gl.particle.PointSourceParticleEngine;
 import org.tetristowerwars.gui.gl.particle.VelocityDampStepFunction;
 import org.tetristowerwars.model.BuildingBlock;
+import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.RectangularBuildingBlock;
 import org.tetristowerwars.model.material.BrickMaterial;
@@ -50,6 +51,7 @@ public class EffectRenderer {
     private final PointSourceParticleEngine frictionParticleEngine;
     private final PointSourceParticleEngine smokeParticleEngine;
     private final PointSourceParticleEngine dustParticleEngine;
+    private final PointSourceParticleEngine bulletTrailParticleEngine;
     private final Texture particleTexture;
     private final static int NUM_VERTICES_PER_LINE = 2;
     private final static int NUM_VERTICES_PER_PARTICLE = 4;
@@ -60,7 +62,7 @@ public class EffectRenderer {
     private final static float ANIMATION_TIME_MS = 750.0f;
     private final Map<Path, Vec2> animations = new LinkedHashMap<Path, Vec2>();
 
-    public EffectRenderer(GL gl) throws IOException {
+    public EffectRenderer(GL gl, GameModel gameModel) throws IOException {
         vertexBuffer = BufferUtil.newFloatBuffer(8 * NUM_VERTICES_PER_LINE * 2);
         colorBuffer = BufferUtil.newFloatBuffer(8 * NUM_VERTICES_PER_LINE * 4);
 
@@ -113,6 +115,15 @@ public class EffectRenderer {
         dustParticleEngine.setRadius(1.0f, 3.0f);
         dustParticleEngine.addStepFunction(new GravityStepFunction());
         dustParticleEngine.addStepFunction(new FadeOutStepFunction(0.9f));
+
+        bulletTrailParticleEngine = new PointSourceParticleEngine();
+        bulletTrailParticleEngine.setTimeToLive(0.3f, 0.3f);
+        bulletTrailParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
+        bulletTrailParticleEngine.setRotationSpeed(0, 0);
+        bulletTrailParticleEngine.setSpeed(0.0f, 0.1f);
+        bulletTrailParticleEngine.setColor(new Color(0.6f, 0.3f, 0.0f, 0.1f), new Color(1.0f, 0.6f, 0.2f, 0.2f), false);
+        bulletTrailParticleEngine.setRadius(gameModel.getBlockSize() * 1.0f, gameModel.getBlockSize() * 1.0f);
+        bulletTrailParticleEngine.addStepFunction(new FadeOutStepFunction(0.0f));
     }
 
     public void render(GL gl, GameModel gameModel, float elapsedTime) {
@@ -211,8 +222,9 @@ public class EffectRenderer {
         frictionParticleEngine.update(elapsedTimeS);
         smokeParticleEngine.update(elapsedTimeS);
         dustParticleEngine.update(elapsedTimeS);
+        bulletTrailParticleEngine.update(elapsedTimeS);
 
-        int numLightVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
+        int numLightVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size() + bulletTrailParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
         int numSolidVertices = ((smokeParticleEngine.getParticles().size() + dustParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE);
         int totalNumVertices = numLightVertices + numSolidVertices;
         if (totalNumVertices * 2 > particleTexCoordBuffer.capacity()) {
@@ -225,6 +237,7 @@ public class EffectRenderer {
         createBufferData(smokeParticleEngine);
         createBufferData(explosionParticleEngine);
         createBufferData(frictionParticleEngine);
+        createBufferData(bulletTrailParticleEngine);
 
         particleVertexBuffer.rewind();
         particleTexCoordBuffer.rewind();
@@ -293,9 +306,13 @@ public class EffectRenderer {
                 createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMinX(), (float) rect.getMaxY())));
                 createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMaxX(), (float) rect.getMinY())));
                 createDustAt(XForm.mul(xForm, new Vec2((float) rect.getMaxX(), (float) rect.getMaxY())));
-
             }
         }
+    }
+
+    public void createBulletTrailEffect(BulletBlock bulletBlock) {
+        bulletTrailParticleEngine.setPosition(bulletBlock.getBody().getPosition());
+        bulletTrailParticleEngine.createParticles(2);
     }
 
     private void createDustAt(Vec2 pos) {

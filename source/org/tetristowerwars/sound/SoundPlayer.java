@@ -29,6 +29,7 @@ import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
 import org.tetristowerwars.model.WinningCondition;
+import org.tetristowerwars.util.MathUtil;
 
 /**
  *
@@ -161,8 +162,8 @@ public class SoundPlayer implements GameModelListener {
                 if (gainControl != null) {
                     float min = gainControl.getMinimum();
                     float max = gainControl.getMaximum();
-                    float value = gainControl.getMinimum() + (max - min) * (float) Math.sqrt(volume);
-                    value = Math.max(min, Math.min(max, value));
+                    float value = MathUtil.lerp(volume, 0.1f, 1.0f, gainControl.getMinimum(), gainControl.getMaximum());
+                    
                     //System.out.println("Found gain control: " + gainControl);
                     gainControl.setValue(value);
                 }

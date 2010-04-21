@@ -347,12 +347,12 @@ public class GameModel {
                     Object userData = shape.getBody().getUserData();
                     if (userData instanceof CannonBlock) {
                         CannonBlock cannonBlock = (CannonBlock) userData;
-                        if  (cannonBlock.getRemainingCoolDown() == 0) {
+                        if  (cannonBlock.getTimeUntilShooting() == 0) {
                             cannonBlock.shoot(bb.getMaterial());
                             blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
                         }
                         else {
-                            //TODO: Graphical feedback of cooldown
+                            //TODO: Graphical feedback of block rejection
                         }
                         return;
                     }
