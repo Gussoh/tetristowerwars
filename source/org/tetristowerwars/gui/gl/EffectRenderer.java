@@ -73,7 +73,7 @@ public class EffectRenderer {
         particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
 
         explosionParticleEngine = new PointSourceParticleEngine();
-        explosionParticleEngine.setTimeToLive(1.5f, 2.0f);
+        explosionParticleEngine.setTimeToLive(2.0f, 2.5f);
         explosionParticleEngine.setDirection(0, MathUtil.PI * 2.0f);
         explosionParticleEngine.setRotationSpeed(0, 0);
         explosionParticleEngine.setSpeed(0.0f, 40.0f);
@@ -220,9 +220,9 @@ public class EffectRenderer {
         float elapsedTimeS = elapsedTimeMs * 0.001f;
         explosionParticleEngine.update(elapsedTimeS);
         frictionParticleEngine.update(elapsedTimeS);
+        bulletTrailParticleEngine.update(elapsedTimeS);
         smokeParticleEngine.update(elapsedTimeS);
         dustParticleEngine.update(elapsedTimeS);
-        bulletTrailParticleEngine.update(elapsedTimeS);
 
         int numLightVertices = (explosionParticleEngine.getParticles().size() + frictionParticleEngine.getParticles().size() + bulletTrailParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE;
         int numSolidVertices = ((smokeParticleEngine.getParticles().size() + dustParticleEngine.getParticles().size()) * NUM_VERTICES_PER_PARTICLE);
@@ -245,8 +245,9 @@ public class EffectRenderer {
 
         particleTexture.bind();
         gl.glEnable(GL_TEXTURE_2D);
-        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        
         gl.glEnableClientState(GL_COLOR_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         gl.glVertexPointer(2, GL_FLOAT, 0, particleVertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, particleTexCoordBuffer);

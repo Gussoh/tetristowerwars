@@ -99,8 +99,8 @@ public class BackgroundRenderer {
 
         // Bottom / ground to stand on
         vertexBuffer.put(new float[]{
-                    0, groundLevel - 10,
-                    renderWorldWidth, groundLevel - 10,
+                    0, 0,
+                    renderWorldWidth, 0,
                     renderWorldWidth, groundLevel,
                     0, groundLevel
                 });

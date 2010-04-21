@@ -60,7 +60,7 @@ public class TextInformationRenderer {
                 }
             }
         }
-        renderText(winningConditionTexts, centerXPos, renderWorldHeight, true, true, 1.0f);
+        renderText(winningConditionTexts, centerXPos, gameModel.getGroundLevel() - 7, true, true, 1.0f);
 
         for (Player player : gameModel.getPlayers()) {
             textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.6f);
@@ -83,7 +83,7 @@ public class TextInformationRenderer {
                 }
             }
 
-            renderText(texts, playerCenterPos, renderWorldHeight, false, true, 1.0f);
+            renderText(texts, playerCenterPos, gameModel.getGroundLevel() - 7, false, true, 1.0f);
 
             for (CannonBlock cannonBlock : player.getCannons()) {
                 if (cannonBlock.isCannonLoaded()) {

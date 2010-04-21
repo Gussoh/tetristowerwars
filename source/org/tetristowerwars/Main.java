@@ -26,6 +26,7 @@ import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
+import org.tetristowerwars.model.winningcondition.LimitedBlocksWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.sound.SoundPlayer;
 import org.tetristowerwars.util.MathUtil;
@@ -39,7 +40,7 @@ public class Main {
     public static final float LEFT_BORDER = 80;
     public static final float RIGHT_BORDER = 160;
     public static final float WORLD_WIDTH = 240;
-    public static final float GROUND_HEIGHT = 10;
+    public static final float GROUND_HEIGHT = 30;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -71,17 +72,17 @@ public class Main {
         cannonFactory.createBasicCannon(player1, new Vec2(LEFT_BORDER, GROUND_HEIGHT), false);
         cannonFactory.createBasicCannon(player2, new Vec2(RIGHT_BORDER, GROUND_HEIGHT), true);
 
-        WinningCondition win1 = new TimedWinningCondition(gameModel, 20000);
+        //WinningCondition win1 = new TimedWinningCondition(gameModel, 3 * 60 * 1000);
         //win1.setWinningCondition();
-        //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 40);
+        //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 20);
         //win2.setWinningCondition();
         WinningCondition win3 = new HeightWinningCondition(gameModel, 100);
-        //win3.setWinningCondition();
-        ArrayList conditions = new ArrayList();
-        conditions.add(win1);
-        conditions.add(win3);
-        WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
-        cwin.setWinningCondition();
+        win3.setWinningCondition();
+        //ArrayList conditions = new ArrayList();
+        //conditions.add(win1);
+        //conditions.add(win3);
+        //WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
+        //cwin.setWinningCondition();
 
         for (;;) {
             Thread.yield();
