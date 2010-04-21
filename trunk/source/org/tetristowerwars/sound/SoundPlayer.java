@@ -26,6 +26,7 @@ import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
+import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
 import org.tetristowerwars.model.WinningCondition;
@@ -44,11 +45,12 @@ public class SoundPlayer implements GameModelListener {
     private static final int MAX_CLIPS = 4;
     private static final String[] collisionSounds = new String[]{"collision1.wav"};
     private static final String[] collisionHardSounds = new String[]{"collisionHard1.wav", "collisionHard2.wav", "collisionHard3.wav", "collisionHard4.wav", "collisionHard4.wav"};
+    private static final String[] explosionSounds = new String[]{"explosion.mp3"};
+    private static final String[] cannonFireSounds = new String[]{"cannonfire.mp3"};
     private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"};
     private static final String select = "select.wav";
     private static final String deselect = "deselect.wav";
     private static final String zap = "zap.wav";
-
     SourceDataLine sourceDataLine;
     AudioInputStream audioInputStream;
 
@@ -162,8 +164,8 @@ public class SoundPlayer implements GameModelListener {
                 if (gainControl != null) {
                     float min = gainControl.getMinimum();
                     float max = gainControl.getMaximum();
-                    float value = MathUtil.lerp(volume, 0.1f, 1.0f, gainControl.getMinimum(), gainControl.getMaximum());
-                    
+                    float value = MathUtil.lerp(volume, 0.1f, 1.0f, gainControl.getMinimum(), MathUtil.lerpNoCap(0.9f, gainControl.getMinimum(), gainControl.getMaximum()));
+
                     //System.out.println("Found gain control: " + gainControl);
                     gainControl.setValue(value);
                 }
@@ -218,6 +220,9 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onBlockCreation(Block block) {
+        if (block instanceof BulletBlock) {
+            playSound(getRandomIndex(cannonFireSounds), 1.0f);
+        }
     }
 
     @Override
@@ -280,7 +285,12 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onBlockDestruction(Block block) {
-        playSound(zap, .6f);
+        if (block instanceof BulletBlock) {
+            playSound(getRandomIndex(explosionSounds), 1.0f);
+        } else {
+            playSound(zap, .6f);
+        }
+
     }
 
     @Override
@@ -290,6 +300,5 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
-        
     }
 }
