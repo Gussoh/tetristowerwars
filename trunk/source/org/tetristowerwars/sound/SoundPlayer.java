@@ -4,6 +4,8 @@
  */
 package org.tetristowerwars.sound;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import org.tetristowerwars.util.MathUtil;
 public class SoundPlayer implements GameModelListener {
 
     private final Map<String, List<Clip>> clipDB = new HashMap<String, List<Clip>>();
+    private final Map<String, AudioData> audioDataDB = new HashMap<String, AudioData>();
     private GameModel gameModel;
     private String soundLocation = "res/sound/";
     private Mixer.Info mixer = null;
@@ -50,6 +53,7 @@ public class SoundPlayer implements GameModelListener {
     private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"};
     private static final String select = "select.wav";
     private static final String deselect = "deselect.wav";
+    private static final String ownerChanged = "ownerchanged.mp3";
     private static final String zap = "zap.wav";
     SourceDataLine sourceDataLine;
     AudioInputStream audioInputStream;
@@ -63,7 +67,23 @@ public class SoundPlayer implements GameModelListener {
             }
         }
         gameModel.addGameModelListener(this);
-
+        System.out.println("- Preloading sounds");
+        getFirstAvailable(select);
+        getFirstAvailable(deselect);
+        getFirstAvailable(zap);
+        getFirstAvailable(ownerChanged);
+        for (int i = 0; i < collisionSounds.length; i++) {
+            getFirstAvailable(collisionSounds[i]);
+        }
+        for (int i = 0; i < collisionHardSounds.length; i++) {
+            getFirstAvailable(collisionHardSounds[i]);
+        }
+        for (int i = 0; i < cannonFireSounds.length; i++) {
+            getFirstAvailable(cannonFireSounds[i]);
+        }
+        for (int i = 0; i < explosionSounds.length; i++) {
+            getFirstAvailable(explosionSounds[i]);
+        }
         playMusic();
     }
 
@@ -89,21 +109,46 @@ public class SoundPlayer implements GameModelListener {
             } else {
                 clip = AudioSystem.getClip();
             }
-            AudioInputStream in = AudioSystem.getAudioInputStream(new File(soundLocation + filename));
 
-            AudioFormat baseFormat = in.getFormat();
-            AudioFormat decodedFormat = new AudioFormat(
-                    AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
-                    baseFormat.getSampleRate(), // sample rate (same as base format)
-                    16, // sample size in bits
-                    baseFormat.getChannels(), // # of Channels
-                    baseFormat.getChannels() * 2, // Frame Size
-                    baseFormat.getSampleRate(), // Frame Rate
-                    false // Big Endian
-                    );
+            AudioData audioData = audioDataDB.get(filename);
 
-            AudioInputStream decodedIn = AudioSystem.getAudioInputStream(decodedFormat, in);
-            clip.open(decodedIn);
+            if (audioData == null) {
+
+                AudioInputStream in = AudioSystem.getAudioInputStream(new File(soundLocation + filename));
+
+                AudioFormat baseFormat = in.getFormat();
+                AudioFormat decodedFormat = new AudioFormat(
+                        AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
+                        baseFormat.getSampleRate(), // sample rate (same as base format)
+                        16, // sample size in bits
+                        baseFormat.getChannels(), // # of Channels
+                        baseFormat.getChannels() * 2, // Frame Size
+                        baseFormat.getSampleRate(), // Frame Rate
+                        false // Big Endian
+                        );
+
+                AudioInputStream decodedIn = AudioSystem.getAudioInputStream(decodedFormat, in);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                byte[] data = new byte[1024];
+                int numBytes = 0;
+                for (;;) {
+                    numBytes = decodedIn.read(data);
+                    if (numBytes == -1) {
+                        break;
+                    } else {
+                        baos.write(data, 0, numBytes);
+                    }
+                }
+
+                decodedIn.close();
+                in.close();
+
+                audioData = new AudioData(baos.toByteArray(), decodedFormat);
+                audioDataDB.put(filename, audioData);
+            }
+
+            clip.open(audioData.audioFormat, audioData.data, 0, audioData.data.length);
 
             return clip;
         } catch (UnsupportedAudioFileException ex) {
@@ -151,6 +196,7 @@ public class SoundPlayer implements GameModelListener {
                 clip.stop();
                 clip.flush();
 
+
                 FloatControl gainControl = null;
                 if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
                     gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -164,11 +210,12 @@ public class SoundPlayer implements GameModelListener {
                 if (gainControl != null) {
                     float min = gainControl.getMinimum();
                     float max = gainControl.getMaximum();
-                    float value = MathUtil.lerp(volume, 0.1f, 1.0f, gainControl.getMinimum(), MathUtil.lerpNoCap(0.9f, gainControl.getMinimum(), gainControl.getMaximum()));
+                    float value = MathUtil.lerp(volume, 0.0f, 1.0f, MathUtil.lerpNoCap(0.5f, gainControl.getMinimum(), gainControl.getMaximum()), MathUtil.lerpNoCap(0.9f, gainControl.getMinimum(), gainControl.getMaximum()));
 
                     //System.out.println("Found gain control: " + gainControl);
                     gainControl.setValue(value);
                 }
+
                 clip.loop(repeat ? Clip.LOOP_CONTINUOUSLY : 0);
                 //System.out.println("Active: " + clip.isActive());
             }
@@ -237,6 +284,7 @@ public class SoundPlayer implements GameModelListener {
 
         byte tempBuffer[] = new byte[10000];
 
+        @Override
         public void run() {
             try {
                 int cnt;
@@ -271,7 +319,7 @@ public class SoundPlayer implements GameModelListener {
         //System.out.println("collision: " + collisionSpeed);
         if (collisionSpeed > 1.0) {
             if (collisionSpeed > 10) {
-                playSound(getRandomIndex(collisionHardSounds), (collisionSpeed - 10) / 8);
+                playSound(getRandomIndex(collisionHardSounds), MathUtil.lerp((collisionSpeed - 10.0f) / 8.0f, 0.0f, 1.0f, 0.0f, 0.9f));
             } else {
                 playSound(getRandomIndex(collisionSounds), collisionSpeed / 4);
             }
@@ -295,10 +343,22 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onJointDestruction(BuildingBlockJoint blockJoint) {
-        playSound(deselect, .7f);
+        playSound(deselect, 1.0f);
     }
 
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
+        playSound(ownerChanged, 0.95f);
+    }
+
+    private class AudioData {
+
+        private final byte[] data;
+        private final AudioFormat audioFormat;
+
+        public AudioData(byte[] data, AudioFormat audioFormat) {
+            this.data = data;
+            this.audioFormat = audioFormat;
+        }
     }
 }

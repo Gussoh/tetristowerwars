@@ -535,9 +535,9 @@ public class GameModel {
                         return;
                     }
 
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 4));
                     if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
-                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
+                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 6));
                     }
                 }
 
@@ -546,9 +546,9 @@ public class GameModel {
                         return;
                     }
 
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 2));
+                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 4));
                     if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
-                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 2));
+                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 6));
                     }
                 }
 
@@ -601,10 +601,13 @@ public class GameModel {
 
         private boolean shouldBulletCollide(BulletBlock bullet, Block otherBlock) {
             if (bullet.getCannon() == otherBlock) {
-                return false;
+                System.out.println("bullet is hitting cannon");
+                return false; // dont allow the bullet to hit its own cannon
             } else if (otherBlock.getOwner() == null && otherBlock != groundBlock) {
+                System.out.println("bullet is hitting non-owned block but not ground");
                 return false;
             } else {
+                System.out.println("bullet hit something else.");
                 return true;
             }
         }

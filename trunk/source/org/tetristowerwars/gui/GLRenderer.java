@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.gui;
 
-import com.sun.opengl.util.GLUT;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
@@ -239,18 +238,15 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         rectangularBuildingBlockRenderer.renderOverlay(gl);
 
         // Render block outlines
-        gl.glLineWidth(lineWidthFactor * gameModel.getBlockSize());
-        rectangularBuildingBlockRenderer.renderLines(gl);
+        rectangularBuildingBlockRenderer.renderLines(gl, lineWidthFactor * gameModel.getBlockSize() * 0.75f);
 
         // Render the joints between mouse/finger and block.
-        gl.glLineWidth(lineWidthFactor * 10.0f);
-        jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints());
+        jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints(), lineWidthFactor * 10.0f);
 
 
         
         cannonRenderer.render(gl, gameModel);
 
-        // Render the light effect of the players border when a block changes owner
 
         for (Player player : gameModel.getPlayers()) {
             for (BulletBlock bulletBlock : player.getBullets()) {
@@ -258,7 +254,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             }
         }
 
-        gl.glLineWidth(lineWidthFactor * 2.0f);
+        gl.glLineWidth(lineWidthFactor * 4.0f);
+        // Render the light effect of the players border when a block changes owner
         effectRenderer.render(gl, gameModel, elapsedTime);
         effectRenderer.renderParticles(gl, elapsedTime);
 
@@ -274,7 +271,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         performanceTimer += System.nanoTime() - startTime;
         if (frameCounter % 60 == 0) {
-            System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
+           // System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
             performanceTimer = 0;
         }
 

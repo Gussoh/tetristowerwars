@@ -47,17 +47,18 @@ public class RectangularBuildingBlockRenderer {
     private int numLines;
     private int numAnimationVertices;
     private final float[] outlineColor = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
-    private final float[] overlayColor = new float[]{0.8f, 1.0f, 0.8f};
+    private final float[] overlayColor = new float[]{0.9f, 1.0f, 0.9f};
     private static final float TEXTURE_COORD_FACTOR = 0.08f;
     private final static float START_INTENSITY = 1.0f;
     private final static float END_INTENSITY = 0.0f;
-    private final static float ANIMATION_TIME_MS = 750.0f;
-    private final static float XY_NORMAL = 0.5f;
+    private final static float ANIMATION_TIME_MS = 1500.0f;
+    private final static float XY_NORMAL = 0.8f;
+    private final static float NON_OWNED_BLOCK_COLOR_FACTOR = 0.4f;
+    private final static float NON_OWNED_BLOCK_ALPHA_FACTOR = 0.8f;
     private final Map<BuildingBlock, Path> animations = new LinkedHashMap<BuildingBlock, Path>();
 
     public RectangularBuildingBlockRenderer(GL gl, boolean lightingEffects) throws IOException {
         this.lightingEffects = lightingEffects;
-
         if (lightingEffects) {
             NUM_VERTICES_PER_SQUARE = 20;
         } else {
@@ -104,6 +105,7 @@ public class RectangularBuildingBlockRenderer {
                 if (lightingEffects) {
                     bufferEntry.normalBuffer = BufferUtil.newFloatBuffer(numVertices * 3);
                 }
+                bufferEntry.colorBuffer = BufferUtil.newFloatBuffer(numVertices * 4);
             }
         }
 
@@ -138,7 +140,7 @@ public class RectangularBuildingBlockRenderer {
         }
     }
 
-    private void putDataIntoBuffers(BufferEntry bufferEntry, Vec2 bottomLeft, Vec2 bottomRight, Vec2 topRight, Vec2 topLeft, Vec3 normal) {
+    private void putDataIntoBuffers(BufferEntry bufferEntry, Vec2 bottomLeft, Vec2 bottomRight, Vec2 topRight, Vec2 topLeft, Vec3 normal, float[] color) {
         bufferEntry.vertexBuffer.put(new float[]{
                     bottomLeft.x, bottomLeft.y,
                     bottomRight.x, bottomRight.y,
@@ -156,6 +158,10 @@ public class RectangularBuildingBlockRenderer {
                         normal.x, normal.y, normal.z
                     });
         }
+        bufferEntry.colorBuffer.put(color);
+        bufferEntry.colorBuffer.put(color);
+        bufferEntry.colorBuffer.put(color);
+        bufferEntry.colorBuffer.put(color);
     }
 
     private void createBufferData(Set<BuildingBlock> buildingBlocks) {
@@ -167,6 +173,18 @@ public class RectangularBuildingBlockRenderer {
                 XForm xForm = rbb.getBody().getXForm();
                 Vec2[] outline = rbb.getOutline();
                 Path p = animations.get(buildingBlock);
+
+                float[] color;
+                if (rbb.getOwner() == null) {
+                    color = new float[] {
+                        bufferEntry.color[0] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                        bufferEntry.color[1] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                        bufferEntry.color[2] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                        bufferEntry.color[3] * NON_OWNED_BLOCK_ALPHA_FACTOR
+                    };
+                } else {
+                    color = bufferEntry.color;
+                }
 
                 for (Rectangle2D r : rbb.getRectangles()) {
 
@@ -205,31 +223,31 @@ public class RectangularBuildingBlockRenderer {
 
                          // create the Middle
                         Vec3 normal = new Vec3(0.0f, 0.0f, 1.0f);
-                        putDataIntoBuffers(bufferEntry, ibl, ibr, itr, itl, normal);
+                        putDataIntoBuffers(bufferEntry, ibl, ibr, itr, itl, normal, color);
                         putTextureData(bufferEntry, texIntBl, texIntBr, texIntTr, texIntTl);
 
                         // create top
                         normal = MathUtil.rotateNormal(xForm, new Vec3(0.0f, XY_NORMAL, 1.0f));
-                        putDataIntoBuffers(bufferEntry, itl, itr, tr, tl, normal);
+                        putDataIntoBuffers(bufferEntry, itl, itr, tr, tl, normal, color);
                         putTextureData(bufferEntry, texIntTl, texIntTr, texTr, texTl);
 
                         // create right
                         normal = MathUtil.rotateNormal(xForm, new Vec3(XY_NORMAL, 0.0f, 1.0f));
-                        putDataIntoBuffers(bufferEntry, ibr, br, tr, itr, normal);
+                        putDataIntoBuffers(bufferEntry, ibr, br, tr, itr, normal, color);
                         putTextureData(bufferEntry, texIntBr, texBr, texTr, texIntTr);
 
                         // create bottom
                         normal = MathUtil.rotateNormal(xForm, new Vec3(0.0f, -XY_NORMAL, 1.0f));
-                        putDataIntoBuffers(bufferEntry, bl, br, ibr, ibl, normal);
+                        putDataIntoBuffers(bufferEntry, bl, br, ibr, ibl, normal, color);
                         putTextureData(bufferEntry, texBl, texBr, texIntBr, texIntBl);
 
                         // create left
                         normal = MathUtil.rotateNormal(xForm, new Vec3(-XY_NORMAL, 0.0f, 1.0f));
-                        putDataIntoBuffers(bufferEntry, bl, ibl, itl, tl, normal);
+                        putDataIntoBuffers(bufferEntry, bl, ibl, itl, tl, normal, color);
                         putTextureData(bufferEntry, texBl, texIntBl, texIntTl, texTl);
 
                     } else {
-                        putDataIntoBuffers(bufferEntry, bl, br, tr, tl, null);
+                        putDataIntoBuffers(bufferEntry, bl, br, tr, tl, null, color);
                         putTextureData(bufferEntry, texBl, texBr, texTr, texTl);
                     }
 
@@ -279,12 +297,16 @@ public class RectangularBuildingBlockRenderer {
         animationVertexBuffer.rewind();
         animationColorBuffer.rewind();
 
-        gl.glDisable(GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl.glEnable(GL_TEXTURE_2D);
+
         gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        gl.glEnableClientState(GL_COLOR_ARRAY);
         if (lightingEffects) {
             gl.glEnableClientState(GL_NORMAL_ARRAY);
             gl.glEnable(GL_LIGHTING);
+            gl.glEnable(GL_COLOR_MATERIAL);
+            gl.glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
         }
 
 
@@ -293,36 +315,36 @@ public class RectangularBuildingBlockRenderer {
 
             bufferEntry.vertexBuffer.rewind();
             bufferEntry.texCoordBuffer.rewind();
+            bufferEntry.colorBuffer.rewind();
             gl.glVertexPointer(2, GL_FLOAT, 0, bufferEntry.vertexBuffer);
             gl.glTexCoordPointer(2, GL_FLOAT, 0, bufferEntry.texCoordBuffer);
+            gl.glColorPointer(4, GL_FLOAT, 0, bufferEntry.colorBuffer);
 
             if (lightingEffects) {
                 bufferEntry.normalBuffer.rewind();
                 gl.glNormalPointer(GL_FLOAT, 0, bufferEntry.normalBuffer);
-
-                gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bufferEntry.color, 0);
+              //  gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bufferEntry.color, 0);
                 gl.glMaterialfv(GL_FRONT, GL_SPECULAR, bufferEntry.specular, 0);
-            } else {
-                gl.glColor4fv(bufferEntry.color, 0);
-            }
+            } 
 
             bufferEntry.texture.bind();
             gl.glDrawArrays(GL_QUADS, 0, bufferEntry.numSquares * NUM_VERTICES_PER_SQUARE);
         }
 
-        gl.glEnable(GL_BLEND);
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        gl.glDisableClientState(GL_COLOR_ARRAY);
         if (lightingEffects) {
+            gl.glDisable(GL_COLOR_MATERIAL);
             gl.glDisableClientState(GL_NORMAL_ARRAY);
             gl.glDisable(GL_LIGHTING);
         }
     }
 
-    public void renderLines(GL gl) {
+    public void renderLines(GL gl, float lineWidth) {
 
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+        gl.glLineWidth(lineWidth);
         gl.glColor4fv(outlineColor, 0);
         gl.glVertexPointer(2, GL_FLOAT, 0, lineVertexBuffer);
         gl.glDrawArrays(GL_LINES, 0, numLines * 2);
@@ -377,6 +399,7 @@ public class RectangularBuildingBlockRenderer {
         private FloatBuffer vertexBuffer;
         private FloatBuffer texCoordBuffer;
         private FloatBuffer normalBuffer;
+        private FloatBuffer colorBuffer;
         private final Texture texture;
         private int numSquares = 0;
         private final float[] color;
@@ -397,6 +420,7 @@ public class RectangularBuildingBlockRenderer {
                 normalBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 3);
             }
 
+            colorBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 4);
         }
     }
 }
