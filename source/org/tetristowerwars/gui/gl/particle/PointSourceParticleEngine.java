@@ -14,8 +14,9 @@ import org.tetristowerwars.util.MathUtil;
 public class PointSourceParticleEngine extends ParticleEngine {
 
     protected Vec2 position = new Vec2();
+    protected float maxPosSpread;
     protected float startDirection;
-    protected float halfSpread;
+    protected float halfDirectionSpread;
     protected float minSpeed;
     protected float maxSpeed;
     protected float minRotSpeed;
@@ -30,11 +31,12 @@ public class PointSourceParticleEngine extends ParticleEngine {
 
     public void setDirection(float direction, float spread) {
         this.startDirection = direction;
-        this.halfSpread = spread * 0.5f;
+        this.halfDirectionSpread = spread * 0.5f;
     }
 
-    public void setPosition(Vec2 position) {
-        this.position = new Vec2(position.x, position.y);
+    public void setPosition(Vec2 pos, float maxPosSpread) {
+        this.position = new Vec2(pos.x, pos.y);
+        this.maxPosSpread = maxPosSpread;
     }
 
     public void setSpeed(float minSpeed, float maxSpeed) {
@@ -72,11 +74,12 @@ public class PointSourceParticleEngine extends ParticleEngine {
     public void createParticles(int numParticles) {
         for (int i = 0; i < numParticles; i++) {
             float initialAngle = MathUtil.random(0, 2.0f * (float) Math.PI);
-            float direction = MathUtil.random(startDirection - halfSpread, startDirection + halfSpread);
+            float direction = MathUtil.random(startDirection - halfDirectionSpread, startDirection + halfDirectionSpread);
             float speed = MathUtil.random(minSpeed, maxSpeed);
             float rotSpeed = MathUtil.random(minRotSpeed, maxRotSpeed);
             float ttlMs = MathUtil.random(minTtlMs, maxTtlMs);
             float radius = MathUtil.random(minRadius, maxRadius);
+            Vec2 pos = new Vec2(MathUtil.random(position.x - maxPosSpread, position.x + maxPosSpread), MathUtil.random(position.y - maxPosSpread, position.y + maxPosSpread));
 
             Color color;
 
@@ -97,7 +100,7 @@ public class PointSourceParticleEngine extends ParticleEngine {
 
             Vec2 velocity = new Vec2((float) Math.cos(direction) * speed, (float) Math.sin(direction) * speed);
 
-            particles.add(new Particle(position, radius, velocity, initialAngle, rotSpeed, ttlMs, color));
+            particles.add(new Particle(pos, radius, velocity, initialAngle, rotSpeed, ttlMs, color));
         }
     }
 }

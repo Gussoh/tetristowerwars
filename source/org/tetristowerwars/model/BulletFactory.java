@@ -61,7 +61,7 @@ public class BulletFactory {
     private Body createBody(Vec2 pos) {
 
         BodyDef boxBodyDef = new BodyDef();
-        boxBodyDef.allowSleep = true;
+        boxBodyDef.allowSleep = false;
         boxBodyDef.position.set(pos.x, pos.y);
 
         return gameModel.getWorld().createBody(boxBodyDef);
@@ -72,7 +72,7 @@ public class BulletFactory {
         CircleDef shapeDef = new CircleDef();
         shapeDef.density = mat.getDensity();
         shapeDef.radius = radius;
-        shapeDef.isSensor = false;
+        shapeDef.isSensor = true;
         shapeDef.friction = 0.8f;
         shapeDef.restitution = 0.1f;
         body.createShape(shapeDef);

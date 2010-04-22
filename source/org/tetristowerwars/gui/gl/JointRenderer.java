@@ -18,22 +18,29 @@ public class JointRenderer {
 
 
     private final float[] color = {1.0f, 0.0f, 0.0f, 0.5f};
+    private final float[] outline = {0.0f, 0.0f, 0.0f, 0.5f};
 
-    public void renderLines(GL gl, Set<BuildingBlockJoint> blockJoints) {
+    public void renderLines(GL gl, Set<BuildingBlockJoint> blockJoints, float lineWidth) {
 
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        gl.glColor4fv(color, 0);
-        
-        gl.glBegin(GL.GL_LINES);
+        gl.glColor4fv(outline, 0);
+        gl.glLineWidth(lineWidth);
+        doRender(gl, blockJoints);
 
+        gl.glColor4fv(color, 0);
+        gl.glLineWidth(lineWidth * 0.5f);
+        doRender(gl, blockJoints);
+    }
+
+    private void doRender(GL gl, Set<BuildingBlockJoint> blockJoints) {
+        gl.glBegin(GL.GL_LINES);
         for (BuildingBlockJoint buildingBlockJoint : blockJoints) {
             Vec2 v1 = buildingBlockJoint.getBodyPosition();
             Vec2 v2 = buildingBlockJoint.getPointerPosition();
             gl.glVertex2f(v1.x, v1.y);
             gl.glVertex2f(v2.x, v2.y);
         }
-
         gl.glEnd();
     }
 }
