@@ -96,7 +96,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         // Anti-aliasing is needed when using lighting for good looking gfx :)
         this.sceneAntiAliasing = lightingEffects;
 
-        gameModel.addGameModelListener(this);
 
         GLCapabilities capabilities = new GLCapabilities();
 
@@ -173,6 +172,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+
+        gameModel.addGameModelListener(this);
+        
         gl.glEnable(GL_NORMALIZE);
 
         gl.glEnable(GL_BLEND);

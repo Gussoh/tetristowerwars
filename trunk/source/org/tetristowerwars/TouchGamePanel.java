@@ -47,6 +47,12 @@ public class TouchGamePanel extends javax.swing.JPanel {
         numBlocksCheckBox.setSelected(settings.isNumBlocksConditionEnabled());
         timeCheckBox.setSelected(settings.isTimeConditionEnabled());
 
+        if (settings.mustAllWinningConditionsBeMet()) {
+            anyAllComboBox.setSelectedIndex(1);
+        } else {
+            anyAllComboBox.setSelectedIndex(0);
+        }
+
         updateSlider(heightSlider, heightTextField);
         updateSlider(numBlocksSlider, numBlocksTextField);
         updateSlider(timeSlider, timeTextField);
@@ -133,7 +139,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         timeCheckBox = new javax.swing.JCheckBox();
         timeTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        anyAllComboBox = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
         heightSlider = new javax.swing.JSlider();
         numBlocksSlider = new javax.swing.JSlider();
@@ -144,7 +150,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         settingsButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Player names"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Team names"));
 
         jLabel1.setText("Left team:");
 
@@ -167,7 +173,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(rightTeamName)
                     .addComponent(leftTeamName, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(61, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -203,7 +209,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
 
         jLabel4.setText("seconds.");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Any condition", "All conditions" }));
+        anyAllComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Any condition", "All conditions" }));
 
         jLabel6.setText("must be fulfilled.");
 
@@ -212,6 +218,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         heightSlider.setMinorTickSpacing(10);
         heightSlider.setPaintLabels(true);
         heightSlider.setPaintTicks(true);
+        heightSlider.setSnapToTicks(true);
         heightSlider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         heightSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -223,6 +230,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         numBlocksSlider.setMinorTickSpacing(5);
         numBlocksSlider.setPaintLabels(true);
         numBlocksSlider.setPaintTicks(true);
+        numBlocksSlider.setSnapToTicks(true);
         numBlocksSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 numBlocksSliderStateChanged(evt);
@@ -234,6 +242,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         timeSlider.setMinorTickSpacing(50);
         timeSlider.setPaintLabels(true);
         timeSlider.setPaintTicks(true);
+        timeSlider.setSnapToTicks(true);
         timeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 timeSliderStateChanged(evt);
@@ -251,7 +260,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(anyAllComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6))
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -277,7 +286,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(numBlocksSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(timeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -304,9 +313,9 @@ public class TouchGamePanel extends javax.swing.JPanel {
                             .addComponent(timeCheckBox)
                             .addComponent(timeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(anyAllComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel6))))
                 .addContainerGap())
         );
@@ -334,13 +343,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(backButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 257, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 215, Short.MAX_VALUE)
                         .addComponent(settingsButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(playButton))
+                        .addGap(18, 18, 18)
+                        .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -349,12 +358,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(backButton)
-                    .addComponent(playButton)
-                    .addComponent(settingsButton))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(playButton, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                        .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -402,6 +412,14 @@ public class TouchGamePanel extends javax.swing.JPanel {
         settings.setProperty(Settings.KEY_HEIGHT_CONDITION, heightTextField.getText());
         settings.setProperty(Settings.KEY_NUM_BLOCKS_CONDITION, numBlocksTextField.getText());
         settings.setProperty(Settings.KEY_TIME_CONDITION, timeTextField.getText());
+
+        
+        if (anyAllComboBox.getSelectedIndex() == 0) {
+            settings.setProperty(Settings.KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, "false");
+        } else {
+            settings.setProperty(Settings.KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, "true");
+        }
+
         try {
             settings.save();
         } catch (IOException ex) {
@@ -412,11 +430,11 @@ public class TouchGamePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_playButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox anyAllComboBox;
     private javax.swing.JButton backButton;
     private javax.swing.JCheckBox heightConditionCheckBox;
     private javax.swing.JSlider heightSlider;
     private javax.swing.JTextField heightTextField;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

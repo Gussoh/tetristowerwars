@@ -29,7 +29,7 @@ public class TextInformationRenderer {
     private final float textScale = 0.08f;
 
     public TextInformationRenderer(GL gl) {
-        textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 64), true, true, null, true);
+        textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 72), true, true, null, true);
     }
 
     public void render(GLDrawable drawable, GameModel gameModel, float renderWorldHeight) {
@@ -47,7 +47,7 @@ public class TextInformationRenderer {
         }
 
         List<TextEntry> winningConditionTexts = new LinkedList<TextEntry>();
-        textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.6f);
+        textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.8f);
         for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
 
             List<MessageEntry> message = winningCondition.getStatusMessage();
@@ -63,7 +63,7 @@ public class TextInformationRenderer {
         renderText(winningConditionTexts, centerXPos, gameModel.getGroundLevel() - 7, true, true, 1.0f);
 
         for (Player player : gameModel.getPlayers()) {
-            textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.6f);
+            textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.8f);
             float playerCenterPos = (player.getRightLimit() + player.getLeftLimit()) * 0.5f;
 
             List<TextEntry> texts = new LinkedList<TextEntry>();
@@ -87,7 +87,7 @@ public class TextInformationRenderer {
 
             for (CannonBlock cannonBlock : player.getCannons()) {
                 if (cannonBlock.isCannonLoaded()) {
-                    textRenderer.setColor(1.0f, 0.0f, 0.0f, 0.6f);
+                    textRenderer.setColor(1.0f, 0.0f, 0.0f, 0.8f);
                     texts.clear();
                     texts.add(new TextEntry((int)Math.ceil(cannonBlock.getTimeUntilShooting()) + ""));
                     Vec2 pos = cannonBlock.getBody().getPosition();
