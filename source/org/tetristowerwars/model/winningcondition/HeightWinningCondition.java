@@ -20,18 +20,18 @@ public class HeightWinningCondition extends WinningCondition {
 
     private final int height;
     private BuildingBlock highestBlock = null;
-    private long startTime;
-    private final long winningTimer = 5000;
+    private long startTimeMs;
+    private final long winningTimeMs = 5000;
     private Player leader;
     private int leaderHeight;
 
-    public HeightWinningCondition(GameModel model, int height) {
+    public HeightWinningCondition(GameModel model, int height, long winningTimer) {
         super(model);
         this.height = height;
     }
 
-    @Override
-    public boolean gameIsOver() {
+   
+    public boolean hasCandidate() {
         ScoreEntry score = getLeader();
         leader = score.getPlayer();
         leaderHeight = score.getScore();
@@ -40,23 +40,39 @@ public class HeightWinningCondition extends WinningCondition {
             BuildingBlock block = leader.getHighestBuilingBlockInTower();
             if (highestBlock != block) {
                 highestBlock = block;
-                startTime = System.currentTimeMillis();
-            } else if (System.currentTimeMillis() >= startTime + winningTimer && highestBlock == block) {
-                return true;
+                startTimeMs = System.currentTimeMillis();
             }
+            return true;
         } else {
             highestBlock = null;
+            return false;
         }
-        return false;
     }
 
     @Override
-    public List<MessageEntry> getStatusMessage() {
+    public List<MessageEntry> getStatusMessages() {
         ArrayList<MessageEntry> message = new ArrayList<MessageEntry>();
         for (ScoreEntry scoreEntry : getScores()) {
             MessageType type = height - scoreEntry.getScore() < 20 ? MessageType.CRITICAL : MessageType.NORMAL;
             message.add(new MessageEntry(Math.max(height - scoreEntry.getScore(), 0) + "m left to win!", type, scoreEntry.getPlayer()));
         }
         return message;
+    }
+
+    @Override
+    public int timeLeftUntilGameOver() {
+        if (hasCandidate()) {
+            long timeLeftMs = startTimeMs + winningTimeMs - System.currentTimeMillis();
+
+            if (timeLeftMs < 0) {
+                return 0;
+            } else if(timeLeftMs > winningTimeMs - 2000) {
+                return -1;
+            } else {
+                return (int) (timeLeftMs / 1000) + 1;
+            }
+        } else {
+            return -1;
+        }
     }
 }

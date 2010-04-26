@@ -13,53 +13,73 @@ import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLDrawable;
 import org.jbox2d.common.Vec2;
+import org.tetristowerwars.gui.gl.animation.Path;
 import org.tetristowerwars.model.CannonBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
-import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.WinningCondition.MessageEntry;
 
 /**
  *
  * @author Andreas
  */
-public class TextInformationRenderer {
+public class MessageRenderer {
 
     private final TextRenderer textRenderer;
-    private final float textScale = 0.08f;
+    private final float textScale = 0.07f;
+    private int lastTimeLeft = -1;
+    private Path timeLeftSizeColorAnimation;
 
-    public TextInformationRenderer(GL gl) {
+    public MessageRenderer(GL gl) {
         textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 72), true, true, null, true);
     }
 
-    public void render(GLDrawable drawable, GameModel gameModel, float renderWorldHeight) {
+    public void render(GLDrawable drawable, GameModel gameModel, float renderWorldHeight, float elapsedTimeS) {
 
-        
+        int timeLeft = gameModel.getWinningCondition().timeLeftUntilGameOver();
+
+        if (timeLeft == -1) {
+            timeLeftSizeColorAnimation = null;
+        } else if (timeLeft != lastTimeLeft) {
+            timeLeftSizeColorAnimation = new Path(new Vec2(1.2f, 1.0f), new Vec2(1.0f, 0.0f), 1.0f);
+            lastTimeLeft = timeLeft;
+        } else if (timeLeftSizeColorAnimation != null) {
+            timeLeftSizeColorAnimation.addTime(elapsedTimeS);
+            if (timeLeftSizeColorAnimation.isDone()) {
+                timeLeftSizeColorAnimation = null;
+            }
+        }
+
         textRenderer.begin3DRendering();
 
         float centerXPos = gameModel.getWorldBoundries().upperBound.x * 0.5f;
 
-        if (gameModel.checkWinningConditions()) {
+        if (gameModel.getWinningCondition().gameIsOver()) {
             ArrayList<TextEntry> leaderEntry = new ArrayList<TextEntry>();
             leaderEntry.add(new TextEntry(gameModel.getLeader().getName() + " wins!"));
             textRenderer.setColor(1.0f, 1.0f, 0.7f, 1.0f);
             renderText(leaderEntry, centerXPos, renderWorldHeight * 0.5f, true, true, 4.0f);
+        } else if (timeLeftSizeColorAnimation != null) {
+            ArrayList<TextEntry> timeLeftEntry = new ArrayList<TextEntry>();
+            timeLeftEntry.add(new TextEntry("Game over in " + timeLeft + " seconds."));
+            Vec2 sizeColor = timeLeftSizeColorAnimation.getCurrentPosition();
+            textRenderer.setColor(1.0f, sizeColor.y, sizeColor.y, 1.0f);
+            renderText(timeLeftEntry, centerXPos, renderWorldHeight * 0.5f, true, true, sizeColor.x * 2);
         }
 
         List<TextEntry> winningConditionTexts = new LinkedList<TextEntry>();
         textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.8f);
-        for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
 
-            List<MessageEntry> message = winningCondition.getStatusMessage();
+        List<MessageEntry> messages = gameModel.getWinningCondition().getStatusMessages();
 
-            if (message != null) {
-                for (MessageEntry messageEntry : message) {
-                    if (messageEntry.getPlayer() == null) {
-                        winningConditionTexts.add(new TextEntry(messageEntry.getText()));
-                    }
+        if (messages != null) {
+            for (MessageEntry messageEntry : messages) {
+                if (messageEntry.getPlayer() == null) {
+                    winningConditionTexts.add(new TextEntry(messageEntry.getText()));
                 }
             }
         }
+
         renderText(winningConditionTexts, centerXPos, gameModel.getGroundLevel() - 7, true, true, 1.0f);
 
         for (Player player : gameModel.getPlayers()) {
@@ -72,13 +92,10 @@ public class TextInformationRenderer {
             texts.add(new TextEntry("Tower height: " + Math.round(player.getTowerHeight()) + " m"));
             texts.add(new TextEntry("Blocks: " + player.getBuildingBlocks().size()));
 
-            for (WinningCondition winningCondition : gameModel.getWinningConditions()) {
-                List<MessageEntry> message = winningCondition.getStatusMessage();
-                if (message != null) {
-                    for (MessageEntry messageEntry : message) {
-                        if (messageEntry.getPlayer() == player) {
-                            texts.add(new TextEntry(messageEntry.getText()));
-                        }
+            if (messages != null) {
+                for (MessageEntry messageEntry : messages) {
+                    if (messageEntry.getPlayer() == player) {
+                        texts.add(new TextEntry(messageEntry.getText()));
                     }
                 }
             }
@@ -89,7 +106,7 @@ public class TextInformationRenderer {
                 if (cannonBlock.isCannonLoaded()) {
                     textRenderer.setColor(1.0f, 0.0f, 0.0f, 0.8f);
                     texts.clear();
-                    texts.add(new TextEntry((int)Math.ceil(cannonBlock.getTimeUntilShooting()) + ""));
+                    texts.add(new TextEntry((int) Math.ceil(cannonBlock.getTimeUntilShooting()) + ""));
                     Vec2 pos = cannonBlock.getBody().getPosition();
                     renderText(texts, pos.x, pos.y, true, true, 2.0f);
                 }
@@ -102,7 +119,7 @@ public class TextInformationRenderer {
 
         float lineSpace = 0;
         float finalSize = textScale * size;
-        
+
         if (equalLineSpace) {
 
             for (TextEntry textEntry : textEntries) {

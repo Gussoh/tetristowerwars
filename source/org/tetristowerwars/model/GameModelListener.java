@@ -27,5 +27,5 @@ public interface GameModelListener {
 
     public void onWinningConditionFulfilled(WinningCondition condition);
 
-    public abstract void onLeaderChanged(ArrayList scoreList);
+    public abstract void onLeaderChanged(Player leader);
 }

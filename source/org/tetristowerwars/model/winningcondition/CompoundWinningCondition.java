@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.model.winningcondition;
 
 import java.util.ArrayList;
@@ -17,15 +16,17 @@ import org.tetristowerwars.model.WinningCondition;
  * @author Reeen
  */
 public class CompoundWinningCondition extends WinningCondition {
+
     private final List<WinningCondition> conditions;
     private final LogicType logicType;
-/**
- *
- * @param model The GameModel
- * @param conditions A List of the WinningConditions
- * @param logicType An Enum controlling the logic to check the WinningConditions
- */
-    public CompoundWinningCondition (GameModel model, List<WinningCondition> conditions, LogicType logicType) {
+
+    /**
+     *
+     * @param model The GameModel
+     * @param conditions A List of the WinningConditions
+     * @param logicType An Enum controlling the logic to check the WinningConditions
+     */
+    public CompoundWinningCondition(GameModel model, List<WinningCondition> conditions, LogicType logicType) {
         super(model);
         this.conditions = conditions;
         this.logicType = logicType;
@@ -43,7 +44,7 @@ public class CompoundWinningCondition extends WinningCondition {
         switch (logicType) {
             case AND:
                 for (WinningCondition winningCondition : conditions) {
-                    if  (!winningCondition.gameIsOver()) {
+                    if (!winningCondition.gameIsOver()) {
                         return false;
                     }
                 }
@@ -51,13 +52,14 @@ public class CompoundWinningCondition extends WinningCondition {
 
             case OR:
                 for (WinningCondition winningCondition : conditions) {
-                    if  (winningCondition.gameIsOver()) {
+                    if (winningCondition.gameIsOver()) {
                         return true;
                     }
                 }
                 return false;
 
-            default: return false;
+            default:
+                return false;
         }
     }
 
@@ -66,10 +68,10 @@ public class CompoundWinningCondition extends WinningCondition {
     }
 
     @Override
-    public List<MessageEntry> getStatusMessage() {
+    public List<MessageEntry> getStatusMessages() {
         ArrayList<MessageEntry> messages = new ArrayList<MessageEntry>();
         for (WinningCondition winningCondition : conditions) {
-            messages.addAll(winningCondition.getStatusMessage());
+            messages.addAll(winningCondition.getStatusMessages());
         }
         return messages;
     }
@@ -78,7 +80,43 @@ public class CompoundWinningCondition extends WinningCondition {
      * Can be either AND or OR.
      */
     public enum LogicType {
+
         AND, OR
     }
 
+    @Override
+    public int timeLeftUntilGameOver() {
+        switch (logicType) {
+            case AND:
+                int longestTimeLeft = 0;
+                for (WinningCondition winningCondition : conditions) {
+                    int timeLeft = winningCondition.timeLeftUntilGameOver();
+
+                    if (timeLeft == -1) {
+                        return -1;
+                    } else {
+                        longestTimeLeft = Math.max(timeLeft, longestTimeLeft);
+                    }
+                }
+                return longestTimeLeft;
+
+            case OR:
+                int shortestTimeLeft = Integer.MAX_VALUE;
+                for (WinningCondition winningCondition : conditions) {
+                    int timeLeft = winningCondition.timeLeftUntilGameOver();
+
+                    if (timeLeft != -1) {
+                        shortestTimeLeft = Math.min(timeLeft, shortestTimeLeft);
+                    }
+                }
+
+                if (shortestTimeLeft == Integer.MAX_VALUE) {
+                    return -1;
+                } else {
+                    return shortestTimeLeft;
+                }
+            default:
+                return -1;
+        }
+    }
 }

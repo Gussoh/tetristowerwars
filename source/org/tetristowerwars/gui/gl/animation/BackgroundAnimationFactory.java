@@ -18,14 +18,14 @@ public class BackgroundAnimationFactory {
     private final BackgroundAnimationRenderer animationRenderer;
     private final float groundLevel;
     private final float horizontLevel;
-    private long totalElapsedTimeMs = 0;
-    private long createTanksAtThisTime = 3000;
-    private long createZeppelinAtThisTime = 5000;
-    private long createSputnikAtThisTime = 30000;
+    private float totalElapsedTimeS = 0;
+    private float createTanksAtThisTime = 3;
+    private float createZeppelinAtThisTime = 5;
+    private float createSputnikAtThisTime = 30;
     private final float worldWidth;
-    private final static int TANK_INTERVAL_MS = 20000;
-    private final static int ZEPPELIN_INTERVAL_MS = 32000;
-    private final static int SPUTNIK_INTERVAL_MS = 60000;
+    private final static float TANK_INTERVAL_S = 20;
+    private final static float ZEPPELIN_INTERVAL_S = 32;
+    private final static float SPUTNIK_INTERVAL_S = 60;
 
     public BackgroundAnimationFactory(BackgroundAnimationRenderer animationRenderer, float groundLevel, float horizontLevel, float worldWidth) {
         this.animationRenderer = animationRenderer;
@@ -34,18 +34,18 @@ public class BackgroundAnimationFactory {
         this.worldWidth = worldWidth;
     }
 
-    public void run(long elapsedTimeMs) {
-        totalElapsedTimeMs += elapsedTimeMs;
+    public void run(float elapsedTimeS) {
+        totalElapsedTimeS += elapsedTimeS;
 
-        if (totalElapsedTimeMs > createTanksAtThisTime) {
+        if (totalElapsedTimeS > createTanksAtThisTime) {
             createGroundFormation();
-            createTanksAtThisTime += TANK_INTERVAL_MS;
-        } else if (totalElapsedTimeMs > createZeppelinAtThisTime) {
+            createTanksAtThisTime += TANK_INTERVAL_S;
+        } else if (totalElapsedTimeS > createZeppelinAtThisTime) {
             createAirVehicle();
-            createZeppelinAtThisTime += ZEPPELIN_INTERVAL_MS;
-        } else if (totalElapsedTimeMs > createSputnikAtThisTime) {
+            createZeppelinAtThisTime += ZEPPELIN_INTERVAL_S;
+        } else if (totalElapsedTimeS > createSputnikAtThisTime) {
             createSputnik();
-            createSputnikAtThisTime += SPUTNIK_INTERVAL_MS;
+            createSputnikAtThisTime += SPUTNIK_INTERVAL_S;
         }
     }
 
@@ -82,7 +82,7 @@ public class BackgroundAnimationFactory {
             Vec2 start = new Vec2(-width * (i + 1), yPos);
             Vec2 end = new Vec2(worldWidth + width * (numTanks - i), yPos);
 
-            float timeToFinish = MathUtil.lerp(y, bottom, top, 20000, 180000);
+            float timeToFinish = MathUtil.lerp(y, bottom, top, 20, 180);
             Path path;
             if (leftToRight) {
                 path = new Path(start, end, timeToFinish);
@@ -101,7 +101,7 @@ public class BackgroundAnimationFactory {
         float y = MathUtil.random(bottom, top);
         float width = MathUtil.random(10, 25);
 
-        float travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -400000, -100000));
+        float travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -400, -100));
 
         boolean leftToRight = Math.random() < 0.5 ? true : false;
 
@@ -139,7 +139,7 @@ public class BackgroundAnimationFactory {
             end = new Vec2(left, top);
         }
 
-        Path p = new Path(start, end, 15000);
+        Path p = new Path(start, end, 15);
 
         animationRenderer.addAnimation(p, sputnikWidth, SPUTNIK);
     }

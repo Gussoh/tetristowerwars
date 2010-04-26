@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.model.winningcondition;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
@@ -16,26 +16,20 @@ import org.tetristowerwars.model.WinningCondition;
  * @author Reeen
  */
 public class LimitedBlocksWinningCondition extends WinningCondition {
-    private final int maxBlocks;
 
-    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks) {
+    private final int maxBlocks;
+    private long startTimeMs;
+    private final long winningTimeMs;
+    private BuildingBlock highestBlock = null;
+
+    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks, long winningTime) {
         super(model);
         this.maxBlocks = maxBlocks;
+        this.winningTimeMs = winningTime;
     }
 
     @Override
-    public boolean gameIsOver() {
-       //TODO: which pieces to count? Global? Player?
-       for (Player player : model.getPlayers()) {
-           if (player.getBuildingBlocks().size() > maxBlocks) {
-               return true;
-           }
-       }
-       return false;
-    }
-
-    @Override
-    public List<MessageEntry> getStatusMessage() {
+    public List<MessageEntry> getStatusMessages() {
         ArrayList<MessageEntry> messages = new ArrayList<MessageEntry>();
 
         for (Player player : model.getPlayers()) {
@@ -46,4 +40,34 @@ public class LimitedBlocksWinningCondition extends WinningCondition {
         return messages;
     }
 
+    public boolean hasCandidate() {
+        for (Player player : model.getPlayers()) {
+            if (player.getBuildingBlocks().size() > maxBlocks) {
+                BuildingBlock block = getLeader().getPlayer().getHighestBuilingBlockInTower();
+                if (block != highestBlock) {
+                    highestBlock = block;
+                    startTimeMs = System.currentTimeMillis();
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+    @Override
+    public int timeLeftUntilGameOver() {
+        if (hasCandidate()) {
+            long timeLeftMs = startTimeMs + winningTimeMs - System.currentTimeMillis();
+
+            if (timeLeftMs < 0) {
+                return 0;
+            } else if (timeLeftMs > winningTimeMs - 2000) {
+                return -1;
+            } else {
+                return (int) (timeLeftMs / 1000) + 1;
+            }
+        } else {
+            return -1;
+        }
+    }
 }

@@ -41,7 +41,7 @@ public class PointerRenderer {
         colorBuffer = BufferUtil.newFloatBuffer(4 * NUM_VERTICES_PER_POINTER * 4);
     }
 
-    public void render(GL gl, Map<Integer, Pointer> pointers, float elapsedTime) {
+    public void render(GL gl, Map<Integer, Pointer> pointers, float elapsedTimeS) {
 
         int numCoords = pointers.size() * NUM_VERTICES_PER_POINTER;
 
@@ -67,10 +67,10 @@ public class PointerRenderer {
             if (p == null) {
                 float extraSize = hit ? 1.0f : 0.0f;
                 float startAlpha = hit ? 1.0f : 0.5f;
-                p = new Path(new Vec2(startAlpha, extraSize), new Vec2(0.5f, 0.0f), 300.0f);
+                p = new Path(new Vec2(startAlpha, extraSize), new Vec2(0.5f, 0.0f), 0.5f);
                 intensityPaths.put(entry.getKey(), p);
             } else {
-                p.addTime(elapsedTime);
+                p.addTime(elapsedTimeS);
             }
 
             Vec2 temp = p.getCurrentPosition();
