@@ -22,10 +22,10 @@ public class LimitedBlocksWinningCondition extends WinningCondition {
     private final long winningTimeMs;
     private BuildingBlock highestBlock = null;
 
-    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks, long winningTime) {
+    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks, long winningTimeS) {
         super(model);
         this.maxBlocks = maxBlocks;
-        this.winningTimeMs = winningTime;
+        this.winningTimeMs = winningTimeS * 1000;
     }
 
     @Override
