@@ -4,10 +4,8 @@
  */
 package org.tetristowerwars.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,9 +20,10 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
-import javax.swing.JFrame;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
+import org.tetristowerwars.Settings;
+import org.tetristowerwars.MainFrame;
 import org.tetristowerwars.gui.gl.BackgroundAnimationRenderer;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.EffectRenderer;
@@ -54,7 +53,6 @@ import org.tetristowerwars.model.WinningCondition;
 public class GLRenderer extends Renderer implements GLEventListener, GameModelListener {
 
     private final GLCanvas glCanvas;
-    private final JFrame frame;
     private Map<Integer, Pointer> id2Pointers = new LinkedHashMap<Integer, Pointer>();
     private BackgroundRenderer backgroundRenderer;
     private JointRenderer jointRenderer;
@@ -73,22 +71,27 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     //private float[] mainLightPosition = {0.0f, 0.7071f, 0.7071f, 0.0f};
     private float[] mainLightPosition = {0.2f, 0.7f, 0.7f, 0.0f};
     private long lastTimeMillis;
+    private final MainFrame startFrame;
     private final boolean lightingEffects;
     private final boolean sceneAntiAliasing;
     private long frameCounter = 0;
     private long performanceTimer = 0;
     private Semaphore renderingSemaphore = new Semaphore(0);
+    private final boolean particleEffects;
 
     /**
      * 
      * @param gameModel The game model.
-     * @param lightingEffects Enables lighting effects which gives the scene a 3D effect.
-     * @param graphicsDevice The graphics device to use, or null to use the default device.
+     * @param startFrame The main Frame.
      */
-    public GLRenderer(GameModel gameModel, boolean lightingEffects, GraphicsDevice graphicsDevice) {
+    public GLRenderer(GameModel gameModel, MainFrame startFrame) {
         super(gameModel);
+        this.startFrame = startFrame;
 
-        this.lightingEffects = lightingEffects;
+        Settings settings = startFrame.getSettings();
+
+        this.lightingEffects = settings.isLightingEnabled();
+        this.particleEffects = settings.isParticlesEnabled();
 
         // Anti-aliasing is needed when using lighting for good looking gfx :)
         this.sceneAntiAliasing = lightingEffects;
@@ -110,22 +113,16 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setBlueBits(8);
         capabilities.setAlphaBits(8);
 
-        if (graphicsDevice == null) {
-            graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        }
 
 
         glCanvas = new GLCanvas(capabilities); //, null, null, graphicsDevice);
 
         glCanvas.addGLEventListener(this);
         glCanvas.setAutoSwapBufferMode(true);
-
-        frame = new JFrame("Awesomeness");
-        frame.setLayout(new BorderLayout());
-        frame.add(glCanvas, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.setVisible(true);
+        glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
+        
+        startFrame.openComponent(glCanvas);
+        
     }
 
     @Override
