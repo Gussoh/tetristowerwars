@@ -17,12 +17,13 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="103" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="networkButton" alignment="0" pref="188" max="32767" attributes="1"/>
-                  <Component id="touchButton" alignment="0" min="-2" pref="188" max="-2" attributes="1"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="emulatorCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="touchButton" alignment="0" pref="337" max="32767" attributes="1"/>
+                  <Component id="networkButton" alignment="0" pref="337" max="32767" attributes="1"/>
               </Group>
-              <EmptySpace pref="99" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -30,10 +31,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="touchButton" min="-2" pref="109" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="networkButton" min="-2" pref="114" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="touchButton" min="-2" pref="93" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="networkButton" min="-2" pref="93" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="emulatorCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="12" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -51,6 +54,14 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Play network game"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="emulatorCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Enable TUIO mouse emulation"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="emulatorCheckBoxActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

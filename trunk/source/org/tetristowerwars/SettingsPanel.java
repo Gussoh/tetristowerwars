@@ -372,7 +372,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             settings.save();
         } catch (IOException ex) {
             Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Unable to save settigns to: " + Settings.SETTINGS_FILE + "\nReason: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Unable to save settings to file: " + Settings.SETTINGS_FILE + "\nReason: " + ex.getMessage());
         }
 
         mainFrame.back();

@@ -5,7 +5,9 @@
 package org.tetristowerwars.control;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.Block;
@@ -25,6 +27,7 @@ public class Controller implements InputListener {
     private final InputManager inputManager;
     private final Renderer renderer;
     private final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
+    private final Queue<InputEvent> eventQueue = new LinkedList<InputEvent>();
 
     public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
         this.gameModel = dataModel;
@@ -34,7 +37,11 @@ public class Controller implements InputListener {
     }
 
     @Override
-    public void onInputDevicePressed(InputEvent event) {
+    public synchronized void onInputDevicePressed(InputEvent event) {
+        eventQueue.offer(event);
+    }
+
+    private void handleInputDevicePressed(InputEvent event) {
 
         if (actionIdToJoint.containsKey(event.getActionId()) == true) {
             return; // Ignore TUIO bugs where an ID can appear twice on the screen
@@ -65,7 +72,11 @@ public class Controller implements InputListener {
     }
 
     @Override
-    public void onInputDeviceReleased(InputEvent event) {
+    public synchronized void onInputDeviceReleased(InputEvent event) {
+        eventQueue.offer(event);
+    }
+
+    private void handleInputDeviceReleased(InputEvent event) {
         performReleaseAction(event);
     }
 
@@ -79,7 +90,11 @@ public class Controller implements InputListener {
     }
 
     @Override
-    public void onInputDeviceDragged(InputEvent event) {
+    public synchronized void onInputDeviceDragged(InputEvent event) {
+        eventQueue.offer(event);
+    }
+
+    private void handleInputDeviceDragged(InputEvent event) {
         boolean hit = false;
         // If a building block joint exists for this very id
         if (actionIdToJoint.get(event.getActionId()) != null) {
@@ -99,5 +114,22 @@ public class Controller implements InputListener {
     public void writeEvent(InputEvent event) {
         System.out.print(event.toString());
         System.out.println(", world: " + renderer.convertWindowToWorldCoordinates(event.getPosition()));
+    }
+
+    public synchronized void pumpEvents() {
+        while(!eventQueue.isEmpty()) {
+            InputEvent event = eventQueue.poll();
+            switch (event.getType()) {
+                case InputEvent.PRESSED:
+                    handleInputDevicePressed(event);
+                    break;
+                case InputEvent.RELEASED:
+                    handleInputDeviceReleased(event);
+                    break;
+                case InputEvent.DRAGGED:
+                    handleInputDeviceDragged(event);
+                    break;
+            }
+        }
     }
 }

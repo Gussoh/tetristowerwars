@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars;
 
-import TUIO.TuioClient;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import org.jbox2d.common.Vec2;
@@ -30,8 +29,9 @@ import org.tetristowerwars.util.MathUtil;
  */
 public class TouchGameLogic {
 
- 
     public TouchGameLogic(MainFrame frame) {
+
+        frame.disableMouseEmulation();
 
         DisplayMode displayMode = frame.getJFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
@@ -41,22 +41,18 @@ public class TouchGameLogic {
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, frame);
 
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
-        final TuioClient tuioClient = new TuioClient();
-
-
+        
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getMouseInputComponent());
-        final InputManager touchInputManager = new TouchInputManager(tuioClient, screenDimensions, glRenderer.getMouseInputComponent());
+        final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getMouseInputComponent());
 
         final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
         final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
 
-        tuioClient.connect();
-
         final float playerAreaWidth = settings.getWorldWidth() * (settings.getPlayerArea() * 0.005f);
 
-        
-        Player player1 = gameModel.createPlayer("Player 1", 0, playerAreaWidth);
-        Player player2 = gameModel.createPlayer("Player 2", settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
+
+        Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 0, playerAreaWidth);
+        Player player2 = gameModel.createPlayer(settings.getRightTeamName(), settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
@@ -78,18 +74,31 @@ public class TouchGameLogic {
 
             @Override
             public void run() {
+                final float constantStepTimeS = 1f / 60f;
+                long lastStepTimeNano = System.nanoTime();
+                
                 for (;;) {
                     Thread.yield();
 
-                    if (gameModel.checkWinningConditions()) {
-                        mouseInputManager.clearEvents();
-                        touchInputManager.clearEvents();
-                    } else {
-                        mouseInputManager.pumpEvents();
-                        touchInputManager.pumpEvents();
+                    long currentTimeNano = System.nanoTime();
+                    long stepTimeNano = currentTimeNano - lastStepTimeNano;
+                    int numTimesStepped = 0;
+
+                    if (stepTimeNano < 0) { // in case of nanoTime wrapping around
+                        stepTimeNano = (long) (constantStepTimeS * 1000000000.0f);
                     }
 
-                    if (gameModel.update() > 0) {
+                    while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
+                        mouseController.pumpEvents();
+                        touchController.pumpEvents();
+                        gameModel.update();
+                        numTimesStepped++;
+                        stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
+                    }
+
+                    lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
+
+                    if (numTimesStepped > 0) {
                         glRenderer.renderFrame();
                     }
 

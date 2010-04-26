@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -31,6 +31,16 @@ public class Settings {
     public static final String KEY_LIGHTING_EFFECTS = "lighting_effects";
     public static final String KEY_PARTICLE_EFFECTS = "particle_effects";
     public static final String KEY_GROUND_HEIGHT = "ground_height";
+    public static final String KEY_USE_HEIGHT_CONDITION = "use_height_condition";
+    public static final String KEY_USE_NUM_BLOCKS_CONDITION = "use_num_blocks_condition";
+    public static final String KEY_USE_TIME_CONDITION = "use_time_condition";
+    public static final String KEY_HEIGHT_CONDITION = "height_condition";
+    public static final String KEY_NUM_BLOCKS_CONDITION = "num_blocks_condition";
+    public static final String KEY_TIME_CONDITION = "time_condition";
+    public static final String KEY_LEFT_TEAM = "left_team";
+    public static final String KEY_RIGHT_TEAM = "right_team";
+    public static final String KEY_MOUSE_EMULATION = "mouse_emulation";
+
     private final Properties properties = new Properties();
 
     public void load() throws IOException {
@@ -105,6 +115,42 @@ public class Settings {
         return Boolean.parseBoolean(properties.getProperty(KEY_PARTICLE_EFFECTS, "true"));
     }
 
+    public boolean isHeightConditionEnabled() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_USE_HEIGHT_CONDITION, "true"));
+    }
+
+    public boolean isNumBlocksConditionEnabled() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_USE_NUM_BLOCKS_CONDITION, "false"));
+    }
+
+    public boolean isTimeConditionEnabled() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_USE_TIME_CONDITION, "true"));
+    }
+
+    public int getHeightCondition() {
+        return getIntProperty(KEY_HEIGHT_CONDITION, 80);
+    }
+
+    public int getNumBlocksCondition() {
+        return getIntProperty(KEY_NUM_BLOCKS_CONDITION, 40);
+    }
+
+    public int getTimeCondition() {
+        return getIntProperty(KEY_TIME_CONDITION, 300);
+    }
+
+    public String getLeftTeamName() {
+        return getStringProperty(KEY_LEFT_TEAM, "Left Team");
+    }
+
+    public String getRightTeamName() {
+        return getStringProperty(KEY_RIGHT_TEAM, "Right Team");
+    }
+
+    public boolean isMouseEmulationEnabled() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_MOUSE_EMULATION));
+    }
+
     private float getFloatProperty(String key, float defaultValue) {
         try {
             String value = properties.getProperty(key);
@@ -129,6 +175,17 @@ public class Settings {
             return Integer.parseInt(value);
         } catch (NumberFormatException ex) {
             properties.setProperty(key, Integer.toString(defaultValue));
+            return defaultValue;
+        }
+    }
+
+    private String getStringProperty(String key, String defaultValue) {
+        String value = properties.getProperty(key);
+
+        if (value != null && value.length() > 0) {
+            return value;
+        } else {
+            properties.setProperty(key, defaultValue);
             return defaultValue;
         }
     }

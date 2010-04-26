@@ -26,10 +26,10 @@ import org.tetristowerwars.model.WinningCondition.MessageEntry;
 public class TextInformationRenderer {
 
     private final TextRenderer textRenderer;
-    private final float textScale = 0.16f;
+    private final float textScale = 0.08f;
 
     public TextInformationRenderer(GL gl) {
-        textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 32), true, true, null, true);
+        textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 64), true, true, null, true);
     }
 
     public void render(GLDrawable drawable, GameModel gameModel, float renderWorldHeight) {
