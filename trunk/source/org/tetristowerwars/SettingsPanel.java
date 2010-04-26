@@ -11,12 +11,7 @@
 package org.tetristowerwars;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -30,53 +25,28 @@ import javax.swing.UIManager;
  */
 public class SettingsPanel extends javax.swing.JPanel {
 
-    public static final String SETTINGS_FILE = "tetristowerwars.ini";
-    public static final String KEY_BUILDING_BLOCK_SIZE = "building_block_size";
-    public static final String KEY_GRAVITY = "gravity";
-    public static final String KEY_WORLD_WIDTH = "world_width";
-    public static final String KEY_WORLD_HEIGHT = "world_height";
-    public static final String KEY_PLAYER_AREA = "player_area";
-    public static final String KEY_PLAY_MUSIC = "play_music";
-    public static final String KEY_PLAY_SOUND_EFFECTS = "play_sound_effects";
-    public static final String KEY_WINDOW_WIDTH = "window_width";
-    public static final String KEY_WINDOW_HEIGHT = "window_height";
-    public static final String KEY_LIGHTING_EFFECTS = "lighting_effects";
-    public static final String KEY_PARTICLE_EFFECTS = "particle_effects";
-    private final Properties properties;
-    private final StartFrame startFrame;
+    
+    private final MainFrame mainFrame;
+    private final Settings settings;
 
     /** Creates new form SettingsPanel */
-    public SettingsPanel(StartFrame startFrame) {
+    public SettingsPanel(MainFrame mainFrame) {
         initComponents();
+        settings = mainFrame.getSettings();
 
-        File settingsFile = new File(SETTINGS_FILE);
-        properties = new Properties();
-
-        if (settingsFile.isFile() && settingsFile.canRead()) {
-            try {
-                System.out.println("Loading properties from file " + settingsFile.getCanonicalPath());
-                InputStream inputStream = new FileInputStream(settingsFile);
-                properties.load(inputStream);
-                inputStream.close();
-            } catch (IOException ex) {
-                Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
-                statusLabel.setText("Unable to load settings file: " + SETTINGS_FILE);
-            }
-        }
-
-
-        buildingBlockSizeField.setText(properties.getProperty(KEY_BUILDING_BLOCK_SIZE, "5"));
-        gravityField.setText(properties.getProperty(KEY_GRAVITY, "9.82"));
-        worldWidthField.setText(properties.getProperty(KEY_WORLD_WIDTH, "300"));
-        worldHeightField.setText(properties.getProperty(KEY_WORLD_HEIGHT, "600"));
-        playerAreaField.setText(properties.getProperty(KEY_PLAYER_AREA, "70"));
-        musicCheckBox.setSelected(Boolean.parseBoolean(properties.getProperty(KEY_PLAY_MUSIC, "true")));
-        soundCheckBox.setSelected(Boolean.parseBoolean(properties.getProperty(KEY_PLAY_SOUND_EFFECTS, "true")));
-        windowWidthField.setText(properties.getProperty(KEY_WINDOW_WIDTH, "1024"));
-        windowHeightField.setText(properties.getProperty(KEY_WINDOW_HEIGHT, "768"));
-        lightingCheckBox.setSelected(Boolean.parseBoolean(properties.getProperty(KEY_LIGHTING_EFFECTS, "true")));
-        particleCheckBox.setSelected(Boolean.parseBoolean(properties.getProperty(KEY_PARTICLE_EFFECTS, "true")));
-        this.startFrame = startFrame;
+        buildingBlockSizeField.setText(Float.toString(settings.getBlockSize()));
+        gravityField.setText(Float.toString(settings.getGravity()));
+        worldWidthField.setText(Float.toString(settings.getWorldWidth()));
+        worldHeightField.setText(Float.toString(settings.getWorldHeight()));
+        playerAreaField.setText(Float.toString(settings.getPlayerArea()));
+        groundHeightField.setText(Float.toString(settings.getGroundHeight()));
+        musicCheckBox.setSelected(settings.isPlayMusicEnabled());
+        soundCheckBox.setSelected(settings.isPlaySoundEffectsEnabled());
+        windowWidthField.setText(Integer.toString(settings.getWindowWidth()));
+        windowHeightField.setText(Integer.toString(settings.getWindowHeight()));
+        lightingCheckBox.setSelected(settings.isLightingEnabled());
+        particleCheckBox.setSelected(settings.isParticlesEnabled());
+        this.mainFrame = mainFrame;
     }
 
     private boolean checkIntField(JTextField textField, int min, int max, JLabel statusField) {
@@ -138,6 +108,8 @@ public class SettingsPanel extends javax.swing.JPanel {
         worldWidthField = new javax.swing.JTextField();
         worldHeightField = new javax.swing.JTextField();
         playerAreaField = new javax.swing.JTextField();
+        groundHeightField = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         musicCheckBox = new javax.swing.JCheckBox();
         soundCheckBox = new javax.swing.JCheckBox();
@@ -165,6 +137,8 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         jLabel5.setText("Player area (%):");
 
+        jLabel9.setText("Ground height (m):");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -176,14 +150,16 @@ public class SettingsPanel extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(jLabel3)
                     .addComponent(jLabel4)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(gravityField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                     .addComponent(buildingBlockSizeField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                     .addComponent(worldWidthField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                     .addComponent(worldHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                    .addComponent(playerAreaField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))
+                    .addComponent(playerAreaField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                    .addComponent(groundHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -208,7 +184,11 @@ public class SettingsPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(playerAreaField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(groundHeightField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sound Options"));
@@ -306,30 +286,30 @@ public class SettingsPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton)))
+                        .addComponent(cancelButton))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(saveButton)
@@ -368,42 +348,45 @@ public class SettingsPanel extends javax.swing.JPanel {
             return;
         }
 
-
-        // If correct, save to properties, write to file, then dispose
-        properties.setProperty(KEY_BUILDING_BLOCK_SIZE, buildingBlockSizeField.getText());
-        properties.setProperty(KEY_GRAVITY, gravityField.getText());
-        properties.setProperty(KEY_WORLD_WIDTH, worldWidthField.getText());
-        properties.setProperty(KEY_WORLD_HEIGHT, worldHeightField.getText());
-        properties.setProperty(KEY_PLAYER_AREA, playerAreaField.getText());
-
-        properties.setProperty(KEY_PLAY_MUSIC, Boolean.toString(musicCheckBox.isSelected()));
-        properties.setProperty(KEY_PLAY_SOUND_EFFECTS, Boolean.toString(soundCheckBox.isSelected()));
-
-        properties.setProperty(KEY_WINDOW_WIDTH, windowWidthField.getText());
-        properties.setProperty(KEY_WINDOW_HEIGHT, windowHeightField.getText());
-        properties.setProperty(KEY_LIGHTING_EFFECTS, Boolean.toString(lightingCheckBox.isSelected()));
-        properties.setProperty(KEY_PARTICLE_EFFECTS, Boolean.toString(particleCheckBox.isSelected()));
-        try {
-            File file = new File(SETTINGS_FILE);
-            System.out.println("Writing properties to file " + file.getCanonicalPath());
-            FileOutputStream fos = new FileOutputStream(file);
-            properties.store(fos, "Settings file for Tetris Tower Wars");
-            fos.close();
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Unable to save settings to " + SETTINGS_FILE + "\nReason: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        if (!checkFloatField(groundHeightField, 1, Float.MAX_VALUE, statusLabel)) {
+            return;
         }
 
-        startFrame.currentPanelDone();
+
+        // If correct, save to settings
+        settings.setProperty(Settings.KEY_BUILDING_BLOCK_SIZE, buildingBlockSizeField.getText());
+        settings.setProperty(Settings.KEY_GRAVITY, gravityField.getText());
+        settings.setProperty(Settings.KEY_WORLD_WIDTH, worldWidthField.getText());
+        settings.setProperty(Settings.KEY_WORLD_HEIGHT, worldHeightField.getText());
+        settings.setProperty(Settings.KEY_PLAYER_AREA, playerAreaField.getText());
+        settings.setProperty(Settings.KEY_GROUND_HEIGHT, groundHeightField.getText());
+
+        settings.setProperty(Settings.KEY_PLAY_MUSIC, Boolean.toString(musicCheckBox.isSelected()));
+        settings.setProperty(Settings.KEY_PLAY_SOUND_EFFECTS, Boolean.toString(soundCheckBox.isSelected()));
+
+        settings.setProperty(Settings.KEY_WINDOW_WIDTH, windowWidthField.getText());
+        settings.setProperty(Settings.KEY_WINDOW_HEIGHT, windowHeightField.getText());
+        settings.setProperty(Settings.KEY_LIGHTING_EFFECTS, Boolean.toString(lightingCheckBox.isSelected()));
+        settings.setProperty(Settings.KEY_PARTICLE_EFFECTS, Boolean.toString(particleCheckBox.isSelected()));
+        try {
+            settings.save();
+        } catch (IOException ex) {
+            Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Unable to save settigns to: " + Settings.SETTINGS_FILE + "\nReason: " + ex.getMessage());
+        }
+
+        mainFrame.back();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        startFrame.currentPanelDone();
+        mainFrame.back();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField buildingBlockSizeField;
     private javax.swing.JButton cancelButton;
     private javax.swing.JTextField gravityField;
+    private javax.swing.JTextField groundHeightField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -412,6 +395,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
