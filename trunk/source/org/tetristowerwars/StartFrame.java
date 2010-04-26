@@ -19,7 +19,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class StartFrame {
 
     private JFrame frame = new JFrame("Tetris Tower Wars");
-    private StartPanel startPanel = new StartPanel(this);
+    private TouchGamePanel startPanel = new TouchGamePanel(this);
     private SettingsPanel settingsPanel = new SettingsPanel(this);
     private JPanel currentPanel;
 

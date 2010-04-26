@@ -14,12 +14,12 @@ package org.tetristowerwars;
  *
  * @author Andreas
  */
-public class StartPanel extends javax.swing.JPanel {
+public class TouchGamePanel extends javax.swing.JPanel {
 
     private final StartFrame startFrame;
 
     /** Creates new form StartPanel */
-    public StartPanel(StartFrame startFrame) {
+    public TouchGamePanel(StartFrame startFrame) {
         initComponents();
         this.startFrame = startFrame;
     }
