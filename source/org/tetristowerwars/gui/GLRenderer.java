@@ -34,6 +34,7 @@ import org.tetristowerwars.gui.gl.Pointer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.MessageRenderer;
+import org.tetristowerwars.gui.gl.WinRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -60,6 +61,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private PointerRenderer pointerRenderer;
     private EffectRenderer effectRenderer;
     private MessageRenderer messageRenderer;
+    private WinRenderer winRenderer;
     private RectangularBuildingBlockRenderer rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
@@ -167,6 +169,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
+            winRenderer = new WinRenderer(gl);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
