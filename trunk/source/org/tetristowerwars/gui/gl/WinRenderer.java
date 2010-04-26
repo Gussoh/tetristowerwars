@@ -6,8 +6,10 @@
 package org.tetristowerwars.gui.gl;
 
 import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.texture.Texture;
 import java.awt.Font;
 import javax.media.opengl.GL;
+import org.tetristowerwars.model.GameModel;
 
 /**
  *
@@ -15,11 +17,19 @@ import javax.media.opengl.GL;
  */
 public class WinRenderer {
 
-   private final TextRenderer textRenderer;
-    private final float textScale = 0.12f;
+    
 
     public WinRenderer(GL gl) {
-        textRenderer = new TextRenderer(new Font("Sans-serif", Font.BOLD, 32), true, true, null, true);
+        
+    }
+
+    public void render(GL gl, GameModel gameModel) {
+        if (gameModel.getWinningCondition().gameIsOver()) {
+
+        }
+    }
+
+    public void triggerWinAnimation(long atTimeMs) {
     }
 }
 
