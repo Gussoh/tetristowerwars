@@ -58,7 +58,7 @@ public class SoundPlayer implements GameModelListener {
     SourceDataLine sourceDataLine;
     AudioInputStream audioInputStream;
 
-    public SoundPlayer(GameModel gameModel) {
+    public SoundPlayer(GameModel gameModel, boolean musicEnabled, boolean soundEffectsEnabled) {
         this.gameModel = gameModel;
         for (javax.sound.sampled.Mixer.Info info : AudioSystem.getMixerInfo()) {
             if (info.getName().contains("Java Sound Audio Engine")) {
@@ -66,39 +66,31 @@ public class SoundPlayer implements GameModelListener {
                 break;
             }
         }
-        gameModel.addGameModelListener(this);
-        System.out.println("- Preloading sounds");
-        getFirstAvailable(select);
-        getFirstAvailable(deselect);
-        getFirstAvailable(zap);
-        getFirstAvailable(ownerChanged);
-        for (int i = 0; i < collisionSounds.length; i++) {
-            getFirstAvailable(collisionSounds[i]);
-        }
-        for (int i = 0; i < collisionHardSounds.length; i++) {
-            getFirstAvailable(collisionHardSounds[i]);
-        }
-        for (int i = 0; i < cannonFireSounds.length; i++) {
-            getFirstAvailable(cannonFireSounds[i]);
-        }
-        for (int i = 0; i < explosionSounds.length; i++) {
-            getFirstAvailable(explosionSounds[i]);
-        }
-        playMusic();
-    }
-
-    public static void main(String[] args) {
-        SoundPlayer sp = new SoundPlayer(null);
-        for (float i = 0; i < 1.1; i += .1) {
-            sp.playSound("collisionHard1.wav", i);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SoundPlayer.class.getName()).log(Level.SEVERE, null, ex);
+        if (soundEffectsEnabled) {
+            gameModel.addGameModelListener(this);
+            System.out.println("- Preloading sounds");
+            getFirstAvailable(select);
+            getFirstAvailable(deselect);
+            getFirstAvailable(zap);
+            getFirstAvailable(ownerChanged);
+            for (int i = 0; i < collisionSounds.length; i++) {
+                getFirstAvailable(collisionSounds[i]);
+            }
+            for (int i = 0; i < collisionHardSounds.length; i++) {
+                getFirstAvailable(collisionHardSounds[i]);
+            }
+            for (int i = 0; i < cannonFireSounds.length; i++) {
+                getFirstAvailable(cannonFireSounds[i]);
+            }
+            for (int i = 0; i < explosionSounds.length; i++) {
+                getFirstAvailable(explosionSounds[i]);
             }
         }
-
+        if (musicEnabled) {
+            playMusic();
+        }
     }
+
 
     public Clip loadSound(String filename) {
         System.out.println("loading " + filename);

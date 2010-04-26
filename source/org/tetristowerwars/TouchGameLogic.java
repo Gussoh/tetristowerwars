@@ -6,6 +6,7 @@ package org.tetristowerwars;
 
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.util.LinkedList;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.InputManager;
@@ -16,10 +17,15 @@ import org.tetristowerwars.model.BuildingBlockFactory;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
+import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
+import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
+import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
+import org.tetristowerwars.model.winningcondition.LimitedBlocksWinningCondition;
+import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.sound.SoundPlayer;
 import org.tetristowerwars.util.MathUtil;
 
@@ -40,7 +46,7 @@ public class TouchGameLogic {
         final GameModel gameModel = new GameModel(settings.getWorldWidth(), settings.getWorldHeight(), settings.getGroundHeight(), settings.getBlockSize());
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, frame);
 
-        final SoundPlayer soundPlayer = new SoundPlayer(gameModel);
+        final SoundPlayer soundPlayer = new SoundPlayer(gameModel, settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
         
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getMouseInputComponent());
         final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getMouseInputComponent());
@@ -58,6 +64,22 @@ public class TouchGameLogic {
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
         cannonFactory.createBasicCannon(player2, new Vec2(settings.getWorldWidth() - playerAreaWidth, settings.getGroundHeight()), true);
 
+        LinkedList<WinningCondition> winningConditions = new LinkedList<WinningCondition>();
+        if (settings.isHeightConditionEnabled()) {
+            winningConditions.add(new HeightWinningCondition(gameModel, settings.getHeightCondition()));
+        }
+
+        if (settings.isNumBlocksConditionEnabled()) {
+            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, settings.getNumBlocksCondition()));
+        }
+
+        if (settings.isTimeConditionEnabled()) {
+            winningConditions.add(new TimedWinningCondition(gameModel, settings.getTimeCondition()));
+        }
+
+        CompoundWinningCondition.LogicType logicType = settings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;
+        CompoundWinningCondition cwc = new CompoundWinningCondition(gameModel, winningConditions, logicType);
+        cwc.setWinningCondition();
         //WinningCondition win1 = new TimedWinningCondition(gameModel, 3 * 60 * 1000);
         //win1.setWinningCondition();
         //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 20);

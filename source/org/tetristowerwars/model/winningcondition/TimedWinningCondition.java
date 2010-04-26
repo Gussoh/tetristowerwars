@@ -21,11 +21,11 @@ public class TimedWinningCondition extends WinningCondition {
     /**
      *
      * @param model
-     * @param gameTime Game time in ms.
+     * @param gameTime Game time in s.
      */
     public TimedWinningCondition(GameModel model, long gameTime) {
         super(model);
-        endTime = System.currentTimeMillis() + gameTime;
+        endTime = System.currentTimeMillis() + gameTime * 1000;
     }
 
     @Override

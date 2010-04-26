@@ -39,6 +39,7 @@ public class Settings {
     public static final String KEY_TIME_CONDITION = "time_condition";
     public static final String KEY_LEFT_TEAM = "left_team";
     public static final String KEY_RIGHT_TEAM = "right_team";
+    public static final String KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET = "must_all_winning_conditions_be_met";
     public static final String KEY_MOUSE_EMULATION = "mouse_emulation";
 
     private final Properties properties = new Properties();
@@ -145,6 +146,10 @@ public class Settings {
 
     public String getRightTeamName() {
         return getStringProperty(KEY_RIGHT_TEAM, "Right Team");
+    }
+
+    public boolean mustAllWinningConditionsBeMet() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, "false"));
     }
 
     public boolean isMouseEmulationEnabled() {
