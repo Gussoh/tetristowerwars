@@ -58,6 +58,10 @@ public class StartPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Right side:");
 
+        leftSideName.setText("Player 1");
+
+        rightSideName.setText("Player 2");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -90,13 +94,21 @@ public class StartPanel extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Winning conditions"));
 
+        heightConditionCheckBox.setSelected(true);
         heightConditionCheckBox.setText("A tower is higher than");
+
+        towerHeightField.setText("80");
 
         jLabel3.setText("meters.");
 
         limitedBlocksCheckBox.setText("The number of blocks owned by a player is");
 
+        numberOfBlocksField.setText("40");
+
+        jCheckBox1.setSelected(true);
         jCheckBox1.setText("Play time reaches");
+
+        jTextField1.setText("600");
 
         jLabel4.setText("seconds.");
 
