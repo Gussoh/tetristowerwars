@@ -21,13 +21,14 @@ public class HeightWinningCondition extends WinningCondition {
     private final int height;
     private BuildingBlock highestBlock = null;
     private long startTimeMs;
-    private final long winningTimeMs = 5000;
+    private final long winningTimeMs;
     private Player leader;
     private int leaderHeight;
 
-    public HeightWinningCondition(GameModel model, int height, long winningTimer) {
+    public HeightWinningCondition(GameModel model, int height, long winningTimeS) {
         super(model);
         this.height = height;
+        this.winningTimeMs = winningTimeS * 1000;
     }
 
    

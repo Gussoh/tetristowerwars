@@ -41,7 +41,7 @@ public class MessageRenderer {
         if (timeLeft == -1) {
             timeLeftSizeColorAnimation = null;
         } else if (timeLeft != lastTimeLeft) {
-            timeLeftSizeColorAnimation = new Path(new Vec2(1.2f, 1.0f), new Vec2(1.0f, 0.0f), 1.0f);
+            timeLeftSizeColorAnimation = new Path(new Vec2(1.1f, 1.0f), new Vec2(1.0f, 0.0f), 1.0f);
             lastTimeLeft = timeLeft;
         } else if (timeLeftSizeColorAnimation != null) {
             timeLeftSizeColorAnimation.addTime(elapsedTimeS);
