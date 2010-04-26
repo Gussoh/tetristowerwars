@@ -16,7 +16,7 @@ import org.tetristowerwars.model.WinningCondition;
  */
 public class TimedWinningCondition extends WinningCondition {
 
-    private long endTime;
+    private long endTimeMs;
 
     /**
      *
@@ -25,17 +25,32 @@ public class TimedWinningCondition extends WinningCondition {
      */
     public TimedWinningCondition(GameModel model, long gameTime) {
         super(model);
-        endTime = System.currentTimeMillis() + gameTime * 1000;
+        endTimeMs = System.currentTimeMillis() + gameTime * 1000;
     }
 
     @Override
     public boolean gameIsOver() {
-        return System.currentTimeMillis() > endTime;
+        return System.currentTimeMillis() > endTimeMs;
     }
 
     @Override
-    public List<MessageEntry> getStatusMessage() {
-        long time = endTime - System.currentTimeMillis();
+    public int timeLeftUntilGameOver() {
+
+            long timeLeftMs = endTimeMs - System.currentTimeMillis();
+
+            if (timeLeftMs < 0) {
+                return 0;
+            } else if (timeLeftMs < 10000) {
+                return (int) (timeLeftMs / 1000) + 1;
+            } else {
+                return -1;
+            }
+
+    }
+
+    @Override
+    public List<MessageEntry> getStatusMessages() {
+        long time = endTimeMs - System.currentTimeMillis();
         ArrayList<MessageEntry> message = new ArrayList<MessageEntry>(1);
         MessageType type = time < 10000 ? MessageType.CRITICAL : MessageType.NORMAL;
         message.add(new MessageEntry("Time remaining: " + Math.max(Math.round(time/1000), 0), type, null));

@@ -8,7 +8,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -34,7 +33,7 @@ import org.tetristowerwars.gui.gl.JointRenderer;
 import org.tetristowerwars.gui.gl.Pointer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
-import org.tetristowerwars.gui.gl.TextInformationRenderer;
+import org.tetristowerwars.gui.gl.MessageRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
 import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
@@ -60,7 +59,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private CannonRenderer cannonRenderer;
     private PointerRenderer pointerRenderer;
     private EffectRenderer effectRenderer;
-    private TextInformationRenderer textInformationRenderer;
+    private MessageRenderer messageRenderer;
     private RectangularBuildingBlockRenderer rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
@@ -164,7 +163,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
             pointerRenderer = new PointerRenderer(gl);
             effectRenderer = new EffectRenderer(gl, gameModel);
-            textInformationRenderer = new TextInformationRenderer(gl);
+            messageRenderer = new MessageRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
@@ -212,7 +211,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
         long currentTime = System.currentTimeMillis();
         long startTime = System.nanoTime();
-        long elapsedTime = currentTime - lastTimeMillis;
+        float elapsedTimeS = (float)(currentTime - lastTimeMillis) / 1000.0f;
         lastTimeMillis = currentTime;
         frameCounter++;
 
@@ -228,11 +227,11 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
 
         // Update and render tanks, zeppelins, etc.
-        backgroundAnimationFactory.run(elapsedTime);
-        backgroundAnimationRenderer.render(gl, elapsedTime);
+        backgroundAnimationFactory.run(elapsedTimeS);
+        backgroundAnimationRenderer.render(gl, elapsedTimeS);
 
         // render building blocks, except outline
-        rectangularBuildingBlockRenderer.render(gl, gameModel, elapsedTime);
+        rectangularBuildingBlockRenderer.render(gl, gameModel, elapsedTimeS);
         // Render the light effect when a block changes owner
         rectangularBuildingBlockRenderer.renderOverlay(gl);
 
@@ -255,8 +254,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         gl.glLineWidth(lineWidthFactor * 4.0f);
         // Render the light effect of the players border when a block changes owner
-        effectRenderer.render(gl, gameModel, elapsedTime);
-        effectRenderer.renderParticles(gl, elapsedTime);
+        effectRenderer.render(gl, gameModel, elapsedTimeS);
+        effectRenderer.renderParticles(gl, elapsedTimeS);
 
         bulletRenderer.render(gl, gameModel);
 
@@ -264,9 +263,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         backgroundRenderer.renderBottom(gl);
 
         // Render the mouse/finger circles.
-        pointerRenderer.render(gl, id2Pointers, elapsedTime);
+        pointerRenderer.render(gl, id2Pointers, elapsedTimeS);
 
-        textInformationRenderer.render(drawable, gameModel, renderWorldHeight);
+        messageRenderer.render(drawable, gameModel, renderWorldHeight, elapsedTimeS);
 
         performanceTimer += System.nanoTime() - startTime;
         if (frameCounter % 60 == 0) {
@@ -364,6 +363,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     }
 
     @Override
-    public void onLeaderChanged(ArrayList scoreList) {
+    public void onLeaderChanged(Player leader) {
     }
 }

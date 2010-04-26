@@ -51,7 +51,8 @@ public class GameModel {
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
     private final float blockSize;
-    private final ArrayList<WinningCondition> winningConditions = new ArrayList<WinningCondition>();
+    private boolean gameIsOver = false;
+    private WinningCondition winningCondition = null;
     private Player leader = null;
 
     /**
@@ -209,6 +210,19 @@ public class GameModel {
 
         for (Player player : players) {
             player.calcHighestBuildingBlockInTower(groundBlock, groundLevel);
+        }
+
+        if (winningCondition.getLeader().getPlayer() != leader) {
+            leader = winningCondition.getLeader().getPlayer();
+            for (GameModelListener gameModelListener : gameModelListeners) {
+                gameModelListener.onLeaderChanged(leader);
+            }
+        }
+        if (winningCondition.gameIsOver() && !gameIsOver) {
+            gameIsOver = true;
+            for (GameModelListener gameModelListener : gameModelListeners) {
+                gameModelListener.onWinningConditionFulfilled(winningCondition);
+            }
         }
 
         timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
@@ -451,34 +465,16 @@ public class GameModel {
         return world;
     }
 
-    public void addWinningCondition(WinningCondition condition) {
-        winningConditions.add(condition);
-    }
-
-    public boolean checkWinningConditions() {
-        for (WinningCondition condition : winningConditions) {
-            if (condition.getLeader().getPlayer() != leader) {
-                leader = condition.getLeader().getPlayer();
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onLeaderChanged(null);
-                }
-            }
-            if (condition.gameIsOver()) {
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onWinningConditionFulfilled(condition);
-                }
-                return true;
-            }
-        }
-        return false;
+    public void setWinningCondition(WinningCondition condition) {
+        winningCondition = condition;
     }
 
     public Player getLeader() {
         return leader;
     }
 
-    public List<WinningCondition> getWinningConditions() {
-        return Collections.unmodifiableList(winningConditions);
+    public WinningCondition getWinningCondition() {
+        return winningCondition;
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {

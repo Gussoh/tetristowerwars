@@ -51,7 +51,7 @@ public class RectangularBuildingBlockRenderer {
     private static final float TEXTURE_COORD_FACTOR = 0.08f;
     private final static float START_INTENSITY = 1.0f;
     private final static float END_INTENSITY = 0.0f;
-    private final static float ANIMATION_TIME_MS = 1500.0f;
+    private final static float ANIMATION_TIME_S = 1.5f;
     private final static float XY_NORMAL = 0.8f;
     private final static float NON_OWNED_BLOCK_COLOR_FACTOR = 1.0f;
     private final static float NON_OWNED_BLOCK_ALPHA_FACTOR = 0.6f;
@@ -284,9 +284,9 @@ public class RectangularBuildingBlockRenderer {
         }
     }
 
-    public void render(GL gl, GameModel gameModel, float elapsedTime) {
+    public void render(GL gl, GameModel gameModel, float elapsedTimeS) {
         ensureBufferCapacity(gameModel);
-        updateAnimationsAndBufferCapacity(elapsedTime);
+        updateAnimationsAndBufferCapacity(elapsedTimeS);
 
         createBufferData(gameModel.getBuildingBlockPool());
         for (Player player : gameModel.getPlayers()) {
@@ -362,10 +362,10 @@ public class RectangularBuildingBlockRenderer {
     }
 
     public void addBuildingBlockOverlayAnimation(BuildingBlock bb) {
-        animations.put(bb, new Path(new Vec2(START_INTENSITY, 0), new Vec2(END_INTENSITY, 0), ANIMATION_TIME_MS));
+        animations.put(bb, new Path(new Vec2(START_INTENSITY, 0), new Vec2(END_INTENSITY, 0), ANIMATION_TIME_S));
     }
 
-    private void updateAnimationsAndBufferCapacity(float elapsedTime) {
+    private void updateAnimationsAndBufferCapacity(float elapsedTimeS) {
 
         int numRects = 0;
 
@@ -377,7 +377,7 @@ public class RectangularBuildingBlockRenderer {
             if (p.isDone()) {
                 it.remove();
             } else {
-                p.addTime(elapsedTime);
+                p.addTime(elapsedTimeS);
                 if (entry.getKey() instanceof RectangularBuildingBlock) {
                     RectangularBuildingBlock rbb = (RectangularBuildingBlock) entry.getKey();
                     numRects += rbb.getRectangles().length;

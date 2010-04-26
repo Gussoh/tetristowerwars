@@ -66,11 +66,11 @@ public class TouchGameLogic {
 
         LinkedList<WinningCondition> winningConditions = new LinkedList<WinningCondition>();
         if (settings.isHeightConditionEnabled()) {
-            winningConditions.add(new HeightWinningCondition(gameModel, settings.getHeightCondition()));
+            winningConditions.add(new HeightWinningCondition(gameModel, settings.getHeightCondition(), 10));
         }
 
         if (settings.isNumBlocksConditionEnabled()) {
-            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, settings.getNumBlocksCondition()));
+            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, settings.getNumBlocksCondition(), 10));
         }
 
         if (settings.isTimeConditionEnabled()) {
@@ -80,17 +80,7 @@ public class TouchGameLogic {
         CompoundWinningCondition.LogicType logicType = settings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;
         CompoundWinningCondition cwc = new CompoundWinningCondition(gameModel, winningConditions, logicType);
         cwc.setWinningCondition();
-        //WinningCondition win1 = new TimedWinningCondition(gameModel, 3 * 60 * 1000);
-        //win1.setWinningCondition();
-        //WinningCondition win2 = new LimitedBlocksWinningCondition(gameModel, 20);
-        //win2.setWinningCondition();
-        //WinningCondition win3 = new HeightWinningCondition(gameModel, 100);
-        //win3.setWinningCondition();
-        //ArrayList conditions = new ArrayList();
-        //conditions.add(win1);
-        //conditions.add(win3);
-        //WinningCondition cwin = new CompoundWinningCondition(gameModel, conditions, CompoundWinningCondition.LogicType.AND);
-        //cwin.setWinningCondition();
+        
 
         new Thread() {
 

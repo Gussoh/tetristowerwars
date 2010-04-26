@@ -50,9 +50,9 @@ public class BackgroundAnimationRenderer {
         texCoordBuffer = BufferUtil.newFloatBuffer(10 * NUM_VERTICES_PER_ANIMATION * 2);
     }
 
-    public void render(GL gl, float timeElapsed) {
+    public void render(GL gl, float timeElapsedS) {
 
-        processAnimation(animations, timeElapsed);
+        processAnimation(animations, timeElapsedS);
         int numAnimations = animations.size();
 
         int numCoords = numAnimations * NUM_VERTICES_PER_ANIMATION;

@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.sound;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +30,7 @@ import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.util.MathUtil;
 
@@ -269,7 +269,7 @@ public class SoundPlayer implements GameModelListener {
     }
 
     @Override
-    public void onLeaderChanged(ArrayList scoreList) {
+    public void onLeaderChanged(Player leader) {
     }
 
     class PlayThread extends Thread {

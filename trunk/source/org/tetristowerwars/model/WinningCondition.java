@@ -21,12 +21,20 @@ public abstract class WinningCondition {
     }
 
     public void setWinningCondition() {
-        model.addWinningCondition(this);
+        model.setWinningCondition(this);
     }
 
-    public abstract boolean gameIsOver();
+    public boolean gameIsOver() {
+        return timeLeftUntilGameOver() == 0;
+    }
 
-    public abstract List<MessageEntry> getStatusMessage();
+    public abstract List<MessageEntry> getStatusMessages();
+
+    /**
+     *
+     * @return -1 if unknown, otherwise the number of seconds.
+     */
+    public abstract int timeLeftUntilGameOver();
 
     public ScoreEntry getLeader() {
         List<ScoreEntry> scores = getScores();

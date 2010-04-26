@@ -117,18 +117,22 @@ public class Controller implements InputListener {
     }
 
     public synchronized void pumpEvents() {
-        while(!eventQueue.isEmpty()) {
-            InputEvent event = eventQueue.poll();
-            switch (event.getType()) {
-                case InputEvent.PRESSED:
-                    handleInputDevicePressed(event);
-                    break;
-                case InputEvent.RELEASED:
-                    handleInputDeviceReleased(event);
-                    break;
-                case InputEvent.DRAGGED:
-                    handleInputDeviceDragged(event);
-                    break;
+        if (gameModel.getWinningCondition().gameIsOver()) {
+            eventQueue.clear();
+        } else {
+            while (!eventQueue.isEmpty()) {
+                InputEvent event = eventQueue.poll();
+                switch (event.getType()) {
+                    case InputEvent.PRESSED:
+                        handleInputDevicePressed(event);
+                        break;
+                    case InputEvent.RELEASED:
+                        handleInputDeviceReleased(event);
+                        break;
+                    case InputEvent.DRAGGED:
+                        handleInputDeviceDragged(event);
+                        break;
+                }
             }
         }
     }

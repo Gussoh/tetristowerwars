@@ -59,7 +59,7 @@ public class EffectRenderer {
     private final static float END_INTENSITY = 0.0f;
     private final static float START_LENGTH = 30.0f;
     private final static float END_LENGTH = 30.0f;
-    private final static float ANIMATION_TIME_MS = 1500.0f;
+    private final static float ANIMATION_TIME_S = 1.5f;
     private final Map<Path, Vec2> animations = new LinkedHashMap<Path, Vec2>();
 
     public EffectRenderer(GL gl, GameModel gameModel) throws IOException {
@@ -126,14 +126,14 @@ public class EffectRenderer {
         bulletTrailParticleEngine.addStepFunction(new FadeOutStepFunction(0.0f));
     }
 
-    public void render(GL gl, GameModel gameModel, float elapsedTime) {
+    public void render(GL gl, GameModel gameModel, float elapsedTimeS) {
         for (Iterator<Path> it = animations.keySet().iterator(); it.hasNext();) {
             Path p = it.next();
 
             if (p.isDone()) {
                 it.remove();
             } else {
-                p.addTime(elapsedTime);
+                p.addTime(elapsedTimeS);
             }
         }
 
@@ -215,9 +215,9 @@ public class EffectRenderer {
         }
     }
 
-    public void renderParticles(GL gl, float elapsedTimeMs) {
+    public void renderParticles(GL gl, float elapsedTimeS) {
 
-        float elapsedTimeS = elapsedTimeMs * 0.001f;
+        
         explosionParticleEngine.update(elapsedTimeS);
         frictionParticleEngine.update(elapsedTimeS);
         bulletTrailParticleEngine.update(elapsedTimeS);
@@ -266,7 +266,7 @@ public class EffectRenderer {
     }
 
     public void createBorderLitAnimation(Vec2 v) {
-        Path p = new Path(new Vec2(START_INTENSITY, START_LENGTH), new Vec2(END_INTENSITY, END_LENGTH), ANIMATION_TIME_MS);
+        Path p = new Path(new Vec2(START_INTENSITY, START_LENGTH), new Vec2(END_INTENSITY, END_LENGTH), ANIMATION_TIME_S);
         animations.put(p, v);
     }
 
