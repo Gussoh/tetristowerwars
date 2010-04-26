@@ -11,6 +11,9 @@
 package org.tetristowerwars;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -25,13 +28,28 @@ public class TouchGamePanel extends javax.swing.JPanel {
 
     private final MainFrame mainFrame;
 
-    /** Creates new form StartPanel */
+    /** Creates new form StartPanel
+     * @param mainFrame 
+     */
     public TouchGamePanel(MainFrame mainFrame) {
         initComponents();
         this.mainFrame = mainFrame;
-        heightTextField.setText(Integer.toString(heightSlider.getValue()));
-        numBlocksTextField.setText(Integer.toString(numBlocksSlider.getValue()));
-        timeTextField.setText(Integer.toString(timeSlider.getValue()));
+        Settings settings = mainFrame.getSettings();
+
+        leftTeamName.setText(settings.getLeftTeamName());
+        rightTeamName.setText(settings.getRightTeamName());
+
+        heightTextField.setText(Integer.toString(settings.getHeightCondition()));
+        numBlocksTextField.setText(Integer.toString(settings.getNumBlocksCondition()));
+        timeTextField.setText(Integer.toString(settings.getTimeCondition()));
+
+        heightConditionCheckBox.setSelected(settings.isHeightConditionEnabled());
+        numBlocksCheckBox.setSelected(settings.isNumBlocksConditionEnabled());
+        timeCheckBox.setSelected(settings.isTimeConditionEnabled());
+
+        updateSlider(heightSlider, heightTextField);
+        updateSlider(numBlocksSlider, numBlocksTextField);
+        updateSlider(timeSlider, timeTextField);
 
         heightTextField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -87,7 +105,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
 
     private void updateSlider(JSlider slider, JTextField field) {
         try {
-            slider.setValue((int) Float.parseFloat(field.getText()));
+            slider.setValue((int) Integer.parseInt(field.getText()));
             field.setBackground(UIManager.getColor("TextField.background"));
         } catch (NumberFormatException ex) {
             field.setBackground(Color.red.brighter().brighter());
@@ -106,13 +124,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        leftSideName = new javax.swing.JTextField();
-        rightSideName = new javax.swing.JTextField();
+        leftTeamName = new javax.swing.JTextField();
+        rightTeamName = new javax.swing.JTextField();
         playButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         heightConditionCheckBox = new javax.swing.JCheckBox();
-        limitedBlocksCheckBox = new javax.swing.JCheckBox();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        numBlocksCheckBox = new javax.swing.JCheckBox();
+        timeCheckBox = new javax.swing.JCheckBox();
         timeTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
@@ -132,9 +150,9 @@ public class TouchGamePanel extends javax.swing.JPanel {
 
         jLabel2.setText("Right team:");
 
-        leftSideName.setText("Left team");
+        leftTeamName.setText("Left team");
 
-        rightSideName.setText("Right team");
+        rightTeamName.setText("Right team");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -147,8 +165,8 @@ public class TouchGamePanel extends javax.swing.JPanel {
                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(rightSideName)
-                    .addComponent(leftSideName, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
+                    .addComponent(rightTeamName)
+                    .addComponent(leftTeamName, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
                 .addContainerGap(70, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -156,11 +174,11 @@ public class TouchGamePanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(leftSideName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(leftTeamName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(rightSideName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rightTeamName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -176,10 +194,10 @@ public class TouchGamePanel extends javax.swing.JPanel {
         heightConditionCheckBox.setSelected(true);
         heightConditionCheckBox.setText("A tower is higher than");
 
-        limitedBlocksCheckBox.setText("Number of blocks owned by a player is");
+        numBlocksCheckBox.setText("Number of blocks owned by a player is");
 
-        jCheckBox1.setSelected(true);
-        jCheckBox1.setText("Play time reaches");
+        timeCheckBox.setSelected(true);
+        timeCheckBox.setText("Play time reaches");
 
         timeTextField.setText("600");
 
@@ -222,12 +240,6 @@ public class TouchGamePanel extends javax.swing.JPanel {
             }
         });
 
-        heightTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                heightTextFieldActionPerformed(evt);
-            }
-        });
-
         jLabel3.setText("meters.");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -250,13 +262,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
                         .addComponent(jLabel3))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(1, 1, 1)
-                        .addComponent(jCheckBox1)
+                        .addComponent(timeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(timeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel4))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(limitedBlocksCheckBox)
+                        .addComponent(numBlocksCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(numBlocksTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -285,11 +297,11 @@ public class TouchGamePanel extends javax.swing.JPanel {
                             .addComponent(jLabel3))
                         .addGap(28, 28, 28)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(limitedBlocksCheckBox)
+                            .addComponent(numBlocksCheckBox)
                             .addComponent(numBlocksTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(40, 40, 40)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCheckBox1)
+                            .addComponent(timeCheckBox)
                             .addComponent(timeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
@@ -376,16 +388,26 @@ public class TouchGamePanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_timeSliderStateChanged
 
-    private void heightTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heightTextFieldActionPerformed
-        try {
-            float value = Float.parseFloat(heightTextField.getText());
-            heightTextField.setBackground(UIManager.getColor("TextField.background"));
-        } catch (NumberFormatException ex) {
-            heightTextField.setBackground(Color.red.brighter().brighter());
-        }
-    }//GEN-LAST:event_heightTextFieldActionPerformed
-
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
+
+        Settings settings = mainFrame.getSettings();
+
+        settings.setProperty(Settings.KEY_LEFT_TEAM, leftTeamName.getText());
+        settings.setProperty(Settings.KEY_RIGHT_TEAM, rightTeamName.getText());
+
+        settings.setProperty(Settings.KEY_USE_HEIGHT_CONDITION, Boolean.toString(heightConditionCheckBox.isSelected()));
+        settings.setProperty(Settings.KEY_USE_NUM_BLOCKS_CONDITION, Boolean.toString(numBlocksCheckBox.isSelected()));
+        settings.setProperty(Settings.KEY_USE_TIME_CONDITION, Boolean.toString(timeCheckBox.isSelected()));
+
+        settings.setProperty(Settings.KEY_HEIGHT_CONDITION, heightTextField.getText());
+        settings.setProperty(Settings.KEY_NUM_BLOCKS_CONDITION, numBlocksTextField.getText());
+        settings.setProperty(Settings.KEY_TIME_CONDITION, timeTextField.getText());
+        try {
+            settings.save();
+        } catch (IOException ex) {
+            Logger.getLogger(TouchGamePanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         new TouchGameLogic(mainFrame);
     }//GEN-LAST:event_playButtonActionPerformed
 
@@ -394,7 +416,6 @@ public class TouchGamePanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox heightConditionCheckBox;
     private javax.swing.JSlider heightSlider;
     private javax.swing.JTextField heightTextField;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -403,13 +424,14 @@ public class TouchGamePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField leftSideName;
-    private javax.swing.JCheckBox limitedBlocksCheckBox;
+    private javax.swing.JTextField leftTeamName;
+    private javax.swing.JCheckBox numBlocksCheckBox;
     private javax.swing.JSlider numBlocksSlider;
     private javax.swing.JTextField numBlocksTextField;
     private javax.swing.JButton playButton;
-    private javax.swing.JTextField rightSideName;
+    private javax.swing.JTextField rightTeamName;
     private javax.swing.JButton settingsButton;
+    private javax.swing.JCheckBox timeCheckBox;
     private javax.swing.JSlider timeSlider;
     private javax.swing.JTextField timeTextField;
     // End of variables declaration//GEN-END:variables

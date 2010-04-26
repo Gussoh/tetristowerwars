@@ -17,8 +17,10 @@ import java.awt.event.MouseMotionListener;
 public class MouseInputManager extends InputManager implements MouseListener, MouseMotionListener {
 
     private static final int dummyId = 0;
+    private final Component component;
 
     public MouseInputManager(Component component) {
+        this.component = component;
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
     }
@@ -31,14 +33,14 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
         InputEvent evt = new InputEvent(InputEvent.PRESSED, new Point(e.getX(), e.getY()), dummyId);
-        pushInputEvent(evt);
+        fireOnPressEvent(evt);
         
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
         InputEvent evt = new InputEvent(InputEvent.RELEASED, new Point(e.getX(), e.getY()), dummyId);
-        pushInputEvent(evt);
+        fireOnReleaseEvent(evt);
     }
 
     @Override
@@ -54,11 +56,17 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
     @Override
     public void mouseDragged(MouseEvent e) {
         InputEvent evt = new InputEvent(InputEvent.DRAGGED, new Point(e.getX(), e.getY()), dummyId);
-        pushInputEvent(evt);
+        fireOnDragEvent(evt);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         // Not used
+    }
+
+    @Override
+    public void unregisterEventProvider() {
+        component.removeMouseListener(this);
+        component.removeMouseMotionListener(this);
     }
 }

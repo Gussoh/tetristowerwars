@@ -37,8 +37,7 @@ public class GameModel {
     private final LinkedHashSet<BuildingBlock> buildingBlockPool = new LinkedHashSet<BuildingBlock>();
     private final ArrayList<Player> players = new ArrayList<Player>();
     private final World world;
-    private static final int ITERATIONS_PER_STEP = 10; // Lower value means less accurate but faster
-    private long lastStepTimeNano = System.nanoTime();
+    private static final int ITERATIONS_PER_STEP = 12; // Lower value means less accurate but faster
     private final AABB worldBoundries;
     private final GroundBlock groundBlock;
     private final BuildingBlockFactory blockFactory;
@@ -48,7 +47,6 @@ public class GameModel {
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private final Set<BuildingBlock> potientialBulletBlock = new LinkedHashSet<BuildingBlock>();
     private float timeTakenToExecuteUpdateMs;
-    private final float constantStepTimeS = 1f / 60f;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
@@ -93,47 +91,17 @@ public class GameModel {
     }
 
     /**
-     * Steps the physics engine if necessary and does game model post processing.
-     * This function keeps track of when it was last executed and will ensure
-     * smooth updates if it is called "often".
-     *
-     * @return How many times the physics engine stepped.
-     * If 0, nothing has changed. This can be used to optimize when to render frames.
+     * Steps the physics engine and game model by 1/60 seconds.
      */
-    public int update() {
+    public void update() {
+
         long currentTimeNano = System.nanoTime();
-        long stepTimeNano = currentTimeNano - lastStepTimeNano;
-        int numTimesStepped = 0;
 
-        if (stepTimeNano < 0) { // in case of nanoTime wrapping around
-            stepTimeNano = (long) (constantStepTimeS * 1000000000.0f);
+        world.step(1f / 60f, ITERATIONS_PER_STEP);
+
+        for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+            buildingBlockJoint.dampAngularVelocity();
         }
-
-        while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
-            for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
-                buildingBlockJoint.dampAngularVelocity();
-            }
-            world.step(constantStepTimeS, ITERATIONS_PER_STEP);
-            postProcess();
-            numTimesStepped++;
-            stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
-        }
-
-        lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
-
-        if (numTimesStepped > 0) {
-
-
-            timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
-        }
-
-        return numTimesStepped;
-    }
-
-    /**
-     * Performs all game related changes to the game world and should run after the physics engine has stepped.
-     */
-    private void postProcess() {
 
         // blocksToRemove will now contain all blocks that are outside the world.
         for (Iterator<MutableEntry<Block, Integer>> it = blocksToRemove.iterator(); it.hasNext();) {
@@ -242,6 +210,8 @@ public class GameModel {
         for (Player player : players) {
             player.calcHighestBuildingBlockInTower(groundBlock, groundLevel);
         }
+
+        timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
     }
 
     /**
@@ -347,11 +317,10 @@ public class GameModel {
                     Object userData = shape.getBody().getUserData();
                     if (userData instanceof CannonBlock) {
                         CannonBlock cannonBlock = (CannonBlock) userData;
-                        if  (cannonBlock.getTimeUntilShooting() == 0) {
+                        if (cannonBlock.getTimeUntilShooting() == 0) {
                             cannonBlock.shoot(bb.getMaterial());
                             blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
-                        }
-                        else {
+                        } else {
                             //TODO: Graphical feedback of block rejection
                         }
                         return;

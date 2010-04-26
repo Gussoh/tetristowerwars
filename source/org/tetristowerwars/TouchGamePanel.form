@@ -74,8 +74,8 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="rightSideName" max="32767" attributes="1"/>
-                      <Component id="leftSideName" alignment="0" pref="340" max="32767" attributes="1"/>
+                      <Component id="rightTeamName" max="32767" attributes="1"/>
+                      <Component id="leftTeamName" alignment="0" pref="340" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace pref="70" max="32767" attributes="0"/>
               </Group>
@@ -86,12 +86,12 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="leftSideName" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="leftTeamName" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="rightSideName" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="rightTeamName" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -109,12 +109,12 @@
             <Property name="text" type="java.lang.String" value="Right team:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="leftSideName">
+        <Component class="javax.swing.JTextField" name="leftTeamName">
           <Properties>
             <Property name="text" type="java.lang.String" value="Left team"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="rightSideName">
+        <Component class="javax.swing.JTextField" name="rightTeamName">
           <Properties>
             <Property name="text" type="java.lang.String" value="Right team"/>
           </Properties>
@@ -159,14 +159,14 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-                          <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                          <Component id="timeCheckBox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="timeTextField" min="-2" pref="50" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="limitedBlocksCheckBox" min="-2" max="-2" attributes="0"/>
+                          <Component id="numBlocksCheckBox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="numBlocksTextField" min="-2" pref="47" max="-2" attributes="0"/>
                       </Group>
@@ -203,12 +203,12 @@
                           </Group>
                           <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="limitedBlocksCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="numBlocksCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="numBlocksTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="timeCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="timeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -231,12 +231,12 @@
             <Property name="text" type="java.lang.String" value="A tower is higher than"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="limitedBlocksCheckBox">
+        <Component class="javax.swing.JCheckBox" name="numBlocksCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Number of blocks owned by a player is"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+        <Component class="javax.swing.JCheckBox" name="timeCheckBox">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Play time reaches"/>
@@ -306,9 +306,6 @@
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="heightTextField">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="heightTextFieldActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>

@@ -8,7 +8,6 @@
  *
  * Created on 2010-apr-26, 10:19:34
  */
-
 package org.tetristowerwars;
 
 /**
@@ -16,12 +15,17 @@ package org.tetristowerwars;
  * @author Andreas
  */
 public class StartPanel extends javax.swing.JPanel {
+
     private final MainFrame mainFrame;
 
-    /** Creates new form StartPanel */
+    /** Creates new form StartPanel
+     * @param mainFrame 
+     */
     public StartPanel(MainFrame mainFrame) {
         initComponents();
         this.mainFrame = mainFrame;
+
+
     }
 
     /** This method is called from within the constructor to
@@ -35,6 +39,7 @@ public class StartPanel extends javax.swing.JPanel {
 
         touchButton = new javax.swing.JButton();
         networkButton = new javax.swing.JButton();
+        emulatorCheckBox = new javax.swing.JCheckBox();
 
         touchButton.setText("Play using a multi-touch screen");
         touchButton.addActionListener(new java.awt.event.ActionListener() {
@@ -45,25 +50,35 @@ public class StartPanel extends javax.swing.JPanel {
 
         networkButton.setText("Play network game");
 
+        emulatorCheckBox.setText("Enable TUIO mouse emulation");
+        emulatorCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emulatorCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(103, 103, 103)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(networkButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(touchButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(emulatorCheckBox)
+                    .addComponent(touchButton, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+                    .addComponent(networkButton, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(touchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(networkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(touchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(networkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(emulatorCheckBox)
+                .addContainerGap(12, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -71,10 +86,18 @@ public class StartPanel extends javax.swing.JPanel {
         mainFrame.openComponent(new TouchGamePanel(mainFrame));
     }//GEN-LAST:event_touchButtonActionPerformed
 
-
+    private void emulatorCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emulatorCheckBoxActionPerformed
+        if (emulatorCheckBox.isSelected()) {
+            mainFrame.enableMouseEmulation();
+            mainFrame.getSettings().setProperty(Settings.KEY_MOUSE_EMULATION, "true");
+        } else {
+            mainFrame.disableMouseEmulation();
+            mainFrame.getSettings().setProperty(Settings.KEY_MOUSE_EMULATION, "false");
+        }
+    }//GEN-LAST:event_emulatorCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox emulatorCheckBox;
     private javax.swing.JButton networkButton;
     private javax.swing.JButton touchButton;
     // End of variables declaration//GEN-END:variables
-
 }

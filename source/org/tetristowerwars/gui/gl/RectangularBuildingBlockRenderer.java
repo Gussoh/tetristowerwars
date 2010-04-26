@@ -53,8 +53,8 @@ public class RectangularBuildingBlockRenderer {
     private final static float END_INTENSITY = 0.0f;
     private final static float ANIMATION_TIME_MS = 1500.0f;
     private final static float XY_NORMAL = 0.8f;
-    private final static float NON_OWNED_BLOCK_COLOR_FACTOR = 0.4f;
-    private final static float NON_OWNED_BLOCK_ALPHA_FACTOR = 0.8f;
+    private final static float NON_OWNED_BLOCK_COLOR_FACTOR = 1.0f;
+    private final static float NON_OWNED_BLOCK_ALPHA_FACTOR = 0.6f;
     private final Map<BuildingBlock, Path> animations = new LinkedHashMap<BuildingBlock, Path>();
 
     public RectangularBuildingBlockRenderer(GL gl, boolean lightingEffects) throws IOException {
