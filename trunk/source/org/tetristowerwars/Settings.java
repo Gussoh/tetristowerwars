@@ -23,6 +23,7 @@ public class Settings {
     public static final String KEY_GRAVITY = "gravity";
     public static final String KEY_WORLD_WIDTH = "world_width";
     public static final String KEY_WORLD_HEIGHT = "world_height";
+    public static final String KEY_WORLD_THEME = "world_theme";
     public static final String KEY_PLAYER_AREA = "player_area";
     public static final String KEY_PLAY_MUSIC = "play_music";
     public static final String KEY_PLAY_SOUND_EFFECTS = "play_sound_effects";
@@ -82,6 +83,10 @@ public class Settings {
 
     public float getWorldHeight() {
         return getFloatProperty(KEY_WORLD_HEIGHT, 600);
+    }
+
+    public int getWorldTheme() {
+        return getIntProperty(KEY_WORLD_THEME, 1);
     }
 
     public float getPlayerArea() {

@@ -31,16 +31,19 @@ public class BackgroundAnimationRenderer {
     private final List<Animation> animations = new LinkedList<Animation>();
     private FloatBuffer vertexBuffer;
     private FloatBuffer texCoordBuffer;
-    public final static int TANK1 = 0, TANK2 = 1, SCUD = 2, ZEPPELIN1 = 3, ZEPPELIN2 = 4, SPUTNIK = 5;
+    public final static int GROUNDVEHICLE1 = 0, GROUNDVEHICLE2 = 1, GROUNDVEHICLE3 = 2, GROUNDVEHICLE4 = 3, AIRVEHICLE1 = 4, AIRVEHICLE2 = 5, AIRVEHICLE3 = 6, TRAJECTORYVEHICLE = 7;
     public final static int NUM_VERTICES_PER_ANIMATION = 4;
 
-    public BackgroundAnimationRenderer(GL gl) throws IOException {
-        textures.put(TANK1, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/tank1.png"), true), true));
-        textures.put(TANK2, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/tank2.png"), true), true));
-        textures.put(SCUD, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/scud.png"), true), true));
-        textures.put(ZEPPELIN1, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/zeppelin1.png"), true), false));
-        textures.put(ZEPPELIN2, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/zeppelin2.png"), true), false));
-        textures.put(SPUTNIK, new TextureEntry(TextureIO.newTexture(new File("res/gfx/decoration/sputnik.png"), true), true));
+    public BackgroundAnimationRenderer(GL gl, int themeIndex) throws IOException {
+        String texturePath = "res/gfx/THEME" + themeIndex + "/";
+        textures.put(GROUNDVEHICLE1, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle1.png"), true), true));
+        textures.put(GROUNDVEHICLE2, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle2.png"), true), true));
+        textures.put(GROUNDVEHICLE3, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle3.png"), true), true));
+        textures.put(GROUNDVEHICLE4, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle4.png"), true), true));
+        textures.put(AIRVEHICLE1, new TextureEntry(TextureIO.newTexture(new File(texturePath + "airvehicle1.png"), true), true));
+        textures.put(AIRVEHICLE2, new TextureEntry(TextureIO.newTexture(new File(texturePath + "airvehicle2.png"), true), true));
+        textures.put(AIRVEHICLE3, new TextureEntry(TextureIO.newTexture(new File(texturePath + "airvehicle3.png"), true), true));
+        textures.put(TRAJECTORYVEHICLE, new TextureEntry(TextureIO.newTexture(new File(texturePath + "trajectoryvehicle1.png"), true), true));
 
         for (TextureEntry entry : textures.values()) {
             GLUtil.fixTextureParameters(entry.texture);

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
+import org.tetristowerwars.Settings;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -29,10 +30,11 @@ public class BackgroundRenderer {
     private static final float cityShrinkFactor = 10.0f;
     private static final float bottomShrinkFactor = 10.0f;
 
-    public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel, float horizontLevel) throws IOException {
-        skyTexture = TextureIO.newTexture(new File("res/gfx/sky.png"), true);
-        cityTexture = TextureIO.newTexture(new File("res/gfx/citysilhuette.png"), true);
-        groundTexture = TextureIO.newTexture(new File("res/gfx/ground.png"), true);
+    public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel, float horizontLevel, int themeIndex) throws IOException {
+        String texturePath = "res/gfx/THEME" + themeIndex + "/";
+        skyTexture = TextureIO.newTexture(new File(texturePath + "sky.png"), true);
+        cityTexture = TextureIO.newTexture(new File(texturePath + "citysilhuette.png"), true);
+        groundTexture = TextureIO.newTexture(new File(texturePath + "ground.png"), true);
         bottomTexture = TextureIO.newTexture(new File("res/gfx/bottom.png"), true);
 
         GLUtil.fixTextureParameters(skyTexture);
