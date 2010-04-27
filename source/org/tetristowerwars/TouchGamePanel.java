@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -46,6 +47,15 @@ public class TouchGamePanel extends javax.swing.JPanel {
         heightConditionCheckBox.setSelected(settings.isHeightConditionEnabled());
         numBlocksCheckBox.setSelected(settings.isNumBlocksConditionEnabled());
         timeCheckBox.setSelected(settings.isTimeConditionEnabled());
+
+        switch(settings.getWorldTheme()) {
+            case 1: sovietTheme.setSelected(true);
+            break;
+            case 2: USATheme.setSelected(true);
+            break;
+            case 3: comboTheme.setSelected(true);
+            break;
+        }
 
         if (settings.mustAllWinningConditionsBeMet()) {
             anyAllComboBox.setSelectedIndex(1);
@@ -127,12 +137,12 @@ public class TouchGamePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        levelThemeButtonGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         leftTeamName = new javax.swing.JTextField();
         rightTeamName = new javax.swing.JTextField();
-        playButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         heightConditionCheckBox = new javax.swing.JCheckBox();
         numBlocksCheckBox = new javax.swing.JCheckBox();
@@ -147,8 +157,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
         heightTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         numBlocksTextField = new javax.swing.JTextField();
+        playButton = new javax.swing.JButton();
         settingsButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        sovietTheme = new javax.swing.JRadioButton();
+        USATheme = new javax.swing.JRadioButton();
+        comboTheme = new javax.swing.JRadioButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Team names"));
 
@@ -187,13 +202,6 @@ public class TouchGamePanel extends javax.swing.JPanel {
                     .addComponent(rightTeamName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        playButton.setText("Play!");
-        playButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                playButtonActionPerformed(evt);
-            }
-        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Winning conditions"));
 
@@ -320,6 +328,13 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
+        playButton.setText("Play!");
+        playButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                playButtonActionPerformed(evt);
+            }
+        });
+
         settingsButton.setText("Change settings...");
         settingsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -334,6 +349,38 @@ public class TouchGamePanel extends javax.swing.JPanel {
             }
         });
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Level theme"));
+
+        levelThemeButtonGroup.add(sovietTheme);
+        sovietTheme.setText("Soviet Theme");
+
+        levelThemeButtonGroup.add(USATheme);
+        USATheme.setText("USA Theme");
+
+        levelThemeButtonGroup.add(comboTheme);
+        comboTheme.setText("Combo Theme");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(sovietTheme)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(USATheme)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(comboTheme)
+                .addContainerGap(202, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(sovietTheme)
+                .addComponent(USATheme)
+                .addComponent(comboTheme))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -342,15 +389,18 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(backButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 215, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
                         .addComponent(settingsButton)
-                        .addGap(18, 18, 18)
-                        .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(13, 13, 13))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -358,13 +408,14 @@ public class TouchGamePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(backButton)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(playButton, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                        .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(playButton, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -413,6 +464,15 @@ public class TouchGamePanel extends javax.swing.JPanel {
         settings.setProperty(Settings.KEY_NUM_BLOCKS_CONDITION, numBlocksTextField.getText());
         settings.setProperty(Settings.KEY_TIME_CONDITION, timeTextField.getText());
 
+        if  (sovietTheme.isSelected()) {
+            settings.setProperty(Settings.KEY_WORLD_THEME, "1");
+        }
+        else if (USATheme.isSelected()) {
+            settings.setProperty(Settings.KEY_WORLD_THEME, "2");
+        }
+        else if (USATheme.isSelected()) {
+            settings.setProperty(Settings.KEY_WORLD_THEME, "3");
+        }
         
         if (anyAllComboBox.getSelectedIndex() == 0) {
             settings.setProperty(Settings.KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, "false");
@@ -430,8 +490,10 @@ public class TouchGamePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_playButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton USATheme;
     private javax.swing.JComboBox anyAllComboBox;
     private javax.swing.JButton backButton;
+    private javax.swing.JRadioButton comboTheme;
     private javax.swing.JCheckBox heightConditionCheckBox;
     private javax.swing.JSlider heightSlider;
     private javax.swing.JTextField heightTextField;
@@ -442,13 +504,16 @@ public class TouchGamePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JTextField leftTeamName;
+    private javax.swing.ButtonGroup levelThemeButtonGroup;
     private javax.swing.JCheckBox numBlocksCheckBox;
     private javax.swing.JSlider numBlocksSlider;
     private javax.swing.JTextField numBlocksTextField;
     private javax.swing.JButton playButton;
     private javax.swing.JTextField rightTeamName;
     private javax.swing.JButton settingsButton;
+    private javax.swing.JRadioButton sovietTheme;
     private javax.swing.JCheckBox timeCheckBox;
     private javax.swing.JSlider timeSlider;
     private javax.swing.JTextField timeTextField;

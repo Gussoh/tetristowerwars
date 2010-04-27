@@ -19,13 +19,13 @@ public class BackgroundAnimationFactory {
     private final float groundLevel;
     private final float horizontLevel;
     private float totalElapsedTimeS = 0;
-    private float createTanksAtThisTime = 3;
-    private float createZeppelinAtThisTime = 5;
-    private float createSputnikAtThisTime = 30;
+    private float createGroundVehicleAtThisTime = 3;
+    private float createAirVehicleAtThisTime = 5;
+    private float createTrajectoryVehicleAtThisTime = 30;
     private final float worldWidth;
-    private final static float TANK_INTERVAL_S = 20;
-    private final static float ZEPPELIN_INTERVAL_S = 32;
-    private final static float SPUTNIK_INTERVAL_S = 60;
+    private final static float GROUNDVEHICLE_INTERVAL_S = 20;
+    private final static float AIRVEHICLE_INTERVAL_S = 32;
+    private final static float TRAJETORYVEHICLE_INTERVAL_S = 60;
 
     public BackgroundAnimationFactory(BackgroundAnimationRenderer animationRenderer, float groundLevel, float horizontLevel, float worldWidth) {
         this.animationRenderer = animationRenderer;
@@ -37,15 +37,15 @@ public class BackgroundAnimationFactory {
     public void run(float elapsedTimeS) {
         totalElapsedTimeS += elapsedTimeS;
 
-        if (totalElapsedTimeS > createTanksAtThisTime) {
+        if (totalElapsedTimeS > createGroundVehicleAtThisTime) {
             createGroundFormation();
-            createTanksAtThisTime += TANK_INTERVAL_S;
-        } else if (totalElapsedTimeS > createZeppelinAtThisTime) {
+            createGroundVehicleAtThisTime += GROUNDVEHICLE_INTERVAL_S;
+        } else if (totalElapsedTimeS > createAirVehicleAtThisTime) {
             createAirVehicle();
-            createZeppelinAtThisTime += ZEPPELIN_INTERVAL_S;
-        } else if (totalElapsedTimeS > createSputnikAtThisTime) {
-            createSputnik();
-            createSputnikAtThisTime += SPUTNIK_INTERVAL_S;
+            createAirVehicleAtThisTime += AIRVEHICLE_INTERVAL_S;
+        } else if (totalElapsedTimeS > createTrajectoryVehicleAtThisTime) {
+            createTrajectory();
+            createTrajectoryVehicleAtThisTime += TRAJETORYVEHICLE_INTERVAL_S;
         }
     }
 
@@ -55,20 +55,19 @@ public class BackgroundAnimationFactory {
         float top = horizontLevel - 3;
         float y = MathUtil.random(bottom, top);
 
-
-
         boolean leftToRight = Math.random() < 0.5;
         int tankImage;
         double randomValue = Math.random();
 
-        if (randomValue < 0.33) {
-            tankImage = TANK1;
-        } else if (randomValue < 0.66) {
-            tankImage = TANK2;
+        if (randomValue < 0.25) {
+            tankImage = GROUNDVEHICLE1;
+        } else if (randomValue < 0.50) {
+            tankImage = GROUNDVEHICLE2;
+        } else if (randomValue < 0.75) {
+            tankImage = GROUNDVEHICLE3;
         } else {
-            tankImage = SCUD;
+            tankImage = GROUNDVEHICLE4;
         }
-
 
         int numTanks = (int) (Math.random() * 5) + 3;
 
@@ -116,17 +115,25 @@ public class BackgroundAnimationFactory {
             path = new Path(end, start, travelTime);
         }
 
-        int image = Math.random() < 0.5 ? ZEPPELIN1 : ZEPPELIN2;
+        int airImage;
+        double randomValue = Math.random();
+        if (randomValue < 0.33) {
+            airImage = AIRVEHICLE1;
+        } else if (randomValue < 0.65) {
+            airImage = AIRVEHICLE2;
+        } else {
+            airImage = AIRVEHICLE3;
+        }
 
-        animationRenderer.addAnimation(path, width, image);
+        animationRenderer.addAnimation(path, width, airImage);
     }
 
-    public void createSputnik() {
+    public void createTrajectory() {
 
-        float sputnikWidth = 10;
+        float vehicleWidth = 10;
 
-        float left = -sputnikWidth;
-        float right = worldWidth + sputnikWidth;
+        float left = -vehicleWidth;
+        float right = worldWidth + vehicleWidth;
 
         float top = horizontLevel + 100;
 
@@ -141,6 +148,6 @@ public class BackgroundAnimationFactory {
 
         Path p = new Path(start, end, 15);
 
-        animationRenderer.addAnimation(p, sputnikWidth, SPUTNIK);
+        animationRenderer.addAnimation(p, vehicleWidth, TRAJECTORYVEHICLE);
     }
 }

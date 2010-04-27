@@ -72,7 +72,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     //private float[] mainLightPosition = {0.0f, 0.7071f, 0.7071f, 0.0f};
     private float[] mainLightPosition = {0.2f, 0.7f, 0.7f, 0.0f};
     private long lastTimeMillis;
-    private final MainFrame startFrame;
+    private final MainFrame mainFrame;
     private final boolean lightingEffects;
     private final boolean sceneAntiAliasing;
     private long frameCounter = 0;
@@ -83,13 +83,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     /**
      * 
      * @param gameModel The game model.
-     * @param startFrame The main Frame.
+     * @param mainFrame The main Frame.
      */
-    public GLRenderer(GameModel gameModel, MainFrame startFrame) {
+    public GLRenderer(GameModel gameModel, MainFrame mainFrame) {
         super(gameModel);
-        this.startFrame = startFrame;
+        this.mainFrame = mainFrame;
 
-        Settings settings = startFrame.getSettings();
+        Settings settings = mainFrame.getSettings();
 
         this.lightingEffects = settings.isLightingEnabled();
         this.particleEffects = settings.isParticlesEnabled();
@@ -121,7 +121,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         glCanvas.setAutoSwapBufferMode(true);
         glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
         
-        startFrame.openComponent(glCanvas);
+        mainFrame.openComponent(glCanvas);
         
     }
 
@@ -166,7 +166,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             pointerRenderer = new PointerRenderer(gl);
             effectRenderer = new EffectRenderer(gl, gameModel);
             messageRenderer = new MessageRenderer(gl);
-            backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl);
+            backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl, mainFrame.getSettings().getWorldTheme());
             rectangularBuildingBlockRenderer = new RectangularBuildingBlockRenderer(gl, lightingEffects);
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
             winRenderer = new WinRenderer(gl);
@@ -300,7 +300,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
         try {
-            backgroundRenderer = new BackgroundRenderer(gl, aabb.upperBound.x, renderWorldHeight, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30);
+            backgroundRenderer = new BackgroundRenderer(gl, aabb.upperBound.x, renderWorldHeight, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, mainFrame.getSettings().getWorldTheme());
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
