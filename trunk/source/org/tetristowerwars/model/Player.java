@@ -30,16 +30,21 @@ public class Player {
     // Bodies owned by player, used for fast look-up in graph contruction.
     private final HashSet<Body> towerBodies = new HashSet<Body>();
     private final String name;
+    private final int playerIndex;
     private final float leftLimit;
     private final float rightLimit;
     private BuildingBlock highestBuilingBlockInTower;
     private float towerHeight;
-    private int score = 0;
 
-    protected Player(String name, float leftLimit, float rightLimit) {
+    protected Player(String name, int playerIndex, float leftLimit, float rightLimit) {
         this.name = name;
+        this.playerIndex = playerIndex;
         this.leftLimit = leftLimit;
         this.rightLimit = rightLimit;
+    }
+
+    public int getPlayerIndex() {
+        return playerIndex;
     }
 
     public Set<BuildingBlock> getBuildingBlocks() {

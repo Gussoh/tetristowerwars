@@ -61,8 +61,8 @@ public class TouchGameLogic {
         final float playerAreaWidth = settings.getWorldWidth() * (settings.getPlayerArea() * 0.005f);
 
 
-        Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 0, playerAreaWidth);
-        Player player2 = gameModel.createPlayer(settings.getRightTeamName(), settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
+        Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 1, 0, playerAreaWidth);
+        Player player2 = gameModel.createPlayer(settings.getRightTeamName(), 2, settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
@@ -136,6 +136,7 @@ public class TouchGameLogic {
                             createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
                         }
                     }
+                    //TODO: auto-reset timer ~20s
                 }
             }
         }.start();

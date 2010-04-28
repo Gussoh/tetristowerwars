@@ -53,6 +53,7 @@ public class GameModel {
     private boolean gameIsOver = false;
     private WinningCondition winningCondition = null;
     private Player leader = null;
+    private final Set<MutableEntry<Block, Integer>> blocksToModify = new LinkedHashSet<MutableEntry<Block, Integer>>();
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -113,6 +114,10 @@ public class GameModel {
             winningCondition.reset();
         }
         gameIsOver = false;
+
+        for (GameModelListener gameModelListener : gameModelListeners) {
+            gameModelListener.onGameReset();
+        }
     }
 
     /**
@@ -228,6 +233,20 @@ public class GameModel {
                     gameModelListener.onBlockDestruction(buildingBlock);
                 }
                 world.destroyBody(buildingBlock.getBody());
+            }
+        }
+
+        //Modify any block (right now only used by BulletBlocks)
+        for (Iterator<MutableEntry<Block, Integer>> it = blocksToModify.iterator(); it.hasNext();) {
+            MutableEntry<Block, Integer> mutableEntry = it.next();
+            Block block = mutableEntry.getKey();
+
+            int delay = mutableEntry.getValue();
+            if (delay > 0) {
+                mutableEntry.setValue(delay - 1);
+            } else {
+                it.remove();
+                block.getBody().getShapeList().m_isSensor = false;
             }
         }
 
@@ -432,8 +451,8 @@ public class GameModel {
      * @param rightLimit The right limit/border of this player in world coordinates.
      * @return The created player object.
      */
-    public Player createPlayer(String name, float leftLimit, float rightLimit) {
-        Player player = new Player(name, leftLimit, rightLimit);
+    public Player createPlayer(String name, int playerIndex, float leftLimit, float rightLimit) {
+        Player player = new Player(name, playerIndex, leftLimit, rightLimit);
         players.add(player);
 
         return player;
@@ -482,6 +501,9 @@ public class GameModel {
     }
 
     protected void fireBodyCreationNotification(Block block) {
+        if (block instanceof BulletBlock) {
+            blocksToModify.add(new MutableEntry<Block, Integer>(block, 60));
+        }
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onBlockCreation(block);
         }
