@@ -23,7 +23,7 @@ public abstract class Renderer {
 
     public abstract void renderFrame();
 
-    public abstract Component getMouseInputComponent();
+    public abstract Component getInputComponent();
 
     public abstract Vec2 convertWindowToWorldCoordinates(Point windowCoord);
 

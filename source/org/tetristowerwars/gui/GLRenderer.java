@@ -78,7 +78,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private long frameCounter = 0;
     private long performanceTimer = 0;
     private Semaphore renderingSemaphore = new Semaphore(0);
-    private final boolean particleEffects;
+    private final boolean useParticleEffects;
 
     /**
      * 
@@ -92,7 +92,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         Settings settings = mainFrame.getSettings();
 
         this.lightingEffects = settings.isLightingEnabled();
-        this.particleEffects = settings.isParticlesEnabled();
+        this.useParticleEffects = settings.isParticlesEnabled();
 
         // Anti-aliasing is needed when using lighting for good looking gfx :)
         this.sceneAntiAliasing = lightingEffects;
@@ -120,9 +120,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         glCanvas.addGLEventListener(this);
         glCanvas.setAutoSwapBufferMode(true);
         glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
-        
+
         mainFrame.openComponent(glCanvas);
-        
+
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     }
 
     @Override
-    public Component getMouseInputComponent() {
+    public Component getInputComponent() {
         return glCanvas;
     }
 
@@ -176,15 +176,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
 
         gameModel.addGameModelListener(this);
-        
+
         gl.glEnable(GL_NORMALIZE);
-
         gl.glEnable(GL_BLEND);
-
 
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
 
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, mainLightColor, 0);
@@ -214,7 +211,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         }
         long currentTime = System.currentTimeMillis();
         long startTime = System.nanoTime();
-        float elapsedTimeS = (float)(currentTime - lastTimeMillis) / 1000.0f;
+        float elapsedTimeS = (float) (currentTime - lastTimeMillis) / 1000.0f;
         lastTimeMillis = currentTime;
         frameCounter++;
 
@@ -245,34 +242,37 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints(), lineWidthFactor * 10.0f);
 
 
-        
+
         cannonRenderer.render(gl, gameModel);
 
-
-        for (Player player : gameModel.getPlayers()) {
-            for (BulletBlock bulletBlock : player.getBullets()) {
-                effectRenderer.createBulletTrailEffect(bulletBlock);
+        if (useParticleEffects) {
+            for (Player player : gameModel.getPlayers()) {
+                for (BulletBlock bulletBlock : player.getBullets()) {
+                    effectRenderer.createBulletTrailEffect(bulletBlock);
+                }
             }
         }
 
-        gl.glLineWidth(lineWidthFactor * 4.0f);
+        
         // Render the light effect of the players border when a block changes owner
-        effectRenderer.render(gl, gameModel, elapsedTimeS);
+        effectRenderer.render(gl, gameModel, elapsedTimeS, lineWidthFactor * 4.0f);
         effectRenderer.renderParticles(gl, elapsedTimeS);
 
         bulletRenderer.render(gl, gameModel);
 
-        
+
         backgroundRenderer.renderBottom(gl);
 
         // Render the mouse/finger circles.
         pointerRenderer.render(gl, id2Pointers, elapsedTimeS);
 
         messageRenderer.render(drawable, gameModel, renderWorldHeight, elapsedTimeS);
+        winRenderer.render(gl, gameModel, elapsedTimeS, renderWorldHeight, useParticleEffects);
+
 
         performanceTimer += System.nanoTime() - startTime;
         if (frameCounter % 60 == 0) {
-           // System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
+            // System.out.println("Average render time: " + (performanceTimer / (60 * 1000000f)) + " ms");
             performanceTimer = 0;
         }
 
@@ -319,8 +319,10 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint) {
 
         if (tangentSpeed > 4.0f) {
-            int numParticles = Math.min((int) tangentSpeed, 10);
-            effectRenderer.createFrictionEffect(contactPoint, numParticles);
+            if (useParticleEffects) {
+                int numParticles = Math.min((int) tangentSpeed, 10);
+                effectRenderer.createFrictionEffect(contactPoint, numParticles);
+            }
         }
     }
 
@@ -330,11 +332,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockDestruction(Block block) {
-        if (block instanceof BulletBlock) {
-            effectRenderer.createExplosionEffect(block.getBody().getPosition());
-            effectRenderer.createSmokeEffect(block.getBody().getPosition());
-        } else if (block instanceof BuildingBlock) {
-            effectRenderer.createBuildingBlockDestructionEffect((BuildingBlock) block);
+        if (useParticleEffects) {
+            if (block instanceof BulletBlock) {
+                effectRenderer.createExplosionEffect(block.getBody().getPosition());
+                effectRenderer.createSmokeEffect(block.getBody().getPosition());
+            } else if (block instanceof BuildingBlock) {
+                effectRenderer.createBuildingBlockDestructionEffect((BuildingBlock) block);
+            }
         }
     }
 

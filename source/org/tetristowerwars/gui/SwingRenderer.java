@@ -67,7 +67,7 @@ public class SwingRenderer extends Renderer {
     }
 
     @Override
-    public Component getMouseInputComponent() {
+    public Component getInputComponent() {
         return renderPanel;
     }
 

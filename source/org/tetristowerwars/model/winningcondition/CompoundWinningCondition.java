@@ -32,6 +32,13 @@ public class CompoundWinningCondition extends WinningCondition {
         this.logicType = logicType;
     }
 
+    @Override
+    public void reset() {
+        for (WinningCondition winningCondition : conditions) {
+            winningCondition.reset();
+        }
+    }
+
     /**
      * Checks if the game is over.<br>
      * Depending on the LogicType set for this object the WinningConditions are
