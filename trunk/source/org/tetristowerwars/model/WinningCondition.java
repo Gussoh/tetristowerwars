@@ -51,6 +51,8 @@ public abstract class WinningCondition {
 
         return scores;
     }
+
+    public abstract void reset();
     
     public class ScoreEntry implements Comparable<ScoreEntry>{
         private final Player player;

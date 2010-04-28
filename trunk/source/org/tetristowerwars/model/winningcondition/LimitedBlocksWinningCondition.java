@@ -29,6 +29,11 @@ public class LimitedBlocksWinningCondition extends WinningCondition {
     }
 
     @Override
+    public void reset() {
+        startTimeMs = 0;
+    }
+
+    @Override
     public List<MessageEntry> getStatusMessages() {
         ArrayList<MessageEntry> messages = new ArrayList<MessageEntry>();
 

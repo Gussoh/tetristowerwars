@@ -45,7 +45,6 @@ public class GameModel {
     private final BulletFactory bulletFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
-    private final Set<BuildingBlock> potientialBulletBlock = new LinkedHashSet<BuildingBlock>();
     private float timeTakenToExecuteUpdateMs;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
@@ -89,6 +88,31 @@ public class GameModel {
         world.setBoundaryListener(physicsEngineListener);
         world.setContactListener(physicsEngineListener);
         world.setContactFilter(physicsEngineListener);
+    }
+
+    public void reset() {
+        int i = 0;
+        for (BuildingBlock buildingBlock : buildingBlockPool) {
+            blocksToRemove.add(new MutableEntry<Block, Integer>(buildingBlock, i));
+            i += 2;
+        }
+
+        for (Player player : players) {
+            for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
+                blocksToRemove.add(new MutableEntry<Block, Integer>(buildingBlock, i));
+                i += 2;
+            }
+
+            for (BulletBlock bulletBlock : player.getBullets()) {
+                blocksToRemove.add(new MutableEntry<Block, Integer>(bulletBlock, i));
+                i += 2;
+            }
+        }
+
+        if (winningCondition != null) {
+            winningCondition.reset();
+        }
+        gameIsOver = false;
     }
 
     /**
@@ -212,16 +236,18 @@ public class GameModel {
             player.calcHighestBuildingBlockInTower(groundBlock, groundLevel);
         }
 
-        if (winningCondition.getLeader().getPlayer() != leader) {
-            leader = winningCondition.getLeader().getPlayer();
-            for (GameModelListener gameModelListener : gameModelListeners) {
-                gameModelListener.onLeaderChanged(leader);
+        if (winningCondition != null) {
+            if (winningCondition.getLeader().getPlayer() != leader) {
+                leader = winningCondition.getLeader().getPlayer();
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onLeaderChanged(leader);
+                }
             }
-        }
-        if (winningCondition.gameIsOver() && !gameIsOver) {
-            gameIsOver = true;
-            for (GameModelListener gameModelListener : gameModelListeners) {
-                gameModelListener.onWinningConditionFulfilled(winningCondition);
+            if (winningCondition.gameIsOver() && !gameIsOver) {
+                gameIsOver = true;
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onWinningConditionFulfilled(winningCondition);
+                }
             }
         }
 
@@ -580,7 +606,6 @@ public class GameModel {
         private boolean shouldBuildingBlockCollideWithCannon(BuildingBlock bb) {
             BuildingBlockJoint bbj = getAttachedJoint(bb);
             if (bbj != null) {
-                potientialBulletBlock.add(bb);
                 return false;
             }
 

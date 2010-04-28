@@ -29,8 +29,13 @@ public class HeightWinningCondition extends WinningCondition {
         super(model);
         this.height = height;
         this.winningTimeMs = winningTimeS * 1000;
+        reset();
     }
 
+    @Override
+    public void reset() {
+        startTimeMs = 0;
+    }
    
     public boolean hasCandidate() {
         ScoreEntry score = getLeader();

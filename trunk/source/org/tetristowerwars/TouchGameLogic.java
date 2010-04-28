@@ -6,6 +6,8 @@ package org.tetristowerwars;
 
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
@@ -35,6 +37,8 @@ import org.tetristowerwars.util.MathUtil;
  */
 public class TouchGameLogic {
 
+    private boolean resetGame = false;
+
     public TouchGameLogic(MainFrame frame) {
 
         frame.disableMouseEmulation();
@@ -47,9 +51,9 @@ public class TouchGameLogic {
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, frame);
 
         final SoundPlayer soundPlayer = new SoundPlayer(gameModel, settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
-        
-        final InputManager mouseInputManager = new MouseInputManager(glRenderer.getMouseInputComponent());
-        final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getMouseInputComponent());
+
+        final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());
+        final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getInputComponent());
 
         final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
         final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
@@ -80,7 +84,16 @@ public class TouchGameLogic {
         CompoundWinningCondition.LogicType logicType = settings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;
         CompoundWinningCondition cwc = new CompoundWinningCondition(gameModel, winningConditions, logicType);
         cwc.setWinningCondition();
-        
+
+        glRenderer.getInputComponent().addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_R) {
+                    resetGame = true;
+                }
+            }
+        });
 
         new Thread() {
 
@@ -88,7 +101,7 @@ public class TouchGameLogic {
             public void run() {
                 final float constantStepTimeS = 1f / 60f;
                 long lastStepTimeNano = System.nanoTime();
-                
+
                 for (;;) {
                     Thread.yield();
 
@@ -103,6 +116,10 @@ public class TouchGameLogic {
                     while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
                         mouseController.pumpEvents();
                         touchController.pumpEvents();
+                        if (resetGame) {
+                            gameModel.reset();
+                            resetGame = false;
+                        }
                         gameModel.update();
                         numTimesStepped++;
                         stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
@@ -114,7 +131,7 @@ public class TouchGameLogic {
                         glRenderer.renderFrame();
                     }
 
-                    if (gameModel.getBuildingBlockPool().size() <= 1) {
+                    if (gameModel.getBuildingBlockPool().size() <= 2) {
                         for (int i = 0; i < 7; i++) {
                             createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
                         }
@@ -125,7 +142,7 @@ public class TouchGameLogic {
 
     }
 
-    public static void createRandomBuildingBlock(GameModel gameModel, float left, float right) {
+    public void createRandomBuildingBlock(GameModel gameModel, float left, float right) {
 
         BuildingBlockFactory bbf = gameModel.getBuildingBlockFactory();
         double randomValue = Math.random() * 3;

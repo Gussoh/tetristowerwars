@@ -17,6 +17,7 @@ import org.tetristowerwars.model.WinningCondition;
 public class TimedWinningCondition extends WinningCondition {
 
     private long endTimeMs;
+    private final long gameTime;
 
     /**
      *
@@ -25,8 +26,15 @@ public class TimedWinningCondition extends WinningCondition {
      */
     public TimedWinningCondition(GameModel model, long gameTime) {
         super(model);
+        this.gameTime = gameTime;
+        reset();
+    }
+
+    @Override
+    public void reset() {
         endTimeMs = System.currentTimeMillis() + gameTime * 1000;
     }
+
 
     @Override
     public boolean gameIsOver() {

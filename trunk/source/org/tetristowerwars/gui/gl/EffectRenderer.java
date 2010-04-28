@@ -126,7 +126,7 @@ public class EffectRenderer {
         bulletTrailParticleEngine.addStepFunction(new FadeOutStepFunction(0.0f));
     }
 
-    public void render(GL gl, GameModel gameModel, float elapsedTimeS) {
+    public void render(GL gl, GameModel gameModel, float elapsedTimeS, float lineWidth) {
         for (Iterator<Path> it = animations.keySet().iterator(); it.hasNext();) {
             Path p = it.next();
 
@@ -176,6 +176,7 @@ public class EffectRenderer {
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         gl.glColorPointer(4, GL_FLOAT, 0, colorBuffer);
 
+        gl.glLineWidth(lineWidth);
         gl.glDrawArrays(GL_LINES, 0, numVertices);
 
         gl.glDisableClientState(GL_COLOR_ARRAY);
