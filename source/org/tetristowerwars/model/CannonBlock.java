@@ -17,7 +17,6 @@ public class CannonBlock extends Block {
     private final float force;
     private final float coolDown;
     private float remainingCoolDown;
-    private final long lastShot = 0;
     private float angleValue = 0;
     private float speedFactor = 1f;
     private final boolean shootingToLeft;
@@ -36,11 +35,7 @@ public class CannonBlock extends Block {
     }
 
     public float getForce() {
-        if (shotMaterial == null) {
-            return force;
-        } else {
-            return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 10.0f, 0.7f, 6.0f);
-        }
+        return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 10.0f, 0.7f, 6.0f);
     }
 
 

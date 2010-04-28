@@ -372,4 +372,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onLeaderChanged(Player leader) {
     }
+
+    @Override
+    public void onGameReset() {
+    }
 }

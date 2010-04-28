@@ -13,7 +13,7 @@ import org.jbox2d.common.Vec2;
  * @author Andreas
  */
 public interface GameModelListener {
-    public abstract void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint);
+    public void onBlockCollision(Block block1, Block block2, float collisionSpeed, float tangentSpeed, Vec2 contactPoint);
 
     public void onJointCreation(BuildingBlockJoint blockJoint);
 
@@ -27,5 +27,7 @@ public interface GameModelListener {
 
     public void onWinningConditionFulfilled(WinningCondition condition);
 
-    public abstract void onLeaderChanged(Player leader);
+    public void onLeaderChanged(Player leader);
+
+    public void onGameReset();
 }

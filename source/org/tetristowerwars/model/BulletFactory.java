@@ -11,7 +11,6 @@ import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.tetristowerwars.model.material.Material;
-import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *

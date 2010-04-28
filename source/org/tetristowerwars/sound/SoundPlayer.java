@@ -51,12 +51,13 @@ public class SoundPlayer implements GameModelListener {
     private static final String[] explosionSounds = new String[]{"explosion.mp3"};
     private static final String[] cannonFireSounds = new String[]{"cannonfire.mp3"};
     private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"};
+    private static final String[] winningMusic = new String[]{"soviet.mp3", "usa.mp3"};
     private static final String select = "select.wav";
     private static final String deselect = "deselect.wav";
     private static final String ownerChanged = "ownerchanged.mp3";
     private static final String zap = "zap.wav";
-    SourceDataLine sourceDataLine;
-    AudioInputStream audioInputStream;
+    PlayThread playThread;
+    private boolean triggerWin = true;
 
     public SoundPlayer(GameModel gameModel, boolean musicEnabled, boolean soundEffectsEnabled) {
         this.gameModel = gameModel;
@@ -87,10 +88,9 @@ public class SoundPlayer implements GameModelListener {
             }
         }
         if (musicEnabled) {
-            playMusic();
+            playMusic(new File(soundLocation + getRandomIndex(music)));
         }
     }
-
 
     public Clip loadSound(String filename) {
         System.out.println("loading " + filename);
@@ -222,39 +222,36 @@ public class SoundPlayer implements GameModelListener {
         return data[(int) (Math.random() * data.length)];
     }
 
-    private void playMusic() {
+    private void playMusic(File musicFile) {
+        AudioInputStream in;
         try {
-            AudioInputStream in = AudioSystem.getAudioInputStream(new File(soundLocation + getRandomIndex(music)));
-
-            AudioFormat baseFormat = in.getFormat();
-            AudioFormat decodedFormat = new AudioFormat(
-                    AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
-                    baseFormat.getSampleRate(), // sample rate (same as base format)
-                    16, // sample size in bits
-                    baseFormat.getChannels(), // # of Channels
-                    baseFormat.getChannels() * 2, // Frame Size
-                    baseFormat.getSampleRate(), // Frame Rate
-                    false // Big Endian
-                    );
-
-            audioInputStream = AudioSystem.getAudioInputStream(decodedFormat, in);
-
-            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, decodedFormat);
-            sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-            sourceDataLine.open(decodedFormat);
-            sourceDataLine.start();
-
-//Create a thread to play back
-// the data and start it
-// running. It will run until
-// all the data has been played
-// back.
-            Thread playThread = new Thread(new PlayThread());
-            playThread.start();
-        } catch (Exception e) {
-            System.out.println(e);
-            System.exit(0);
+            in = AudioSystem.getAudioInputStream(musicFile);
+        } catch (UnsupportedAudioFileException ex) {
+            System.out.println("Sound file format not supported!");
+            return;
+        } catch (IOException ex) {
+            System.out.println("Error when reading file!");
+            return;
         }
+
+        AudioFormat baseFormat = in.getFormat();
+        AudioFormat decodedFormat = new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
+                baseFormat.getSampleRate(), // sample rate (same as base format)
+                16, // sample size in bits
+                baseFormat.getChannels(), // # of Channels
+                baseFormat.getChannels() * 2, // Frame Size
+                baseFormat.getSampleRate(), // Frame Rate
+                false // Big Endian
+                );
+
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(decodedFormat, in);
+
+        if (playThread != null) {
+            playThread.stopMusic();
+        }
+        playThread = new PlayThread(audioInputStream);
+        playThread.start();
     }
 
     @Override
@@ -266,44 +263,21 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onWinningConditionFulfilled(WinningCondition condition) {
+        if (triggerWin) {
+            triggerWin = false;
+            System.out.println("playing winningsound!");
+            playMusic(new File(soundLocation + winningMusic[gameModel.getLeader().getPlayerIndex()-1]));
+        }
+    }
+
+    @Override
+    public void onGameReset() {
+        triggerWin = true;
+        playMusic(new File(soundLocation + getRandomIndex(music)));
     }
 
     @Override
     public void onLeaderChanged(Player leader) {
-    }
-
-    class PlayThread extends Thread {
-
-        byte tempBuffer[] = new byte[10000];
-
-        @Override
-        public void run() {
-            try {
-                int cnt;
-//Keep looping until the input
-// read method returns -1 for
-// empty stream.
-                while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
-                    if (cnt > 0) {
-//Write data to the internal
-// buffer of the data line
-// where it will be delivered
-// to the speaker.
-                        sourceDataLine.write(tempBuffer, 0, cnt);
-                    }
-                }
-//Block and wait for internal
-// buffer of the data line to
-// empty.
-                sourceDataLine.drain();
-                sourceDataLine.close();
-
-                playMusic();
-            } catch (Exception e) {
-                System.out.println(e);
-                System.exit(0);
-            }
-        }
     }
 
     @Override
@@ -330,7 +304,6 @@ public class SoundPlayer implements GameModelListener {
         } else {
             playSound(zap, .6f);
         }
-
     }
 
     @Override
@@ -351,6 +324,62 @@ public class SoundPlayer implements GameModelListener {
         public AudioData(byte[] data, AudioFormat audioFormat) {
             this.data = data;
             this.audioFormat = audioFormat;
+        }
+    }
+
+    class PlayThread extends Thread {
+
+        private byte tempBuffer[] = new byte[5000];
+        private boolean isAlive = true;
+        private final AudioInputStream audioInputStream;
+        private SourceDataLine sourceDataLine = null;
+
+        public PlayThread(AudioInputStream audioInputStream) {
+            this.audioInputStream = audioInputStream;
+            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioInputStream.getFormat());
+            try {
+                sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+                sourceDataLine.open(audioInputStream.getFormat());
+                sourceDataLine.start();
+            } catch (LineUnavailableException ex) {
+                System.out.println("Sound card not available!");
+            }
+        }
+
+        public void stopMusic() {
+            isAlive = false;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int cnt;
+                //Keep looping until the input
+                // read method returns -1 for
+                // empty stream.
+                while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1 && isAlive) {
+                    if (cnt > 0) {
+                        //Write data to the internal
+                        // buffer of the data line
+                        // where it will be delivered
+                        // to the speaker.
+                        sourceDataLine.write(tempBuffer, 0, cnt);
+                    }
+                }
+                //Block and wait for internal
+                // buffer of the data line to
+                // empty.
+                sourceDataLine.drain();
+                sourceDataLine.close();
+
+                if (triggerWin) {
+                    playMusic(new File(soundLocation + getRandomIndex(music)));
+                }
+
+            } catch (Exception e) {
+                System.out.println(e);
+                System.exit(0);
+            }
         }
     }
 }
