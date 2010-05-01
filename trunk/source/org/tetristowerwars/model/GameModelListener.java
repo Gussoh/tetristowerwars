@@ -5,7 +5,6 @@
 
 package org.tetristowerwars.model;
 
-import java.util.ArrayList;
 import org.jbox2d.common.Vec2;
 
 /**

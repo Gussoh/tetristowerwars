@@ -42,7 +42,6 @@ public class SoundPlayer implements GameModelListener {
 
     private final Map<String, List<Clip>> clipDB = new HashMap<String, List<Clip>>();
     private final Map<String, AudioData> audioDataDB = new HashMap<String, AudioData>();
-    private GameModel gameModel;
     private String soundLocation = "res/sound/";
     private Mixer.Info mixer = null;
     private static final int MAX_CLIPS = 4;
@@ -58,9 +57,12 @@ public class SoundPlayer implements GameModelListener {
     private static final String zap = "zap.wav";
     PlayThread playThread;
     private boolean triggerWin = true;
+    private boolean musicEnabled;
+    private boolean soundEffectsEnabled;
 
-    public SoundPlayer(GameModel gameModel, boolean musicEnabled, boolean soundEffectsEnabled) {
-        this.gameModel = gameModel;
+    public SoundPlayer(boolean musicEnabled, boolean soundEffectsEnabled) {
+        this.musicEnabled = musicEnabled;
+        this.soundEffectsEnabled = soundEffectsEnabled;
         for (javax.sound.sampled.Mixer.Info info : AudioSystem.getMixerInfo()) {
             if (info.getName().contains("Java Sound Audio Engine")) {
                 mixer = info;
@@ -68,7 +70,6 @@ public class SoundPlayer implements GameModelListener {
             }
         }
         if (soundEffectsEnabled) {
-            gameModel.addGameModelListener(this);
             System.out.println("- Preloading sounds");
             getFirstAvailable(select);
             getFirstAvailable(deselect);
@@ -178,38 +179,37 @@ public class SoundPlayer implements GameModelListener {
     }
 
     public void playSound(String filename, float volume, boolean repeat) {
+        if (soundEffectsEnabled) {
+            //System.out.println("playing " + filename + " at volume " + volume);
+            Clip clip = getFirstAvailable(filename);
 
+            if (clip != null) {
+                if (!clip.isActive()) {
+                    clip.stop();
+                    clip.flush();
 
-        //System.out.println("playing " + filename + " at volume " + volume);
-        Clip clip = getFirstAvailable(filename);
+                    FloatControl gainControl = null;
+                    if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                        gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                    }
 
-        if (clip != null) {
-            if (!clip.isActive()) {
-                clip.stop();
-                clip.flush();
+                    FloatControl panControl = null;
+                    if (clip.isControlSupported(FloatControl.Type.PAN)) {
+                        panControl = (FloatControl) clip.getControl(FloatControl.Type.PAN);
+                    }
 
+                    if (gainControl != null) {
+                        float min = gainControl.getMinimum();
+                        float max = gainControl.getMaximum();
+                        float value = MathUtil.lerp(volume, 0.0f, 1.0f, MathUtil.lerpNoCap(0.5f, gainControl.getMinimum(), gainControl.getMaximum()), MathUtil.lerpNoCap(0.9f, gainControl.getMinimum(), gainControl.getMaximum()));
 
-                FloatControl gainControl = null;
-                if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                    gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                        //System.out.println("Found gain control: " + gainControl);
+                        gainControl.setValue(value);
+                    }
+
+                    clip.loop(repeat ? Clip.LOOP_CONTINUOUSLY : 0);
+                    //System.out.println("Active: " + clip.isActive());
                 }
-
-                FloatControl panControl = null;
-                if (clip.isControlSupported(FloatControl.Type.PAN)) {
-                    panControl = (FloatControl) clip.getControl(FloatControl.Type.PAN);
-                }
-
-                if (gainControl != null) {
-                    float min = gainControl.getMinimum();
-                    float max = gainControl.getMaximum();
-                    float value = MathUtil.lerp(volume, 0.0f, 1.0f, MathUtil.lerpNoCap(0.5f, gainControl.getMinimum(), gainControl.getMaximum()), MathUtil.lerpNoCap(0.9f, gainControl.getMinimum(), gainControl.getMaximum()));
-
-                    //System.out.println("Found gain control: " + gainControl);
-                    gainControl.setValue(value);
-                }
-
-                clip.loop(repeat ? Clip.LOOP_CONTINUOUSLY : 0);
-                //System.out.println("Active: " + clip.isActive());
             }
         }
     }
@@ -223,35 +223,37 @@ public class SoundPlayer implements GameModelListener {
     }
 
     private void playMusic(File musicFile) {
-        AudioInputStream in;
-        try {
-            in = AudioSystem.getAudioInputStream(musicFile);
-        } catch (UnsupportedAudioFileException ex) {
-            System.out.println("Sound file format not supported!");
-            return;
-        } catch (IOException ex) {
-            System.out.println("Error when reading file!");
-            return;
+        if (musicEnabled) {
+            AudioInputStream in;
+            try {
+                in = AudioSystem.getAudioInputStream(musicFile);
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println("Sound file format not supported!");
+                return;
+            } catch (IOException ex) {
+                System.out.println("Error when reading file!");
+                return;
+            }
+
+            AudioFormat baseFormat = in.getFormat();
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
+                    baseFormat.getSampleRate(), // sample rate (same as base format)
+                    16, // sample size in bits
+                    baseFormat.getChannels(), // # of Channels
+                    baseFormat.getChannels() * 2, // Frame Size
+                    baseFormat.getSampleRate(), // Frame Rate
+                    false // Big Endian
+                    );
+
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(decodedFormat, in);
+
+            if (playThread != null) {
+                playThread.stopMusic();
+            }
+            playThread = new PlayThread(audioInputStream);
+            playThread.start();
         }
-
-        AudioFormat baseFormat = in.getFormat();
-        AudioFormat decodedFormat = new AudioFormat(
-                AudioFormat.Encoding.PCM_SIGNED, // Encoding to use
-                baseFormat.getSampleRate(), // sample rate (same as base format)
-                16, // sample size in bits
-                baseFormat.getChannels(), // # of Channels
-                baseFormat.getChannels() * 2, // Frame Size
-                baseFormat.getSampleRate(), // Frame Rate
-                false // Big Endian
-                );
-
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(decodedFormat, in);
-
-        if (playThread != null) {
-            playThread.stopMusic();
-        }
-        playThread = new PlayThread(audioInputStream);
-        playThread.start();
     }
 
     @Override
@@ -266,14 +268,15 @@ public class SoundPlayer implements GameModelListener {
         if (triggerWin) {
             triggerWin = false;
             System.out.println("playing winningsound!");
-            playMusic(new File(soundLocation + winningMusic[gameModel.getLeader().getPlayerIndex()-1]));
+            playMusic(new File(soundLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex()-1]));
         }
     }
 
     @Override
     public void onGameReset() {
-        triggerWin = true;
+        System.out.println("sound reset");
         playMusic(new File(soundLocation + getRandomIndex(music)));
+        triggerWin = true;
     }
 
     @Override
@@ -330,7 +333,8 @@ public class SoundPlayer implements GameModelListener {
     class PlayThread extends Thread {
 
         private byte tempBuffer[] = new byte[5000];
-        private boolean isAlive = true;
+        private boolean keepPlaying = true;
+        private boolean playNextSong = false;
         private final AudioInputStream audioInputStream;
         private SourceDataLine sourceDataLine = null;
 
@@ -347,32 +351,29 @@ public class SoundPlayer implements GameModelListener {
         }
 
         public void stopMusic() {
-            isAlive = false;
+            keepPlaying = false;
         }
 
         @Override
         public void run() {
             try {
                 int cnt;
-                //Keep looping until the input
-                // read method returns -1 for
-                // empty stream.
-                while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1 && isAlive) {
+                //Keep looping until the input read method returns -1 for empty stream.
+                while (keepPlaying && (cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
                     if (cnt > 0) {
-                        //Write data to the internal
-                        // buffer of the data line
-                        // where it will be delivered
-                        // to the speaker.
+                        //Write data to the internal buffer of the data line
+                        //where it will be delivered to the speaker.
                         sourceDataLine.write(tempBuffer, 0, cnt);
                     }
+                    else {
+                        playNextSong = true;
+                    }
                 }
-                //Block and wait for internal
-                // buffer of the data line to
-                // empty.
+                //Block and wait for internal buffer of the data line to empty.
                 sourceDataLine.drain();
                 sourceDataLine.close();
 
-                if (triggerWin) {
+                if (playNextSong) {
                     playMusic(new File(soundLocation + getRandomIndex(music)));
                 }
 

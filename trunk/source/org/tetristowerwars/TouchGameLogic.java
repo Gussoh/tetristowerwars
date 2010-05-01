@@ -38,6 +38,8 @@ import org.tetristowerwars.util.MathUtil;
 public class TouchGameLogic {
 
     private boolean resetGame = false;
+    private boolean timedReset = true;
+    private long resetTime = 0;
 
     public TouchGameLogic(MainFrame frame) {
 
@@ -50,7 +52,8 @@ public class TouchGameLogic {
         final GameModel gameModel = new GameModel(settings.getWorldWidth(), settings.getWorldHeight(), settings.getGroundHeight(), settings.getBlockSize());
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, frame);
 
-        final SoundPlayer soundPlayer = new SoundPlayer(gameModel, settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
+        final SoundPlayer soundPlayer = new SoundPlayer( settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
+        gameModel.addGameModelListener(soundPlayer);
 
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());
         final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getInputComponent());
@@ -136,7 +139,18 @@ public class TouchGameLogic {
                             createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
                         }
                     }
-                    //TODO: auto-reset timer ~20s
+                    
+                    if (gameModel.getWinningCondition().gameIsOver()) {
+                        if (timedReset) {
+                            resetTime = System.currentTimeMillis() + 10000;
+                            timedReset = false;
+                        }
+                        else if (System.currentTimeMillis() >= resetTime) {
+                            System.out.println("RESETTING");
+                            timedReset = true;
+                            gameModel.reset();
+                        }
+                    }
                 }
             }
         }.start();
