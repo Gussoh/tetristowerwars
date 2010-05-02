@@ -39,36 +39,6 @@ public class CompoundWinningCondition extends WinningCondition {
         }
     }
 
-    /**
-     * Checks if the game is over.<br>
-     * Depending on the LogicType set for this object the WinningConditions are
-     * checked with AND-logic (all must be true) or OR-logic (any must be true).
-     *
-     * @return true if the game is over, else false
-     */
-    @Override
-    public boolean gameIsOver() {
-        switch (logicType) {
-            case AND:
-                for (WinningCondition winningCondition : conditions) {
-                    if (!winningCondition.gameIsOver()) {
-                        return false;
-                    }
-                }
-                return true;
-
-            case OR:
-                for (WinningCondition winningCondition : conditions) {
-                    if (winningCondition.gameIsOver()) {
-                        return true;
-                    }
-                }
-                return false;
-
-            default:
-                return false;
-        }
-    }
 
     public LogicType getLogicType() {
         return logicType;
@@ -87,7 +57,6 @@ public class CompoundWinningCondition extends WinningCondition {
      * Can be either AND or OR.
      */
     public enum LogicType {
-
         AND, OR
     }
 

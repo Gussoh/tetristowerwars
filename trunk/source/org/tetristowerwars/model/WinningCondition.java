@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.model;
 
 import java.util.ArrayList;
@@ -14,7 +13,9 @@ import java.util.List;
  * @author Reeen
  */
 public abstract class WinningCondition {
+
     protected final GameModel model;
+    private int lastTimeLeftUntilGameOver = -1;
 
     public WinningCondition(GameModel model) {
         this.model = model;
@@ -25,6 +26,14 @@ public abstract class WinningCondition {
     }
 
     public boolean gameIsOver() {
+        int timeLeft = timeLeftUntilGameOver();
+        System.out.println("LEL");
+        if (timeLeft != lastTimeLeftUntilGameOver) {
+            System.out.println("LELL");
+            lastTimeLeftUntilGameOver = timeLeft;
+            model.fireTimeLeftBeat(timeLeft);
+        }
+        
         return timeLeftUntilGameOver() == 0;
     }
 
@@ -53,12 +62,13 @@ public abstract class WinningCondition {
     }
 
     public abstract void reset();
-    
-    public class ScoreEntry implements Comparable<ScoreEntry>{
+
+    public class ScoreEntry implements Comparable<ScoreEntry> {
+
         private final Player player;
         private final int score;
 
-        private ScoreEntry (Player player, int score) {
+        private ScoreEntry(Player player, int score) {
             this.player = player;
             this.score = score;
         }
@@ -78,6 +88,7 @@ public abstract class WinningCondition {
     }
 
     public class MessageEntry {
+
         private final String text;
         private final MessageType type;
         private final Player player;
@@ -88,7 +99,7 @@ public abstract class WinningCondition {
          * @param type For formatting
          * @param player Null for a general message
          */
-        public MessageEntry (String text, MessageType type, Player player) {
+        public MessageEntry(String text, MessageType type, Player player) {
             this.text = text;
             this.type = type;
             this.player = player;
@@ -108,6 +119,7 @@ public abstract class WinningCondition {
     }
 
     public enum MessageType {
+
         NORMAL, CRITICAL
     }
 }

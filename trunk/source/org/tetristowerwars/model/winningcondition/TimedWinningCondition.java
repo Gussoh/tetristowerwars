@@ -61,7 +61,7 @@ public class TimedWinningCondition extends WinningCondition {
         long time = endTimeMs - System.currentTimeMillis();
         ArrayList<MessageEntry> message = new ArrayList<MessageEntry>(1);
         MessageType type = time < 10000 ? MessageType.CRITICAL : MessageType.NORMAL;
-        message.add(new MessageEntry("Time remaining: " + Math.max(Math.round(time/1000), 0), type, null));
+        message.add(new MessageEntry("Time remaining: " + Math.max(time / 1000 + 1, 0), type, null));
         return message;
     }
 
