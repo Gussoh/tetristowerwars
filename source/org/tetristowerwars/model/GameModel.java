@@ -513,6 +513,12 @@ public class GameModel {
         }
     }
 
+    protected void fireTimeLeftBeat(int timeLestS) {
+        for (GameModelListener gameModelListener : gameModelListeners) {
+            gameModelListener.onTimerBeat(timeLestS);
+        }
+    }
+
     protected World getWorld() {
         return world;
     }

@@ -332,7 +332,9 @@ public class SoundPlayer implements GameModelListener {
         playSound(ownerChanged, 0.95f);
     }
 
+    @Override
     public void onTimerBeat(int beatsLeft) {
+        System.out.println("BEAT");
         playSound(beep, 0.5f);
     }
 
