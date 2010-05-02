@@ -290,7 +290,7 @@ public class GameModel {
      * @return An unmodifiable version of the buildingBlockPool.
      */
     public Set<BuildingBlock> getBuildingBlockPool() {
-        return Collections.unmodifiableSet(buildingBlockPool);
+        return Collections.unmodifiableSet(new LinkedHashSet<BuildingBlock>(buildingBlockPool));
     }
 
     public float getBlockSize() {
@@ -444,7 +444,7 @@ public class GameModel {
      * @return An unmodifiable set of the building block joints.
      */
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {
-        return Collections.unmodifiableSet(buildingBlockJoints);
+        return Collections.unmodifiableSet(new LinkedHashSet<BuildingBlockJoint>(buildingBlockJoints));
     }
 
     /**
