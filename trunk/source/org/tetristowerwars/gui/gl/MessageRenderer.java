@@ -53,18 +53,19 @@ public class MessageRenderer {
         textRenderer.begin3DRendering();
 
         float centerXPos = gameModel.getWorldBoundries().upperBound.x * 0.5f;
+        float centerYPos = renderWorldHeight * 0.5f;
 
         if (gameModel.getWinningCondition().gameIsOver()) {
             ArrayList<TextEntry> leaderEntry = new ArrayList<TextEntry>();
             leaderEntry.add(new TextEntry(gameModel.getLeader().getName() + " wins!"));
             textRenderer.setColor(1.0f, 1.0f, 0.7f, 1.0f);
-            renderText(leaderEntry, centerXPos, renderWorldHeight * 0.5f, true, true, 4.0f);
+            renderText(leaderEntry, centerXPos, centerYPos, true, true, 4.0f);
         } else if (timeLeftSizeColorAnimation != null) {
             ArrayList<TextEntry> timeLeftEntry = new ArrayList<TextEntry>();
             timeLeftEntry.add(new TextEntry(gameModel.getWinningCondition().getLeader().getPlayer().getName() + " wins in " + timeLeft + " seconds."));
             Vec2 sizeColor = timeLeftSizeColorAnimation.getCurrentPosition();
             textRenderer.setColor(1.0f, sizeColor.y, sizeColor.y, 1.0f);
-            renderText(timeLeftEntry, centerXPos, renderWorldHeight * 0.5f, true, true, sizeColor.x * 2);
+            renderText(timeLeftEntry, centerXPos, centerYPos, true, true, sizeColor.x * 2);
         }
 
         List<TextEntry> winningConditionTexts = new LinkedList<TextEntry>();
@@ -80,7 +81,7 @@ public class MessageRenderer {
             }
         }
 
-        renderText(winningConditionTexts, centerXPos, gameModel.getGroundLevel() - 7, true, true, 1.0f);
+        renderText(winningConditionTexts, centerXPos, renderWorldHeight * 0.7f, true, true, 6.0f);
 
         for (Player player : gameModel.getPlayers()) {
             textRenderer.setColor(1.0f, 1.0f, 1.0f, 0.8f);

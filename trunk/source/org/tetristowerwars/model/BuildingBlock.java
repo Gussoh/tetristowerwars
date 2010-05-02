@@ -6,6 +6,7 @@ package org.tetristowerwars.model;
 
 import org.jbox2d.collision.MassData;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World;
 import org.tetristowerwars.model.material.Material;
 
 /**
@@ -32,4 +33,5 @@ public abstract class BuildingBlock extends Block {
     public MassData getOriginalMassData() {
         return massData;
     }
+
 }

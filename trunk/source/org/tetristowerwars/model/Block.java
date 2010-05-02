@@ -5,6 +5,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World;
 
 /**
  *
@@ -14,13 +15,20 @@ public abstract class Block {
 
     private final Body body;
     private Player owner;
-
+    private boolean destroyed = false;
 
     public Block(Body body) {
         this.body = body;
         body.setUserData(this);
     }
 
+
+    protected void destroyBody(World world) {
+        if (!destroyed) {
+            destroyed = true;
+            world.destroyBody(body);
+        }
+    }
 
     public Body getBody() {
         return body;

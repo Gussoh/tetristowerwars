@@ -48,15 +48,15 @@ public class Player {
     }
 
     public Set<BuildingBlock> getBuildingBlocks() {
-        return Collections.unmodifiableSet(new LinkedHashSet<BuildingBlock>(buildingBlocks));
+        return Collections.unmodifiableSet(buildingBlocks);
     }
 
     public Set<CannonBlock> getCannons() {
-        return Collections.unmodifiableSet(new LinkedHashSet<CannonBlock>(cannons));
+        return Collections.unmodifiableSet(cannons);
     }
 
     public Set<BulletBlock> getBullets() {
-        return Collections.unmodifiableSet(new LinkedHashSet<BulletBlock>(bullets));
+        return Collections.unmodifiableSet(bullets);
     }
 
     protected void addCannon(CannonBlock cannonBlock) {

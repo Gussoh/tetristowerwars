@@ -16,6 +16,7 @@ import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.CannonBlock;
+import org.tetristowerwars.model.TriggerBlock;
 
 /**
  *
@@ -47,14 +48,14 @@ public class Controller implements InputListener {
             return; // Ignore TUIO bugs where an ID can appear twice on the screen
         }
 
-        Block collisionBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()));
+        Block selectedBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(event.getPosition()));
 
-        if (collisionBlock == null) {
+        if (selectedBlock == null) {
             renderer.putCursorPoint(event.getActionId(), event.getPosition(), false);
             return;
         }
 
-        if (collisionBlock instanceof BuildingBlock) {
+        if (selectedBlock instanceof BuildingBlock) {
             // Check if a building block joint already exists for this action id
            /* if (actionIdToJoint.containsKey(event.getActionId()) == true) {
             // TODO: Do we really remove the old actionId? Workaround remove it.
@@ -63,11 +64,14 @@ public class Controller implements InputListener {
 
             renderer.putCursorPoint(event.getActionId(), event.getPosition(), true);
 
-            actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) collisionBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
-        } else if (collisionBlock instanceof CannonBlock) {
+            actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) selectedBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
+        } else if (selectedBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
             //gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
-        } else if (collisionBlock instanceof BulletBlock) {
+        } else if (selectedBlock instanceof BulletBlock) {
+        } else if (selectedBlock instanceof TriggerBlock) {
+            TriggerBlock triggerBlock = (TriggerBlock) selectedBlock;
+            triggerBlock.getRunnable().run();
         }
     }
 

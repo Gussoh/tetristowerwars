@@ -35,6 +35,7 @@ public class GameModel {
     //private final LinkedHashSet<Block> blockPool = new LinkedHashSet<Block>();
     // Trying out generic block pool?
     private final LinkedHashSet<BuildingBlock> buildingBlockPool = new LinkedHashSet<BuildingBlock>();
+    private final LinkedHashSet<TriggerBlock> triggerBlocks = new LinkedHashSet<TriggerBlock>();
     private final ArrayList<Player> players = new ArrayList<Player>();
     private final World world;
     private static final int ITERATIONS_PER_STEP = 12; // Lower value means less accurate but faster
@@ -43,6 +44,7 @@ public class GameModel {
     private final BuildingBlockFactory blockFactory;
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
+    private final TriggerBlockFactory triggerBlockFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private float timeTakenToExecuteUpdateMs;
@@ -86,6 +88,7 @@ public class GameModel {
         blockFactory = new BuildingBlockFactory(buildingBlockPool, this, blockSize);
         cannonFactory = new CannonFactory(this, blockSize);
         bulletFactory = new BulletFactory(this, blockSize);
+        triggerBlockFactory = new TriggerBlockFactory(this);
         world.setBoundaryListener(physicsEngineListener);
         world.setContactListener(physicsEngineListener);
         world.setContactFilter(physicsEngineListener);
@@ -93,12 +96,14 @@ public class GameModel {
 
     public void reset() {
         int i = 0;
+        System.out.println("pool: " + buildingBlockPool.size());
         for (BuildingBlock buildingBlock : buildingBlockPool) {
             blocksToRemove.add(new MutableEntry<Block, Integer>(buildingBlock, i));
             i += 2;
         }
 
         for (Player player : players) {
+            System.out.println(player.getName() + ": " + player.getBuildingBlocks().size());
             for (BuildingBlock buildingBlock : player.getBuildingBlocks()) {
                 blocksToRemove.add(new MutableEntry<Block, Integer>(buildingBlock, i));
                 i += 2;
@@ -170,7 +175,7 @@ public class GameModel {
                     for (GameModelListener gameModelListener : gameModelListeners) {
                         gameModelListener.onBlockDestruction(buildingBlock);
                     }
-                    world.destroyBody(buildingBlock.getBody());
+                    buildingBlock.destroyBody(world);
 
                 } else if (block instanceof BulletBlock) {
                     BulletBlock bulletBlock = (BulletBlock) block;
@@ -178,7 +183,7 @@ public class GameModel {
                     for (GameModelListener gameModelListener : gameModelListeners) {
                         gameModelListener.onBlockDestruction(bulletBlock);
                     }
-                    world.destroyBody(bulletBlock.getBody());
+                    bulletBlock.destroyBody(world);
                 } else {
                     System.out.println("WARNING: Block of type " + block.getClass().getName() + " not removed when outside of world.");
                 }
@@ -211,7 +216,7 @@ public class GameModel {
                         for (GameModelListener gameModelListener : gameModelListeners) {
                             gameModelListener.onBlockDestruction(buildingBlock);
                         }
-                        world.destroyBody(buildingBlock.getBody());
+                        buildingBlock.destroyBody(world);
                     }
                 }
             }
@@ -242,7 +247,7 @@ public class GameModel {
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockDestruction(buildingBlock);
                 }
-                world.destroyBody(buildingBlock.getBody());
+                buildingBlock.destroyBody(world);
             }
         }
 
@@ -290,7 +295,11 @@ public class GameModel {
      * @return An unmodifiable version of the buildingBlockPool.
      */
     public Set<BuildingBlock> getBuildingBlockPool() {
-        return Collections.unmodifiableSet(new LinkedHashSet<BuildingBlock>(buildingBlockPool));
+        return Collections.unmodifiableSet(buildingBlockPool);
+    }
+
+    public Set<TriggerBlock> getTriggerBlocks() {
+        return Collections.unmodifiableSet(triggerBlocks);
     }
 
     public float getBlockSize() {
@@ -412,6 +421,10 @@ public class GameModel {
         return blockFactory;
     }
 
+    public TriggerBlockFactory getTriggerBlockFactory() {
+        return triggerBlockFactory;
+    }
+
     /**
      * Returns the cannon block factory which can be used to create new
      * cannon blocks in this game world.
@@ -444,7 +457,7 @@ public class GameModel {
      * @return An unmodifiable set of the building block joints.
      */
     public Set<BuildingBlockJoint> getBuildingBlockJoints() {
-        return Collections.unmodifiableSet(new LinkedHashSet<BuildingBlockJoint>(buildingBlockJoints));
+        return Collections.unmodifiableSet(buildingBlockJoints);
     }
 
     /**
@@ -533,6 +546,10 @@ public class GameModel {
 
     public WinningCondition getWinningCondition() {
         return winningCondition;
+    }
+
+    protected void addTriggerBlock(TriggerBlock triggerBlock) {
+        triggerBlocks.add(triggerBlock);
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {
@@ -648,6 +665,10 @@ public class GameModel {
         public boolean shouldCollide(Shape shape1, Shape shape2) {
             Object userData1 = shape1.getBody().getUserData();
             Object userData2 = shape2.getBody().getUserData();
+
+            if (userData1 instanceof TriggerBlock || userData2 instanceof TriggerBlock) {
+                return false;
+            }
 
             if (userData1 instanceof BulletBlock && userData2 instanceof Block) {
                 return shouldBulletCollide((BulletBlock) userData1, (Block) userData2);

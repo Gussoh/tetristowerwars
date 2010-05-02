@@ -20,7 +20,7 @@ public class BulletFactory {
     private final float blockSize;
     private final GameModel gameModel;
 
-    public BulletFactory(GameModel gameModel, float blockSize) {
+    protected BulletFactory(GameModel gameModel, float blockSize) {
         this.blockSize = blockSize;
         this.gameModel = gameModel;
     }
