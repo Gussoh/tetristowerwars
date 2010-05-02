@@ -24,7 +24,7 @@ public class TriggerBlockFactory {
         this.gameModel = gameModel;
     }
 
-    public void createRoundTrigger(Vec2 pos, float radius, String text, Runnable runnable) {
+    public void createRoundTrigger(Vec2 pos, float radius, String text, TriggerListener triggerListener) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(pos);
         bodyDef.allowSleep = true;
@@ -36,12 +36,12 @@ public class TriggerBlockFactory {
         circleDef.radius = radius;
 
         body.createShape(circleDef);
-        TriggerBlock triggerBlock = new TriggerBlock(body, text, runnable);
+        TriggerBlock triggerBlock = new TriggerBlock(body, text, triggerListener);
         gameModel.addTriggerBlock(triggerBlock);
     }
 
 
-    public void createSquareTrigger(Vec2 pos, float width, float height, String text, Runnable runnable) {
+    public void createSquareTrigger(Vec2 pos, float width, float height, String text, TriggerListener triggerListener) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.allowSleep = true;
         bodyDef.position.set(pos);
@@ -61,7 +61,7 @@ public class TriggerBlockFactory {
 
         body.createShape(polygonDef);
 
-        TriggerBlock triggerBlock = new TriggerBlock(body, text, runnable);
+        TriggerBlock triggerBlock = new TriggerBlock(body, text, triggerListener);
         gameModel.addTriggerBlock(triggerBlock);
     }
 }

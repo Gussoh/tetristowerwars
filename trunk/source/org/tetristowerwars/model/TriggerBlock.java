@@ -12,20 +12,24 @@ import org.jbox2d.dynamics.Body;
  */
 public class TriggerBlock extends Block {
 
-    private final Runnable runnable;
-    private final String text;
+    private final TriggerListener triggerListener;
+    private String text;
 
-    public TriggerBlock(Body body, String text, Runnable runnable) {
+    public TriggerBlock(Body body, String text, TriggerListener triggerListener) {
         super(body);
         this.text = text;
-        this.runnable = runnable;
+        this.triggerListener = triggerListener;
     }
 
-    public Runnable getRunnable() {
-        return runnable;
+    public TriggerListener getTriggerListener() {
+        return triggerListener;
     }
 
     public String getText() {
         return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
