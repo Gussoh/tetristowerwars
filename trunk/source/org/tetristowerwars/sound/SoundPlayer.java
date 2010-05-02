@@ -257,6 +257,18 @@ public class SoundPlayer implements GameModelListener {
         }
     }
 
+    public void stopAllMusic() {
+        playThread.stopMusic();
+    }
+
+    public void unloadAllSounds() {
+        for (List<Clip> clipList : clipDB.values()) {
+            for (Clip clip : clipList) {
+                clip.close();
+            }
+        }
+    }
+
     @Override
     public void onBlockCreation(Block block) {
         if (block instanceof BulletBlock) {
