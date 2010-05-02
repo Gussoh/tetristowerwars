@@ -25,7 +25,7 @@ public class BuildingBlockFactory {
     private final GameModel gameModel;
     private final float blockSize;
 
-    public BuildingBlockFactory(Set<BuildingBlock> buildingBlockPool, GameModel gameModel, float blockSize) {
+    protected BuildingBlockFactory(Set<BuildingBlock> buildingBlockPool, GameModel gameModel, float blockSize) {
         this.buildingBlockPool = buildingBlockPool;
         this.gameModel = gameModel;
         this.blockSize = blockSize;

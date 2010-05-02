@@ -9,6 +9,7 @@ import java.awt.DisplayMode;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
+import javax.swing.SwingUtilities;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.InputManager;
@@ -19,6 +20,7 @@ import org.tetristowerwars.model.BuildingBlockFactory;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
+import org.tetristowerwars.model.TriggerBlock;
 import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
@@ -53,7 +55,7 @@ public class TouchGameLogic {
         final GameModel gameModel = new GameModel(settings.getWorldWidth(), settings.getWorldHeight(), settings.getGroundHeight(), settings.getBlockSize());
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, mainFrame);
 
-        final SoundPlayer soundPlayer = new SoundPlayer( settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
+        final SoundPlayer soundPlayer = new SoundPlayer(settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
         gameModel.addGameModelListener(soundPlayer);
 
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());
@@ -95,8 +97,7 @@ public class TouchGameLogic {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_R) {
                     resetGame = true;
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     alive = false;
                     mainFrame.back();
                 }
@@ -110,6 +111,21 @@ public class TouchGameLogic {
                 final float constantStepTimeS = 1f / 60f;
                 long lastStepTimeNano = System.nanoTime();
 
+                /*gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, 30.0f), 50.0f, "Exit", new Runnable() {
+
+                @Override
+                public void run() {
+                alive = false;
+                SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                mainFrame.back();
+                }
+                });
+                }
+                });*/
+
                 while (alive) {
                     Thread.yield();
 
@@ -121,14 +137,16 @@ public class TouchGameLogic {
                         stepTimeNano = (long) (constantStepTimeS * 1000000000.0f);
                     }
 
+                    if (resetGame) {
+                        gameModel.reset();
+                        resetGame = false;
+                        timedReset = true;
+                    }
+
                     while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
                         mouseController.pumpEvents();
                         touchController.pumpEvents();
-                        if (resetGame) {
-                            gameModel.reset();
-                            resetGame = false;
-                            timedReset = true;
-                        }
+
                         gameModel.update();
                         numTimesStepped++;
                         stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
@@ -141,17 +159,16 @@ public class TouchGameLogic {
                     }
 
                     if (gameModel.getBuildingBlockPool().size() <= 2) {
-                        for (int i = 0; i < 7; i++) {
+                        for (int i = 0; i < 70; i++) {
                             createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
                         }
                     }
-                    
+
                     if (gameModel.getWinningCondition().gameIsOver()) {
                         if (timedReset) {
-                            resetTime = System.currentTimeMillis() + 10000;
+                            resetTime = System.currentTimeMillis() + 20000;
                             timedReset = false;
-                        }
-                        else if (System.currentTimeMillis() >= resetTime) {
+                        } else if (System.currentTimeMillis() >= resetTime) {
                             System.out.println("RESETTING");
                             timedReset = true;
                             gameModel.reset();

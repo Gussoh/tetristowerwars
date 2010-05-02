@@ -123,7 +123,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         glCanvas.setAutoSwapBufferMode(true);
         glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
 
-        mainFrame.openComponent(glCanvas, true);
+        mainFrame.openComponent(glCanvas, false);
 
     }
 
