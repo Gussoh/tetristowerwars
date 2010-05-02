@@ -122,6 +122,7 @@ public class TouchGameLogic {
                         if (resetGame) {
                             gameModel.reset();
                             resetGame = false;
+                            timedReset = true;
                         }
                         gameModel.update();
                         numTimesStepped++;

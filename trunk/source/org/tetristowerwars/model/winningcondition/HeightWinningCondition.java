@@ -35,6 +35,7 @@ public class HeightWinningCondition extends WinningCondition {
     @Override
     public void reset() {
         startTimeMs = 0;
+        highestBlock = null;
     }
    
     public boolean hasCandidate() {
