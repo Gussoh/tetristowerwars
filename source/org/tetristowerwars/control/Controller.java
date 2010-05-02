@@ -28,6 +28,7 @@ public class Controller implements InputListener {
     private final InputManager inputManager;
     private final Renderer renderer;
     private final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
+    private final Map<Integer, TriggerBlock> actionIdToTrigger = new HashMap<Integer, TriggerBlock>();
     private final Queue<InputEvent> eventQueue = new LinkedList<InputEvent>();
 
     public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
@@ -71,7 +72,8 @@ public class Controller implements InputListener {
         } else if (selectedBlock instanceof BulletBlock) {
         } else if (selectedBlock instanceof TriggerBlock) {
             TriggerBlock triggerBlock = (TriggerBlock) selectedBlock;
-            triggerBlock.getRunnable().run();
+            triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock);
+            actionIdToTrigger.put(event.getActionId(), triggerBlock);
         }
     }
 
@@ -90,6 +92,11 @@ public class Controller implements InputListener {
         BuildingBlockJoint bbj = actionIdToJoint.remove(event.getActionId());
         if (bbj != null) {
             gameModel.removeBuldingBlockJoint(bbj);
+        } else {
+            TriggerBlock triggerBlock = actionIdToTrigger.remove(event.getActionId());
+            if (triggerBlock != null) {
+                triggerBlock.getTriggerListener().onTriggerReleased(triggerBlock);
+            }
         }
     }
 
@@ -121,23 +128,21 @@ public class Controller implements InputListener {
     }
 
     public synchronized void pumpEvents() {
-        if (gameModel.getWinningCondition().gameIsOver()) {
-            eventQueue.clear();
-        } else {
-            while (!eventQueue.isEmpty()) {
-                InputEvent event = eventQueue.poll();
-                switch (event.getType()) {
-                    case InputEvent.PRESSED:
-                        handleInputDevicePressed(event);
-                        break;
-                    case InputEvent.RELEASED:
-                        handleInputDeviceReleased(event);
-                        break;
-                    case InputEvent.DRAGGED:
-                        handleInputDeviceDragged(event);
-                        break;
-                }
+
+        while (!eventQueue.isEmpty()) {
+            InputEvent event = eventQueue.poll();
+            switch (event.getType()) {
+                case InputEvent.PRESSED:
+                    handleInputDevicePressed(event);
+                    break;
+                case InputEvent.RELEASED:
+                    handleInputDeviceReleased(event);
+                    break;
+                case InputEvent.DRAGGED:
+                    handleInputDeviceDragged(event);
+                    break;
             }
         }
+
     }
 }

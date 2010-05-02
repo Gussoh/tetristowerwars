@@ -12,11 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLDrawable;
+import org.jbox2d.collision.CircleShape;
+import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.gui.gl.animation.Path;
 import org.tetristowerwars.model.CannonBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
+import org.tetristowerwars.model.TriggerBlock;
 import org.tetristowerwars.model.WinningCondition.MessageEntry;
 
 /**
@@ -112,7 +116,23 @@ public class MessageRenderer {
                     renderText(texts, pos.x, pos.y, true, true, 2.0f);
                 }
             }
+
         }
+
+        List<TextEntry> triggerTexts = new LinkedList<TextEntry>();
+        textRenderer.setColor(0.7f, 0.7f, 0.7f, 0.8f);
+        for (TriggerBlock triggerBlock : gameModel.getTriggerBlocks()) {
+            triggerTexts.add(new TextEntry(triggerBlock.getText()));
+            Body body = triggerBlock.getBody();
+            Shape s = body.getShapeList();
+
+            if (s instanceof CircleShape) {
+                CircleShape circleShape = (CircleShape) s;
+                Vec2 pos = body.getPosition();
+                renderText(triggerTexts, pos.x, pos.y + 10, true, true, 1.5f);
+            }
+        }
+
         textRenderer.end3DRendering();
     }
 

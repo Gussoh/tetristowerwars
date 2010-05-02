@@ -21,6 +21,7 @@ import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
 import org.tetristowerwars.model.TriggerBlock;
+import org.tetristowerwars.model.TriggerListener;
 import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
@@ -111,20 +112,32 @@ public class TouchGameLogic {
                 final float constantStepTimeS = 1f / 60f;
                 long lastStepTimeNano = System.nanoTime();
 
-                /*gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, 30.0f), 50.0f, "Exit", new Runnable() {
+                gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, 0f), 15.0f, "Exit", new TriggerListener() {
 
-                @Override
-                public void run() {
-                alive = false;
-                SwingUtilities.invokeLater(new Runnable() {
+                    private long timePressed;
 
-                @Override
-                public void run() {
-                mainFrame.back();
-                }
+                    @Override
+                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                        timePressed = System.currentTimeMillis();
+                        triggerBlock.setText("Hold");
+                    }
+
+                    @Override
+                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                        if (timePressed + 4000 < System.currentTimeMillis()) {
+                            alive = false;
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    mainFrame.back();
+                                }
+                            });
+                        }
+
+                        triggerBlock.setText("Exit");
+                    }
                 });
-                }
-                });*/
 
                 while (alive) {
                     Thread.yield();
@@ -159,7 +172,7 @@ public class TouchGameLogic {
                     }
 
                     if (gameModel.getBuildingBlockPool().size() <= 2) {
-                        for (int i = 0; i < 70; i++) {
+                        for (int i = 0; i < 7; i++) {
                             createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
                         }
                     }

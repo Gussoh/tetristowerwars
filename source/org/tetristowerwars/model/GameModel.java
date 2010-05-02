@@ -323,7 +323,10 @@ public class GameModel {
                 Shape shape = shapes[i];
 
                 if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
-                    return (Block) shape.getBody().getUserData();
+                    Block b = (Block) shape.getBody().getUserData();
+                    if (b != groundBlock) {
+                        return b;
+                    }
                 }
             }
         }

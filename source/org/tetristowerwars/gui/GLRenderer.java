@@ -34,6 +34,7 @@ import org.tetristowerwars.gui.gl.Pointer;
 import org.tetristowerwars.gui.gl.PointerRenderer;
 import org.tetristowerwars.gui.gl.RectangularBuildingBlockRenderer;
 import org.tetristowerwars.gui.gl.MessageRenderer;
+import org.tetristowerwars.gui.gl.TriggerRenderer;
 import org.tetristowerwars.gui.gl.WinRenderer;
 import org.tetristowerwars.gui.gl.WinningHeightRenderer;
 import org.tetristowerwars.gui.gl.animation.BackgroundAnimationFactory;
@@ -63,6 +64,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private EffectRenderer effectRenderer;
     private MessageRenderer messageRenderer;
     private WinRenderer winRenderer;
+    private TriggerRenderer triggerRenderer;
     private WinningHeightRenderer winningHeightRenderer;
     private RectangularBuildingBlockRenderer rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
@@ -173,6 +175,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             backgroundAnimationFactory = new BackgroundAnimationFactory(backgroundAnimationRenderer, gameModel.getGroundLevel(), gameModel.getGroundLevel() + 30, gameModel.getWorldBoundries().upperBound.x);
             winRenderer = new WinRenderer(gl, gameModel);
             winningHeightRenderer = new WinningHeightRenderer();
+            triggerRenderer = new TriggerRenderer(gl);
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -267,6 +270,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         backgroundRenderer.renderBottom(gl);
 
+        triggerRenderer.render(gl, gameModel);
 
         // Render the mouse/finger circles.
         pointerRenderer.render(gl, id2Pointers, elapsedTimeS);
