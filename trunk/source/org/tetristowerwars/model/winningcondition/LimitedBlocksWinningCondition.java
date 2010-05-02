@@ -75,4 +75,16 @@ public class LimitedBlocksWinningCondition extends WinningCondition {
             return -1;
         }
     }
+
+    @Override
+    public float getWinningHeight(Player player) {
+        float highest = 0;
+        for (Player otherPlayer : model.getPlayers()) {
+            if (otherPlayer != player) {
+                highest = Math.max(highest, otherPlayer.getTowerHeight());
+            }
+        }
+
+        return highest;
+    }
 }

@@ -8,6 +8,7 @@ package org.tetristowerwars.model.winningcondition;
 import java.util.ArrayList;
 import java.util.List;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
 
 /**
@@ -35,7 +36,6 @@ public class TimedWinningCondition extends WinningCondition {
         endTimeMs = System.currentTimeMillis() + gameTime * 1000;
     }
 
-
     @Override
     public boolean gameIsOver() {
         return System.currentTimeMillis() > endTimeMs;
@@ -53,7 +53,6 @@ public class TimedWinningCondition extends WinningCondition {
             } else {
                 return -1;
             }
-
     }
 
     @Override
@@ -63,6 +62,18 @@ public class TimedWinningCondition extends WinningCondition {
         MessageType type = time < 10000 ? MessageType.CRITICAL : MessageType.NORMAL;
         message.add(new MessageEntry("Time remaining: " + Math.max(time / 1000 + 1, 0), type, null));
         return message;
+    }
+
+    @Override
+    public float getWinningHeight(Player player) {
+        float highest = 0;
+        for (Player otherPlayer : model.getPlayers()) {
+            if (otherPlayer != player) {
+                highest = Math.max(highest, otherPlayer.getTowerHeight());
+            }
+        }
+
+        return highest;
     }
 
 }

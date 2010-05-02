@@ -29,7 +29,7 @@ import static javax.media.opengl.GL.*;
  */
 public class WinRenderer {
 
-    private final Texture flagTexture;
+    private final Texture[] flagTextures;
     private final Texture particleTexture;
     private FloatBuffer vertexBuffer;
     private FloatBuffer texCoordBuffer;
@@ -43,11 +43,14 @@ public class WinRenderer {
     private final PointSourceParticleEngine particleEngine = new PointSourceParticleEngine();
     private boolean shouldFlagExplode;
 
-    public WinRenderer(GL gl) throws IOException {
-        flagTexture = TextureIO.newTexture(new File("res/gfx/decoration/SovietFlagAndArms.png"), true);
+    public WinRenderer(GL gl, GameModel gameModel) throws IOException {
+        flagTextures = new Texture[gameModel.getPlayers().size() + 1];
+        for (Player player : gameModel.getPlayers()) {
+            flagTextures[player.getPlayerIndex()] = TextureIO.newTexture(new File("res/gfx/THEME" + player.getPlayerIndex() + "/win.png"), true);
+            GLUtil.fixTextureParameters(flagTextures[player.getPlayerIndex()]);
+        }
         particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
-        GLUtil.fixTextureParameters(flagTexture);
-        widthHeightRatio = flagTexture.getWidth() / (float) flagTexture.getHeight();
+        widthHeightRatio = flagTextures[1].getWidth() / (float) flagTextures[1].getHeight();
 
         vertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_OBJECT * 2);
         texCoordBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_OBJECT * 2);
@@ -60,11 +63,11 @@ public class WinRenderer {
 
     public void render(GL gl, GameModel gameModel, float elapsedTimeS, float renderHeight, boolean useParticles) {
         if (gameModel.getWinningCondition().gameIsOver()) {
+            Player winner = gameModel.getLeader();
             if (flagAnimation == null) {
                 float width = gameModel.getWorldBoundries().upperBound.x;
                 float centerX = width * 0.5f;
                 float centerY = renderHeight * 0.5f;
-                Player winner = gameModel.getLeader();
 
                 float playerCenterX = (winner.getLeftLimit() + winner.getRightLimit()) * 0.5f;
                 float halfPlayerWidth = (winner.getRightLimit() - winner.getLeftLimit()) * 0.5f;
@@ -76,7 +79,7 @@ public class WinRenderer {
                 particleEngine.setRotationSpeed(0, 0);
                 particleEngine.setTimeToLive(0.5f, 0.6f);
                 particleEngine.setSpeed(20.0f, 25.0f);
-                particleEngine.setColor(new Color(0.7f, 0.6f, 0.3f, 1.0f), new Color(0.9f, 0.7f, 0.5f, 1.0f), false);
+                particleEngine.setColor(new Color(0.3f, 0.2f, 0.1f, 0.8f), new Color(0.9f, 0.7f, 0.5f, 1.0f), false);
             }
 
             flagAnimation.addTime(elapsedTimeS);
@@ -90,7 +93,7 @@ public class WinRenderer {
             if (useParticles) {
                 particleEngine.setPosition(flagPos, Math.min(halfWidth, halfHeight));
                 if (!flagAnimation.isDone()) {
-                    particleEngine.setRadius(halfWidth * 0.05f, halfWidth * 0.05f);
+                    particleEngine.setRadius(halfWidth * 0.03f, halfWidth * 0.05f);
                     particleEngine.createParticles((int) (elapsedTimeS * 5000));
                 } else if (shouldFlagExplode) {
                     shouldFlagExplode = false;
@@ -164,15 +167,16 @@ public class WinRenderer {
             gl.glEnable(GL_TEXTURE_2D);
             gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             gl.glEnableClientState(GL_COLOR_ARRAY);
-            gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
             gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
             gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
             gl.glColorPointer(4, GL_FLOAT, 0, colorBuffer);
 
-            flagTexture.bind();
+            gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            flagTextures[winner.getPlayerIndex()].bind();
             gl.glDrawArrays(GL_QUADS, 0, NUM_VERTICES_PER_OBJECT);
 
+            gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             particleTexture.bind();
             gl.glDrawArrays(GL_QUADS, NUM_VERTICES_PER_OBJECT, numParticleVertices);
 
