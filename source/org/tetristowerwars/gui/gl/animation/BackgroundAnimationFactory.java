@@ -99,8 +99,21 @@ public class BackgroundAnimationFactory {
 
         float y = MathUtil.random(bottom, top);
         float width = MathUtil.random(10, 25);
-
+        
         float travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -400, -100));
+
+        int airImage;
+        double randomValue = Math.random();
+        if (randomValue < 0.33) {
+            airImage = AIRVEHICLE1;
+            travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -400, -100));
+        } else if (randomValue < 0.65) {
+            airImage = AIRVEHICLE2;
+            travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -150, -30));
+        } else {
+            airImage = AIRVEHICLE3;
+            travelTime = Math.abs(MathUtil.lerp(width, 10, 25, -50, -10));
+        }
 
         boolean leftToRight = Math.random() < 0.5 ? true : false;
 
@@ -113,16 +126,6 @@ public class BackgroundAnimationFactory {
             path = new Path(start, end, travelTime);
         } else {
             path = new Path(end, start, travelTime);
-        }
-
-        int airImage;
-        double randomValue = Math.random();
-        if (randomValue < 0.33) {
-            airImage = AIRVEHICLE1;
-        } else if (randomValue < 0.65) {
-            airImage = AIRVEHICLE2;
-        } else {
-            airImage = AIRVEHICLE3;
         }
 
         animationRenderer.addAnimation(path, width, airImage);
