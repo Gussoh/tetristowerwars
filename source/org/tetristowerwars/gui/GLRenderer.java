@@ -376,4 +376,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     @Override
     public void onGameReset() {
     }
+
+    public void onTimerBeat(int beatsLeft) {
+    }
 }
