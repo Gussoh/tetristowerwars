@@ -82,4 +82,9 @@ public class HeightWinningCondition extends WinningCondition {
             return -1;
         }
     }
+
+    @Override
+    public float getWinningHeight(Player player) {
+        return height;
+    }
 }

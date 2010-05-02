@@ -61,7 +61,7 @@ public class MessageRenderer {
             renderText(leaderEntry, centerXPos, renderWorldHeight * 0.5f, true, true, 4.0f);
         } else if (timeLeftSizeColorAnimation != null) {
             ArrayList<TextEntry> timeLeftEntry = new ArrayList<TextEntry>();
-            timeLeftEntry.add(new TextEntry("Game over in " + timeLeft + " seconds."));
+            timeLeftEntry.add(new TextEntry(gameModel.getWinningCondition().getLeader().getPlayer().getName() + " wins in " + timeLeft + " seconds."));
             Vec2 sizeColor = timeLeftSizeColorAnimation.getCurrentPosition();
             textRenderer.setColor(1.0f, sizeColor.y, sizeColor.y, 1.0f);
             renderText(timeLeftEntry, centerXPos, renderWorldHeight * 0.5f, true, true, sizeColor.x * 2);

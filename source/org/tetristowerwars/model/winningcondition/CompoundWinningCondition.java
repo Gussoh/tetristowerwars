@@ -7,6 +7,7 @@ package org.tetristowerwars.model.winningcondition;
 import java.util.ArrayList;
 import java.util.List;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;
 
 /**
@@ -94,5 +95,29 @@ public class CompoundWinningCondition extends WinningCondition {
             default:
                 return -1;
         }
+    }
+
+    @Override
+    public float getWinningHeight(Player player) {
+        
+        switch(logicType) {
+            case AND:
+            {
+                float height = 0;
+                for (WinningCondition winningCondition : conditions) {
+                    height = Math.max(winningCondition.getWinningHeight(player), height);
+                }
+                return height;
+            }
+            case OR:
+            {
+                float height = Float.MAX_VALUE;
+                for (WinningCondition winningCondition : conditions) {
+                    height = Math.min(height, winningCondition.getWinningHeight(player));
+                }
+                return height;
+            }
+        }
+        return 0;
     }
 }

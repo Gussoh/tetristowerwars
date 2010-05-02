@@ -25,11 +25,12 @@ public abstract class WinningCondition {
         model.setWinningCondition(this);
     }
 
+    public abstract float getWinningHeight(Player player);
+        
+
     public boolean gameIsOver() {
         int timeLeft = timeLeftUntilGameOver();
-        System.out.println("LEL");
         if (timeLeft != lastTimeLeftUntilGameOver) {
-            System.out.println("LELL");
             lastTimeLeftUntilGameOver = timeLeft;
             model.fireTimeLeftBeat(timeLeft);
         }
