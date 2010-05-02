@@ -6,7 +6,6 @@ package org.tetristowerwars.gui.gl;
 
 import com.sun.opengl.util.texture.Texture;
 import javax.media.opengl.GL;
-import org.jbox2d.common.Vec2;
 
 /**
  *

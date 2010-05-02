@@ -77,11 +77,11 @@ public class TouchGameLogic {
 
         LinkedList<WinningCondition> winningConditions = new LinkedList<WinningCondition>();
         if (settings.isHeightConditionEnabled()) {
-            winningConditions.add(new HeightWinningCondition(gameModel, settings.getHeightCondition(), 12));
+            winningConditions.add(new HeightWinningCondition(gameModel, settings.getHeightCondition(), 16));
         }
 
         if (settings.isNumBlocksConditionEnabled()) {
-            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, settings.getNumBlocksCondition(), 12));
+            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, settings.getNumBlocksCondition(), 16));
         }
 
         if (settings.isTimeConditionEnabled()) {
