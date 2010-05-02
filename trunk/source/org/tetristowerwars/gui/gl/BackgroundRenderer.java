@@ -35,7 +35,7 @@ public class BackgroundRenderer {
         skyTexture = TextureIO.newTexture(new File(texturePath + "sky.png"), true);
         cityTexture = TextureIO.newTexture(new File(texturePath + "citysilhuette.png"), true);
         groundTexture = TextureIO.newTexture(new File(texturePath + "ground.png"), true);
-        bottomTexture = TextureIO.newTexture(new File("res/gfx/bottom.png"), true);
+        bottomTexture = TextureIO.newTexture(new File(texturePath + "bottom.png"), true);
 
         GLUtil.fixTextureParameters(skyTexture);
         GLUtil.fixTextureParameters(cityTexture);
