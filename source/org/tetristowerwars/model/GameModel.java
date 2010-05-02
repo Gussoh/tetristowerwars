@@ -50,7 +50,7 @@ public class GameModel {
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
     private final float blockSize;
-    private boolean gameIsOver = false;
+    private boolean winningNotificationTriggered = false;
     private WinningCondition winningCondition = null;
     private Player leader = null;
     private final Set<MutableEntry<Block, Integer>> blocksToModify = new LinkedHashSet<MutableEntry<Block, Integer>>();
@@ -110,10 +110,11 @@ public class GameModel {
             }
         }
 
+        winningNotificationTriggered = false;
+
         if (winningCondition != null) {
             winningCondition.reset();
         }
-        gameIsOver = false;
 
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onGameReset();
@@ -127,6 +128,15 @@ public class GameModel {
 
         long currentTimeNano = System.nanoTime();
 
+        if (winningCondition != null && winningCondition.gameIsOver()) {
+            if (!winningNotificationTriggered) {
+                winningNotificationTriggered = true;
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onWinningConditionFulfilled(winningCondition);
+                }
+            }
+            return;
+        }
         world.step(1f / 60f, ITERATIONS_PER_STEP);
 
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
@@ -260,12 +270,6 @@ public class GameModel {
                 leader = winningCondition.getLeader().getPlayer();
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onLeaderChanged(leader);
-                }
-            }
-            if (winningCondition.gameIsOver() && !gameIsOver) {
-                gameIsOver = true;
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onWinningConditionFulfilled(winningCondition);
                 }
             }
         }

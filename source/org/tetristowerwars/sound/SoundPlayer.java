@@ -222,7 +222,7 @@ public class SoundPlayer implements GameModelListener {
         return data[(int) (Math.random() * data.length)];
     }
 
-    private void playMusic(File musicFile) {
+    private synchronized void playMusic(File musicFile) {
         if (musicEnabled) {
             AudioInputStream in;
             try {
@@ -334,7 +334,6 @@ public class SoundPlayer implements GameModelListener {
 
         private byte tempBuffer[] = new byte[5000];
         private boolean keepPlaying = true;
-        private boolean playNextSong = false;
         private final AudioInputStream audioInputStream;
         private SourceDataLine sourceDataLine = null;
 
@@ -364,16 +363,14 @@ public class SoundPlayer implements GameModelListener {
                         //Write data to the internal buffer of the data line
                         //where it will be delivered to the speaker.
                         sourceDataLine.write(tempBuffer, 0, cnt);
-                    }
-                    else {
-                        playNextSong = true;
-                    }
+                    }                    
                 }
                 //Block and wait for internal buffer of the data line to empty.
                 sourceDataLine.drain();
                 sourceDataLine.close();
 
-                if (playNextSong) {
+                if (keepPlaying) {
+                    System.out.println("playing next song");
                     playMusic(new File(soundLocation + getRandomIndex(music)));
                 }
 
