@@ -10,6 +10,10 @@
  */
 package org.tetristowerwars;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Andreas
@@ -24,8 +28,14 @@ public class StartPanel extends javax.swing.JPanel {
     public StartPanel(MainFrame mainFrame) {
         initComponents();
         this.mainFrame = mainFrame;
-
-
+        boolean e = mainFrame.getSettings().isMouseEmulationEnabled();
+        System.out.println(e);
+        emulatorCheckBox.setSelected(e);
+        if (e) {
+            mainFrame.enableMouseEmulation();
+        } else {
+            mainFrame.disableMouseEmulation();
+        }
     }
 
     /** This method is called from within the constructor to
@@ -93,6 +103,11 @@ public class StartPanel extends javax.swing.JPanel {
         } else {
             mainFrame.disableMouseEmulation();
             mainFrame.getSettings().setProperty(Settings.KEY_MOUSE_EMULATION, "false");
+        }
+        try {
+            mainFrame.getSettings().save();
+        } catch (IOException ex) {
+            Logger.getLogger(StartPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_emulatorCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

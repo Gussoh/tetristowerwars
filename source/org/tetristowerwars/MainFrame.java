@@ -40,14 +40,14 @@ public class MainFrame {
         tuioClient.connect();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationByPlatform(true);
-        openComponent(new StartPanel(this), false);
-        frame.setVisible(true);
         settings = new Settings();
         try {
             settings.load();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(componentStack.peek(), "Unable to load settings file: " + Settings.SETTINGS_FILE + "\nReason: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        openComponent(new StartPanel(this), false);
+        frame.setVisible(true);
     }
 
     public TuioClient getTuioClient() {
