@@ -29,4 +29,6 @@ public interface GameModelListener {
     public void onLeaderChanged(Player leader);
 
     public void onGameReset();
+
+    public void onTimerBeat(int beatsLeft);
 }

@@ -55,6 +55,7 @@ public class SoundPlayer implements GameModelListener {
     private static final String deselect = "deselect.wav";
     private static final String ownerChanged = "ownerchanged.mp3";
     private static final String zap = "zap.wav";
+    private static final String beep = "beep.wav";
     PlayThread playThread;
     private boolean triggerWin = true;
     private boolean musicEnabled;
@@ -317,6 +318,10 @@ public class SoundPlayer implements GameModelListener {
     @Override
     public void onBuildingBlockOwnerChanged(BuildingBlock block) {
         playSound(ownerChanged, 0.95f);
+    }
+
+    public void onTimerBeat(int beatsLeft) {
+        playSound(beep, 0.5f);
     }
 
     private class AudioData {
