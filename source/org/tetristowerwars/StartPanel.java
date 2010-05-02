@@ -83,7 +83,7 @@ public class StartPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void touchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_touchButtonActionPerformed
-        mainFrame.openComponent(new TouchGamePanel(mainFrame));
+        mainFrame.openComponent(new TouchGamePanel(mainFrame), false);
     }//GEN-LAST:event_touchButtonActionPerformed
 
     private void emulatorCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emulatorCheckBoxActionPerformed

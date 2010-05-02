@@ -421,7 +421,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
-        mainFrame.openComponent(new SettingsPanel(mainFrame));
+        mainFrame.openComponent(new SettingsPanel(mainFrame), false);
     }//GEN-LAST:event_settingsButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed

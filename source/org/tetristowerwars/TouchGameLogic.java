@@ -39,24 +39,25 @@ public class TouchGameLogic {
 
     private boolean resetGame = false;
     private boolean timedReset = true;
+    private boolean alive = true;
     private long resetTime = 0;
 
-    public TouchGameLogic(MainFrame frame) {
+    public TouchGameLogic(final MainFrame mainFrame) {
 
-        frame.disableMouseEmulation();
+        mainFrame.disableMouseEmulation();
 
-        DisplayMode displayMode = frame.getJFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
+        DisplayMode displayMode = mainFrame.getJFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
-        final Settings settings = frame.getSettings();
+        final Settings settings = mainFrame.getSettings();
 
         final GameModel gameModel = new GameModel(settings.getWorldWidth(), settings.getWorldHeight(), settings.getGroundHeight(), settings.getBlockSize());
-        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, frame);
+        final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, mainFrame);
 
         final SoundPlayer soundPlayer = new SoundPlayer( settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
         gameModel.addGameModelListener(soundPlayer);
 
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());
-        final InputManager touchInputManager = new TouchInputManager(frame.getTuioClient(), screenDimensions, glRenderer.getInputComponent());
+        final InputManager touchInputManager = new TouchInputManager(mainFrame.getTuioClient(), screenDimensions, glRenderer.getInputComponent());
 
         final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
         final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
@@ -95,6 +96,10 @@ public class TouchGameLogic {
                 if (e.getKeyCode() == KeyEvent.VK_R) {
                     resetGame = true;
                 }
+                else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    alive = false;
+                    mainFrame.back();
+                }
             }
         });
 
@@ -105,7 +110,7 @@ public class TouchGameLogic {
                 final float constantStepTimeS = 1f / 60f;
                 long lastStepTimeNano = System.nanoTime();
 
-                for (;;) {
+                while (alive) {
                     Thread.yield();
 
                     long currentTimeNano = System.nanoTime();
@@ -153,6 +158,8 @@ public class TouchGameLogic {
                         }
                     }
                 }
+                soundPlayer.stopAllMusic();
+                soundPlayer.unloadAllSounds();
             }
         }.start();
 

@@ -9,6 +9,8 @@ import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -27,17 +29,18 @@ import org.tetristowerwars.control.TouchInputManager;
  */
 public class MainFrame {
 
-    private final JFrame frame = new JFrame("Tetris Tower Wars");
+    private JFrame frame = new JFrame("Tetris Tower Wars");
     private final Deque<Component> componentStack = new ArrayDeque<Component>();
     private final Settings settings;
     private final TuioClient tuioClient = new TuioClient();
     private MouseEmulator emulator;
+    private boolean isFullscreen = false;
 
     public MainFrame() {
         tuioClient.connect();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationByPlatform(true);
-        openComponent(new StartPanel(this));
+        openComponent(new StartPanel(this), false);
         frame.setVisible(true);
         settings = new Settings();
         try {
@@ -73,16 +76,31 @@ public class MainFrame {
 
     }
 
-    public void openComponent(Component component) {
+    public void openComponent(Component component, boolean fullscreen) {
         Component currentComponent = componentStack.peek();
 
         if (currentComponent != null) {
             frame.remove(currentComponent);
         }
-
-        componentStack.push(component);
-        frame.add(component);
-        frame.pack();
+        if(fullscreen) {
+            isFullscreen = true;
+            frame.dispose();
+            frame = new JFrame();
+            frame.setUndecorated(true);
+            frame.setVisible(true);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            GraphicsDevice gDev = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            int width = gDev.getDisplayMode().getWidth();
+            int height = gDev.getDisplayMode().getHeight();
+            componentStack.push(component);
+            frame.add(component);
+            frame.setSize(width, height);
+        }
+        else {
+            componentStack.push(component);
+            frame.add(component);
+            frame.pack();
+        }
     }
 
     public JFrame getJFrame() {
@@ -90,7 +108,18 @@ public class MainFrame {
     }
 
     public void back() {
-        frame.remove(componentStack.pop());
+        if (isFullscreen) {
+            isFullscreen = false;
+            frame.dispose();
+            frame = new JFrame("Tetris Tower Wars");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationByPlatform(true);
+            frame.setVisible(true);
+            componentStack.pop();
+        }
+        else {
+            frame.remove(componentStack.pop());
+        }
         frame.add(componentStack.peek());
         frame.pack();
     }
