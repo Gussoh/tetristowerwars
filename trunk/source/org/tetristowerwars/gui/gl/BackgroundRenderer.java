@@ -41,6 +41,7 @@ public class BackgroundRenderer {
         GLUtil.fixTextureParameters(cityTexture);
         GLUtil.fixTextureParameters(groundTexture);
         GLUtil.fixTextureParameters(bottomTexture);
+        GLUtil.mirrorTexture(bottomTexture);
 
         color = BufferUtil.newFloatBuffer(4);
         color.put(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
