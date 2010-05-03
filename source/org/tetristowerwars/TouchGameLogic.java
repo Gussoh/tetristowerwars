@@ -137,7 +137,25 @@ public class TouchGameLogic {
 
                         triggerBlock.setText("Exit");
                     }
-                });
+                }).setVisible(true);
+
+                TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
+
+                            private long timePressed;
+
+                            @Override
+                            public void onTriggerPressed(TriggerBlock triggerBlock) {
+                                timePressed = System.currentTimeMillis();
+                            }
+
+                            @Override
+                            public void onTriggerReleased(TriggerBlock triggerBlock) {
+                                if (timePressed + 200 < System.currentTimeMillis()) {
+                                    triggerBlock.setVisible(false);
+                                    resetGame = true;
+                                }
+                            }
+                        });
 
                 while (alive) {
                     Thread.yield();
@@ -177,15 +195,18 @@ public class TouchGameLogic {
                         }
                     }
 
-                    if (gameModel.getWinningCondition().gameIsOver()) {
-                        if (timedReset) {
-                            resetTime = System.currentTimeMillis() + 20000;
-                            timedReset = false;
-                        } else if (System.currentTimeMillis() >= resetTime) {
-                            System.out.println("RESETTING");
-                            timedReset = true;
-                            gameModel.reset();
-                        }
+                    if (gameModel.getWinningCondition().gameIsOver() && !restartTrigger.isVisible()) {
+                        restartTrigger.setVisible(true);
+                        
+                         //reset timer at end of game
+//                        if (timedReset) {
+//                            resetTime = System.currentTimeMillis() + 20000;
+//                            timedReset = false;
+//                        } else if (System.currentTimeMillis() >= resetTime) {
+//                            System.out.println("RESETTING");
+//                            timedReset = true;
+//                            gameModel.reset();
+//                        }
                     }
                 }
                 soundPlayer.stopAllMusic();

@@ -50,27 +50,29 @@ public class TriggerRenderer {
         }
 
         for (TriggerBlock triggerBlock : triggerBlocks) {
-            Vec2 pos = triggerBlock.getBody().getPosition();
-            Shape shape = triggerBlock.getBody().getShapeList();
+            if (triggerBlock.isVisible()) {
+                Vec2 pos = triggerBlock.getBody().getPosition();
+                Shape shape = triggerBlock.getBody().getShapeList();
 
-            if (shape instanceof CircleShape) {
-                CircleShape circleShape = (CircleShape) shape;
-                float r = circleShape.getRadius();
-                vertexBuffer.put(new float[]{
-                            pos.x - r, pos.y - r,
-                            pos.x + r, pos.y - r,
-                            pos.x + r, pos.y + r,
-                            pos.x - r, pos.y + r
+                if (shape instanceof CircleShape) {
+                    CircleShape circleShape = (CircleShape) shape;
+                    float r = circleShape.getRadius();
+                    vertexBuffer.put(new float[]{
+                                pos.x - r, pos.y - r,
+                                pos.x + r, pos.y - r,
+                                pos.x + r, pos.y + r,
+                                pos.x - r, pos.y + r
+                            });
+                } else if (shape instanceof PolygonShape) {
+                }
+
+                texCoordBuffer.put(new float[]{
+                            0.0f, 1.0f,
+                            1.0f, 1.0f,
+                            1.0f, 0.0f,
+                            0.0f, 0.0f
                         });
-            } else if (shape instanceof PolygonShape) {
             }
-
-            texCoordBuffer.put(new float[]{
-                        0.0f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.0f,
-                        0.0f, 0.0f
-                    });
         }
 
         vertexBuffer.rewind();

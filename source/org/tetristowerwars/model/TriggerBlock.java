@@ -14,6 +14,11 @@ public class TriggerBlock extends Block {
 
     private final TriggerListener triggerListener;
     private String text;
+    private boolean visibility = false;
+
+    public void setVisible(boolean visibility) {
+        this.visibility = visibility;
+    }
 
     public TriggerBlock(Body body, String text, TriggerListener triggerListener) {
         super(body);
@@ -31,5 +36,9 @@ public class TriggerBlock extends Block {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean isVisible() {
+        return visibility;
     }
 }

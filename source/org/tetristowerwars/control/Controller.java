@@ -72,8 +72,10 @@ public class Controller implements InputListener {
         } else if (selectedBlock instanceof BulletBlock) {
         } else if (selectedBlock instanceof TriggerBlock) {
             TriggerBlock triggerBlock = (TriggerBlock) selectedBlock;
-            triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock);
-            actionIdToTrigger.put(event.getActionId(), triggerBlock);
+            if (triggerBlock.isVisible()) {
+                triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock);
+                actionIdToTrigger.put(event.getActionId(), triggerBlock);
+            }
         }
     }
 

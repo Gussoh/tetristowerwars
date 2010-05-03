@@ -324,7 +324,10 @@ public class GameModel {
 
                 if (shape.testPoint(shape.getBody().getXForm(), new Vec2(x, y))) {
                     Block b = (Block) shape.getBody().getUserData();
-                    if (b != groundBlock) {
+                    if (b instanceof BuildingBlock) {
+                        return b;
+                    }
+                    if ((b instanceof TriggerBlock && ((TriggerBlock)b).isVisible())) {
                         return b;
                     }
                 }

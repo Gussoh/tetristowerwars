@@ -389,4 +389,9 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     public void onTimerBeat(int beatsLeft) {
     }
+
+    @Override
+    public float getRenderWorldHeight() {
+        return renderWorldHeight;
+    }
 }
