@@ -125,7 +125,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         glCanvas.setAutoSwapBufferMode(true);
         glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
 
-        mainFrame.openComponent(glCanvas, false);
+        mainFrame.openComponent(glCanvas, true);
 
     }
 
@@ -236,6 +236,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         backgroundAnimationFactory.run(elapsedTimeS);
         backgroundAnimationRenderer.render(gl, elapsedTimeS);
 
+        cannonRenderer.render(gl, gameModel);
+
         // render building blocks, except outline
         rectangularBuildingBlockRenderer.render(gl, gameModel, elapsedTimeS);
         // Render the light effect when a block changes owner
@@ -246,10 +248,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         // Render the joints between mouse/finger and block.
         jointRenderer.renderLines(gl, gameModel.getBuildingBlockJoints(), lineWidthFactor * 10.0f);
-
-
-
-        cannonRenderer.render(gl, gameModel);
 
         if (useParticleEffects) {
             for (Player player : gameModel.getPlayers()) {

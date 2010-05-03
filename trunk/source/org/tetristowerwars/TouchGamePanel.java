@@ -467,7 +467,7 @@ public class TouchGamePanel extends javax.swing.JPanel {
         else if (USATheme.isSelected()) {
             settings.setProperty(Settings.KEY_WORLD_THEME, "2");
         }
-        else if (USATheme.isSelected()) {
+        else if (comboTheme.isSelected()) {
             settings.setProperty(Settings.KEY_WORLD_THEME, "3");
         }
         

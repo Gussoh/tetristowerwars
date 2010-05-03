@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
-import org.tetristowerwars.Settings;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -41,7 +40,6 @@ public class BackgroundRenderer {
         GLUtil.fixTextureParameters(cityTexture);
         GLUtil.fixTextureParameters(groundTexture);
         GLUtil.fixTextureParameters(bottomTexture);
-        GLUtil.mirrorTexture(bottomTexture);
 
         color = BufferUtil.newFloatBuffer(4);
         color.put(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
@@ -54,7 +52,7 @@ public class BackgroundRenderer {
         float bottomRepeats = bottomShrinkFactor * renderWorldWidth / bottomTexture.getWidth();
 
         cityTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-        bottomTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        bottomTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_MIRRORED_REPEAT);
 
         // remember counter-clockwise order
         // First the sky
