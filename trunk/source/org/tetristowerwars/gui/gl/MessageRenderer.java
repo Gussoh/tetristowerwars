@@ -122,14 +122,17 @@ public class MessageRenderer {
         List<TextEntry> triggerTexts = new LinkedList<TextEntry>();
         textRenderer.setColor(0.7f, 0.7f, 0.7f, 0.8f);
         for (TriggerBlock triggerBlock : gameModel.getTriggerBlocks()) {
-            triggerTexts.add(new TextEntry(triggerBlock.getText()));
-            Body body = triggerBlock.getBody();
-            Shape s = body.getShapeList();
+            if (triggerBlock.isVisible()) {
+                triggerTexts.add(new TextEntry(triggerBlock.getText()));
+                Body body = triggerBlock.getBody();
+                Shape s = body.getShapeList();
 
-            if (s instanceof CircleShape) {
-                CircleShape circleShape = (CircleShape) s;
-                Vec2 pos = body.getPosition();
-                renderText(triggerTexts, pos.x, pos.y + 10, true, true, 1.5f);
+                if (s instanceof CircleShape) {
+                    CircleShape circleShape = (CircleShape) s;
+                    Vec2 pos = body.getPosition();
+                    renderText(triggerTexts, pos.x, pos.y + 10, true, true, 1.5f);
+                }
+                triggerTexts.clear();
             }
         }
 

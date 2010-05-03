@@ -23,6 +23,8 @@ public abstract class Renderer {
 
     public abstract void renderFrame();
 
+    public abstract float getRenderWorldHeight();
+
     public abstract Component getInputComponent();
 
     public abstract Vec2 convertWindowToWorldCoordinates(Point windowCoord);

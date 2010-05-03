@@ -104,6 +104,11 @@ public class SwingRenderer extends Renderer {
         cursorPoints.remove(id);
     }
 
+    @Override
+    public float getRenderWorldHeight() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     private class RenderPanel extends JPanel {
 
         public RenderPanel() {
