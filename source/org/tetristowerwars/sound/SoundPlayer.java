@@ -260,8 +260,10 @@ public class SoundPlayer implements GameModelListener {
         }
     }
 
-    public void stopAllMusic() {
-        playThread.stopMusic();
+    public synchronized void stopAllMusic() {
+        if (playThread != null) {
+            playThread.stopMusic();
+        }
     }
 
     public void unloadAllSounds() {
@@ -284,7 +286,7 @@ public class SoundPlayer implements GameModelListener {
         if (triggerWin) {
             triggerWin = false;
             System.out.println("playing winningsound!");
-            playMusic(new File(musicLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex()-1]));
+            playMusic(new File(musicLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex() - 1]));
         }
     }
 
@@ -385,7 +387,7 @@ public class SoundPlayer implements GameModelListener {
                         //Write data to the internal buffer of the data line
                         //where it will be delivered to the speaker.
                         sourceDataLine.write(tempBuffer, 0, cnt);
-                    }                    
+                    }
                 }
                 //Block and wait for internal buffer of the data line to empty.
                 sourceDataLine.drain();

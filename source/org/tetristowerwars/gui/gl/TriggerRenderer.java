@@ -42,7 +42,12 @@ public class TriggerRenderer {
     public void render(GL gl, GameModel gameModel) {
         Set<TriggerBlock> triggerBlocks = gameModel.getTriggerBlocks();
 
-        int numVertices = triggerBlocks.size() * NUM_VERTICES_PER_OBJECT;
+        int numVertices = 0;
+        for (TriggerBlock triggerBlock : triggerBlocks) {
+            if (triggerBlock.isVisible()) {
+                numVertices += NUM_VERTICES_PER_OBJECT;
+            }
+        }
 
         if (numVertices * 2 > vertexBuffer.capacity()) {
             vertexBuffer = BufferUtil.newFloatBuffer(numVertices * 2);
