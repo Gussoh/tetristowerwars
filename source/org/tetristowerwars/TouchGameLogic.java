@@ -56,7 +56,7 @@ public class TouchGameLogic {
         final GameModel gameModel = new GameModel(settings.getWorldWidth(), settings.getWorldHeight(), settings.getGroundHeight(), settings.getBlockSize());
         final Renderer glRenderer = new org.tetristowerwars.gui.GLRenderer(gameModel, mainFrame);
 
-        final SoundPlayer soundPlayer = new SoundPlayer(settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled());
+        final SoundPlayer soundPlayer = new SoundPlayer(settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled(), settings.getWorldTheme());
         gameModel.addGameModelListener(soundPlayer);
 
         final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());

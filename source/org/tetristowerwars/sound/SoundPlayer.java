@@ -43,6 +43,7 @@ public class SoundPlayer implements GameModelListener {
     private final Map<String, List<Clip>> clipDB = new HashMap<String, List<Clip>>();
     private final Map<String, AudioData> audioDataDB = new HashMap<String, AudioData>();
     private String soundLocation = "res/sound/";
+    private String musicLocation = "res/sound/";
     private Mixer.Info mixer = null;
     private static final int MAX_CLIPS = 4;
     private static final String[] collisionSounds = new String[]{"collision1.wav"};
@@ -61,9 +62,11 @@ public class SoundPlayer implements GameModelListener {
     private boolean musicEnabled;
     private boolean soundEffectsEnabled;
 
-    public SoundPlayer(boolean musicEnabled, boolean soundEffectsEnabled) {
+    public SoundPlayer(boolean musicEnabled, boolean soundEffectsEnabled, int themeIndex) {
         this.musicEnabled = musicEnabled;
         this.soundEffectsEnabled = soundEffectsEnabled;
+        musicLocation = musicLocation.concat("THEME" + themeIndex + "/");
+        System.out.println("soundlocation: " + soundLocation);
         for (javax.sound.sampled.Mixer.Info info : AudioSystem.getMixerInfo()) {
             if (info.getName().contains("Java Sound Audio Engine")) {
                 mixer = info;
@@ -90,7 +93,7 @@ public class SoundPlayer implements GameModelListener {
             }
         }
         if (musicEnabled) {
-            playMusic(new File(soundLocation + getRandomIndex(music)));
+            playMusic(new File(musicLocation + getRandomIndex(music)));
         }
     }
 
@@ -281,14 +284,14 @@ public class SoundPlayer implements GameModelListener {
         if (triggerWin) {
             triggerWin = false;
             System.out.println("playing winningsound!");
-            playMusic(new File(soundLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex()-1]));
+            playMusic(new File(musicLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex()-1]));
         }
     }
 
     @Override
     public void onGameReset() {
         System.out.println("sound reset");
-        playMusic(new File(soundLocation + getRandomIndex(music)));
+        playMusic(new File(musicLocation + getRandomIndex(music)));
         triggerWin = true;
     }
 
@@ -390,7 +393,7 @@ public class SoundPlayer implements GameModelListener {
 
                 if (keepPlaying) {
                     System.out.println("playing next song");
-                    playMusic(new File(soundLocation + getRandomIndex(music)));
+                    playMusic(new File(musicLocation + getRandomIndex(music)));
                 }
 
             } catch (Exception e) {
