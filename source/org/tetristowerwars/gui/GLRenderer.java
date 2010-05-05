@@ -23,6 +23,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.Settings;
 import org.tetristowerwars.MainFrame;
+import org.tetristowerwars.gui.gl.AvatarRenderer;
 import org.tetristowerwars.gui.gl.BackgroundAnimationRenderer;
 import org.tetristowerwars.gui.gl.BackgroundRenderer;
 import org.tetristowerwars.gui.gl.EffectRenderer;
@@ -69,6 +70,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private RectangularBuildingBlockRenderer rectangularBuildingBlockRenderer;
     private BackgroundAnimationRenderer backgroundAnimationRenderer;
     private BackgroundAnimationFactory backgroundAnimationFactory;
+    private AvatarRenderer avatarRenderer;
     private float renderWorldHeight;
     private float lineWidthFactor = 1.0f;
     private float[] ambientLight = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -176,6 +178,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             winRenderer = new WinRenderer(gl, gameModel);
             winningHeightRenderer = new WinningHeightRenderer();
             triggerRenderer = new TriggerRenderer(gl);
+            avatarRenderer = new AvatarRenderer(gl, mainFrame.getSettings().getWorldTheme());
         } catch (IOException ex) {
             Logger.getLogger(GLRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -232,6 +235,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             backgroundRenderer.render(gl);
         }
 
+
+
         // Update and render tanks, zeppelins, etc.
         backgroundAnimationFactory.run(elapsedTimeS);
         backgroundAnimationRenderer.render(gl, elapsedTimeS);
@@ -257,7 +262,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
             }
         }
 
-        
+
         // Render the light effect of the players border when a block changes owner
         effectRenderer.render(gl, gameModel, elapsedTimeS, lineWidthFactor * 4.0f);
         effectRenderer.renderParticles(gl, elapsedTimeS);
@@ -267,7 +272,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         winningHeightRenderer.render(gl, gameModel, lineWidthFactor);
 
         backgroundRenderer.renderBottom(gl);
-
+        avatarRenderer.render(gl, gameModel, lineWidthFactor);
         triggerRenderer.render(gl, gameModel);
 
         // Render the mouse/finger circles.

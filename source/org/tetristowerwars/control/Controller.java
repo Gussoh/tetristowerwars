@@ -4,6 +4,7 @@
  */
 package org.tetristowerwars.control;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -57,14 +58,12 @@ public class Controller implements InputListener {
         }
 
         if (selectedBlock instanceof BuildingBlock) {
-            // Check if a building block joint already exists for this action id
-           /* if (actionIdToJoint.containsKey(event.getActionId()) == true) {
-            // TODO: Do we really remove the old actionId? Workaround remove it.
-            performReleaseAction(event);
-            }*/
+
+            if (gameModel.getWinningCondition() != null && gameModel.getWinningCondition().isGameOver())  {
+                return; // Do not let user create joints when game is over.
+            }
 
             renderer.putCursorPoint(event.getActionId(), event.getPosition(), true);
-
             actionIdToJoint.put(event.getActionId(), gameModel.createBuildingBlockJoint((BuildingBlock) selectedBlock, renderer.convertWindowToWorldCoordinates(event.getPosition())));
         } else if (selectedBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
@@ -130,6 +129,12 @@ public class Controller implements InputListener {
     }
 
     public synchronized void pumpEvents() {
+
+        if (gameModel.getWinningCondition().isGameOver()) {
+            for (Integer id : actionIdToJoint.keySet()) {
+                performReleaseAction(new InputEvent(InputEvent.RELEASED, new Point(), id));
+            }
+        }
 
         while (!eventQueue.isEmpty()) {
             InputEvent event = eventQueue.poll();

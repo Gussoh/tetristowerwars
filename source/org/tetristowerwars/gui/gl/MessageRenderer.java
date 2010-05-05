@@ -59,9 +59,14 @@ public class MessageRenderer {
         float centerXPos = gameModel.getWorldBoundries().upperBound.x * 0.5f;
         float centerYPos = renderWorldHeight * 0.5f;
 
-        if (gameModel.getWinningCondition().gameIsOver()) {
+        if (gameModel.isGameOver()) {
             ArrayList<TextEntry> leaderEntry = new ArrayList<TextEntry>();
             leaderEntry.add(new TextEntry(gameModel.getLeader().getName() + " wins!"));
+            textRenderer.setColor(1.0f, 1.0f, 0.7f, 1.0f);
+            renderText(leaderEntry, centerXPos, centerYPos, true, true, 4.0f);
+        } else if (gameModel.getWinningCondition().isGameOver()) {
+            ArrayList<TextEntry> leaderEntry = new ArrayList<TextEntry>();
+            leaderEntry.add(new TextEntry(gameModel.getLeader().getName() + " is winning..."));
             textRenderer.setColor(1.0f, 1.0f, 0.7f, 1.0f);
             renderText(leaderEntry, centerXPos, centerYPos, true, true, 4.0f);
         } else if (timeLeftSizeColorAnimation != null) {
@@ -94,7 +99,7 @@ public class MessageRenderer {
             List<TextEntry> texts = new LinkedList<TextEntry>();
 
             texts.add(new TextEntry(player.getName()));
-            texts.add(new TextEntry("Tower height: " + Math.round(player.getTowerHeight()) + " m"));
+            texts.add(new TextEntry("Height: " + Math.round(player.getTowerHeight()) + " m"));
             texts.add(new TextEntry("Blocks: " + player.getBuildingBlocks().size()));
 
             if (messages != null) {

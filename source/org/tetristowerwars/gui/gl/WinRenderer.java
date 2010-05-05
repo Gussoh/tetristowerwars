@@ -10,6 +10,7 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.List;
 import javax.media.opengl.GL;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.animation.Path;
@@ -62,7 +63,7 @@ public class WinRenderer {
     }
 
     public void render(GL gl, GameModel gameModel, float elapsedTimeS, float renderHeight, boolean useParticles) {
-        if (gameModel.getWinningCondition().gameIsOver()) {
+        if (gameModel.isGameOver()) {
             Player winner = gameModel.getLeader();
             if (flagAnimation == null) {
                 float width = gameModel.getWorldBoundries().upperBound.x;
@@ -184,10 +185,15 @@ public class WinRenderer {
             gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             gl.glDisableClientState(GL_COLOR_ARRAY);
             gl.glDisable(GL_TEXTURE_2D);
-        } else { //!gameIsOver
+        } else { //!isGameOver
             shouldFlagExplode = true;
             flagAnimation = null;
             flagResizeAnimation = null;
+            List<Particle> particles = particleEngine.getParticles();
+
+            if (!particles.isEmpty()) {
+                particleEngine.getParticles().clear();
+            }
         }
     }
 }
