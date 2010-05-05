@@ -56,6 +56,10 @@ public class GameModel {
     private WinningCondition winningCondition = null;
     private Player leader = null;
     private final Set<MutableEntry<Block, Integer>> blocksToModify = new LinkedHashSet<MutableEntry<Block, Integer>>();
+    private boolean bulletTimerValid;
+    private long bulletTimer;
+    private boolean gameOver;
+    private final static long GAME_OVER_TIMER = 3000;
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -120,6 +124,7 @@ public class GameModel {
         if (winningCondition != null) {
             winningCondition.reset();
         }
+        gameOver = false;
 
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onGameReset();
@@ -133,15 +138,39 @@ public class GameModel {
 
         long currentTimeNano = System.nanoTime();
 
-        if (winningCondition != null && winningCondition.gameIsOver()) {
-            if (!winningNotificationTriggered) {
-                winningNotificationTriggered = true;
-                for (GameModelListener gameModelListener : gameModelListeners) {
-                    gameModelListener.onWinningConditionFulfilled(winningCondition);
-                }
+
+        if (gameOver) {
+            if (!winningNotificationTriggered)
+            winningNotificationTriggered = true;
+            for (GameModelListener gameModelListener : gameModelListeners) {
+                gameModelListener.onWinningConditionFulfilled(winningCondition);
             }
             return;
         }
+
+        if (winningCondition != null && winningCondition.isGameOver()) {
+
+            boolean moreBulletsExist = false;
+            for (Player player : players) {
+                if (!player.getBullets().isEmpty()) {
+                    moreBulletsExist = true;
+                    break;
+                }
+            }
+
+            if (moreBulletsExist) {
+                bulletTimerValid = false;
+            } else {
+                if (!bulletTimerValid) {
+                    bulletTimerValid = true;
+                    bulletTimer = System.currentTimeMillis() + GAME_OVER_TIMER;
+                } else if (System.currentTimeMillis() > bulletTimer) {
+                    gameOver = true;
+                    bulletTimerValid = false;
+                }
+            }
+        }
+
         world.step(1f / 60f, ITERATIONS_PER_STEP);
 
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
@@ -327,7 +356,7 @@ public class GameModel {
                     if (b instanceof BuildingBlock) {
                         return b;
                     }
-                    if ((b instanceof TriggerBlock && ((TriggerBlock)b).isVisible())) {
+                    if ((b instanceof TriggerBlock && ((TriggerBlock) b).isVisible())) {
                         return b;
                     }
                 }
@@ -556,6 +585,10 @@ public class GameModel {
 
     protected void addTriggerBlock(TriggerBlock triggerBlock) {
         triggerBlocks.add(triggerBlock);
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {

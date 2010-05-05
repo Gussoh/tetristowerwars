@@ -28,7 +28,7 @@ public abstract class WinningCondition {
     public abstract float getWinningHeight(Player player);
         
 
-    public boolean gameIsOver() {
+    public boolean isGameOver() {
         int timeLeft = timeLeftUntilGameOver();
         if (timeLeft != lastTimeLeftUntilGameOver) {
             lastTimeLeftUntilGameOver = timeLeft;

@@ -37,7 +37,7 @@ public class TimedWinningCondition extends WinningCondition {
     }
 
     @Override
-    public boolean gameIsOver() {
+    public boolean isGameOver() {
         return System.currentTimeMillis() > endTimeMs;
     }
 

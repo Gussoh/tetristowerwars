@@ -127,7 +127,7 @@ public class TouchGameLogic {
 
                     @Override
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
-                        if (timePressed + 4000 < System.currentTimeMillis()) {
+                        if (timePressed + 2000 < System.currentTimeMillis()) {
                             alive = false;
                             SwingUtilities.invokeLater(new Runnable() {
 
@@ -153,6 +153,7 @@ public class TouchGameLogic {
 
                     @Override
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
+                        triggerBlock.setVisible(false);
                     }
                 });
 
@@ -183,18 +184,8 @@ public class TouchGameLogic {
                             timedReset = true;
                         }
 
-                        if (gameModel.getWinningCondition().gameIsOver() && !restartTrigger.isVisible()) {
+                        if (gameModel.isGameOver() && !restartTrigger.isVisible()) {
                             restartTrigger.setVisible(true);
-
-                            //reset timer at end of game
-//                        if (timedReset) {
-//                            resetTime = System.currentTimeMillis() + 20000;
-//                            timedReset = false;
-//                        } else if (System.currentTimeMillis() >= resetTime) {
-//                            System.out.println("RESETTING");
-//                            timedReset = true;
-//                            gameModel.reset();
-//                        }
                         }
                     }
 
