@@ -148,15 +148,11 @@ public class TouchGameLogic {
 
                     @Override
                     public void onTriggerPressed(TriggerBlock triggerBlock) {
-                        timePressed = System.currentTimeMillis();
+                        resetGame = true;
                     }
 
                     @Override
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
-                        if (timePressed + 200 < System.currentTimeMillis()) {
-                            triggerBlock.setVisible(false);
-                            resetGame = true;
-                        }
                     }
                 });
 
