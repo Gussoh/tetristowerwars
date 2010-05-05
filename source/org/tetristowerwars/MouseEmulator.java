@@ -71,4 +71,8 @@ public class MouseEmulator implements InputListener {
             robot.mouseMove(event.getPosition().x, event.getPosition().y);
         }
     }
+
+    public void setMousePosition(int x, int y) {
+        robot.mouseMove(x, y);
+    }
 }

@@ -222,10 +222,11 @@ public class TouchGamePanel extends javax.swing.JPanel {
         jLabel6.setText("must be fulfilled.");
 
         heightSlider.setMajorTickSpacing(50);
-        heightSlider.setMaximum(200);
+        heightSlider.setMaximum(130);
         heightSlider.setMinorTickSpacing(10);
         heightSlider.setPaintLabels(true);
         heightSlider.setPaintTicks(true);
+        heightSlider.setSnapToTicks(true);
         heightSlider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         heightSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -243,11 +244,12 @@ public class TouchGamePanel extends javax.swing.JPanel {
             }
         });
 
-        timeSlider.setMajorTickSpacing(200);
-        timeSlider.setMaximum(600);
-        timeSlider.setMinorTickSpacing(50);
+        timeSlider.setMajorTickSpacing(60);
+        timeSlider.setMaximum(300);
+        timeSlider.setMinorTickSpacing(10);
         timeSlider.setPaintLabels(true);
         timeSlider.setPaintTicks(true);
+        timeSlider.setSnapToTicks(true);
         timeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 timeSliderStateChanged(evt);
