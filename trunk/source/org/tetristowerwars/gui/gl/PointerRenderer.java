@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.media.opengl.GL;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.gui.gl.animation.Path;
+import org.tetristowerwars.model.GameModel;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -25,16 +26,23 @@ import static javax.media.opengl.GL.*;
 public class PointerRenderer {
 
     private final Texture texture;
+    private final Texture disabledTexture;
     private FloatBuffer vertexBuffer;
     private FloatBuffer texCoordBuffer;
     private FloatBuffer colorBuffer;
     private static final int NUM_VERTICES_PER_POINTER = 4;
     private static final float POINTER_RADIUS = 3.0f;
     private Map<Integer, Path> intensityPaths = new LinkedHashMap<Integer, Path>();
+    private final GameModel gameModel;
 
-    public PointerRenderer(GL gl) throws IOException {
+    public PointerRenderer(GL gl, GameModel gameModel) throws IOException {
+        this.gameModel = gameModel;
+
         texture = TextureIO.newTexture(new File("res/gfx/marker.png"), true);
         GLUtil.fixTextureParameters(texture);
+
+        disabledTexture = TextureIO.newTexture(new File("res/gfx/marker-disabled.png"), true);
+        GLUtil.fixTextureParameters(disabledTexture);
 
         vertexBuffer = BufferUtil.newFloatBuffer(4 * NUM_VERTICES_PER_POINTER * 2);
         texCoordBuffer = BufferUtil.newFloatBuffer(4 * NUM_VERTICES_PER_POINTER * 2);
@@ -121,7 +129,12 @@ public class PointerRenderer {
         gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
         gl.glColorPointer(4, GL_FLOAT, 0, colorBuffer);
 
-        texture.bind();
+        if (gameModel.getWinningCondition().isGameOver()) {
+            disabledTexture.bind();
+        } else {
+            texture.bind();
+        }
+        
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
 
 

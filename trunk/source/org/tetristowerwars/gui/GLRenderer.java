@@ -169,7 +169,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         try {
             bulletRenderer = new BulletRenderer(gl, lightingEffects);
             cannonRenderer = new CannonRenderer(gl, gameModel.getBlockSize(), lightingEffects);
-            pointerRenderer = new PointerRenderer(gl);
+            pointerRenderer = new PointerRenderer(gl, gameModel);
             effectRenderer = new EffectRenderer(gl, gameModel);
             messageRenderer = new MessageRenderer(gl);
             backgroundAnimationRenderer = new BackgroundAnimationRenderer(gl, mainFrame.getSettings().getWorldTheme());
