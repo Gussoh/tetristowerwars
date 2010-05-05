@@ -102,18 +102,28 @@ public class PointerRenderer {
                         0.0f, 0.0f
                     });
 
-            float greenBlueColor;
-            if (entry.getValue().hit) {
-                greenBlueColor = 1.0f - p.getRatio();
+            if (gameModel.getWinningCondition().isGameOver()) {
+                colorBuffer.put(new float[]{
+                            1.0f, 0f, 0f, alpha,
+                            1.0f, 0f, 0f, alpha,
+                            1.0f, 0f, 0f, alpha,
+                            1.0f, 0f, 0f, alpha
+                        });
             } else {
-                greenBlueColor = 0.0f;
+                float fader;
+                if (entry.getValue().hit) {
+                    fader = 1.0f - p.getRatio();
+                } else {
+                    fader = 0.0f;
+                }
+                colorBuffer.put(new float[]{
+                            fader, 1.0f, fader, alpha,
+                            fader, 1.0f, fader, alpha,
+                            fader, 1.0f, fader, alpha,
+                            fader, 1.0f, fader, alpha
+                        });
             }
-            colorBuffer.put(new float[]{
-                        1.0f, greenBlueColor, greenBlueColor, alpha,
-                        1.0f, greenBlueColor, greenBlueColor, alpha,
-                        1.0f, greenBlueColor, greenBlueColor, alpha,
-                        1.0f, greenBlueColor, greenBlueColor, alpha
-                    });
+
         }
 
         vertexBuffer.rewind();
@@ -134,7 +144,7 @@ public class PointerRenderer {
         } else {
             texture.bind();
         }
-        
+
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
 
 
