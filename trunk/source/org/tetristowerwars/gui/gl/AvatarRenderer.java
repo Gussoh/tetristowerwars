@@ -91,9 +91,9 @@ public class AvatarRenderer {
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        gl.glLineWidth(lineWidthFactor * 2);
-        gl.glColor4fv(new float[] {0.0f, 0.0f, 0.0f, 1.0f}, 0);
-        gl.glDrawArrays(GL_LINE_LOOP, 0, 4);
-        gl.glDrawArrays(GL_LINE_LOOP, 4, 4);
+//        gl.glLineWidth(lineWidthFactor * 2);
+//        gl.glColor4fv(new float[] {0.0f, 0.0f, 0.0f, 1.0f}, 0);
+//        gl.glDrawArrays(GL_LINE_LOOP, 0, 4);
+//        gl.glDrawArrays(GL_LINE_LOOP, 4, 4);
     }
 }
