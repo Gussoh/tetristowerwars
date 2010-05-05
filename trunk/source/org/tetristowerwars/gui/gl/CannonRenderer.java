@@ -58,6 +58,7 @@ public class CannonRenderer {
         GLUtil.fixTextureParameters(topTexture);
         GLUtil.fixTextureParameters(pipeTexture);
 
+
         baseVertexBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 2);
         topVertexBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 2);
         pipeVertexBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 2);
@@ -116,7 +117,7 @@ public class CannonRenderer {
                         ps = (PolygonShape) shape;
                     }
                 }
-                
+
                 if (ps == null) {
                     System.out.println("WARNING: cannon did not contain a polygonShape");
                     continue;
@@ -243,6 +244,7 @@ public class CannonRenderer {
         pipeTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
 
+
         gl.glVertexPointer(2, GL_FLOAT, 0, baseVertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, baseTexCoordBuffer);
         if (lightingEffects) {
@@ -266,5 +268,6 @@ public class CannonRenderer {
             gl.glDisable(GL_LIGHTING);
             gl.glDisableClientState(GL_NORMAL_ARRAY);
         }
+
     }
 }

@@ -188,13 +188,14 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         gl.glEnable(GL_NORMALIZE);
         gl.glEnable(GL_BLEND);
+        gl.glEnable(GL_COLOR_SUM);
 
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, mainLightColor, 0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, mainLightColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_POSITION, mainLightPosition, 0);
 
         gl.glEnable(GL_LIGHT0);
@@ -206,7 +207,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         //gl.glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
         // TODO: Check if we need to have specular color added in the fragment shader instead.
         // This might be needed for good looking shiny effects when using textures.
-        //gl.glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+        gl.glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
 
         lastTimeMillis = System.currentTimeMillis();
