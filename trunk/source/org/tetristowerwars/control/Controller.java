@@ -6,6 +6,7 @@ package org.tetristowerwars.control;
 
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -131,7 +132,9 @@ public class Controller implements InputListener {
     public synchronized void pumpEvents() {
 
         if (gameModel.getWinningCondition().isGameOver()) {
-            for (Integer id : actionIdToJoint.keySet()) {
+            LinkedHashSet<Integer> actionSet = new LinkedHashSet<Integer>(actionIdToJoint.keySet());
+            
+            for (Integer id : actionSet) {
                 performReleaseAction(new InputEvent(InputEvent.RELEASED, new Point(), id));
             }
         }
