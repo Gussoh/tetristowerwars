@@ -16,12 +16,20 @@ public abstract class Block {
     private final Body body;
     private Player owner;
     private boolean destroyed = false;
+    private boolean hilighted = false;
 
     public Block(Body body) {
         this.body = body;
         body.setUserData(this);
     }
 
+    public boolean isHilighted() {
+        return hilighted;
+    }
+
+    public void setHilighted(boolean hilighted) {
+        this.hilighted = hilighted;
+    }
 
     protected void destroyBody(World world) {
         if (!destroyed) {
