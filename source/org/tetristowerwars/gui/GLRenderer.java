@@ -127,7 +127,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         glCanvas.setAutoSwapBufferMode(true);
         glCanvas.setPreferredSize(new Dimension(settings.getWindowWidth(), settings.getWindowHeight()));
 
-        mainFrame.openComponent(glCanvas, true);
+        mainFrame.openComponent(glCanvas, false);
 
     }
 
@@ -195,7 +195,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, mainLightColor, 0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, new float[]{0.0f, 0.0f, 0.0f, 1.0f}, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, new float[]{1.0f, 1.0f, 1.0f, 1.0f}, 0);
         gl.glLightfv(GL_LIGHT0, GL_POSITION, mainLightPosition, 0);
 
         gl.glEnable(GL_LIGHT0);

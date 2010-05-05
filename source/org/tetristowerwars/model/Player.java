@@ -169,6 +169,10 @@ public class Player {
 
     protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock, float groundLevel) {
 
+        if (highestBuilingBlockInTower != null) {
+            highestBuilingBlockInTower.setHilighted(false);
+        }
+
         towerBodies.add(groundBlock.getBody());
 
         // Create undirected graph
@@ -233,6 +237,7 @@ public class Player {
 
         if (highestConnectedBody.getUserData() instanceof BuildingBlock) {
             highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
+            highestBuilingBlockInTower.setHilighted(true);
             towerHeight = highestPositionInBody - groundLevel;
         } else {
             highestBuilingBlockInTower = null;

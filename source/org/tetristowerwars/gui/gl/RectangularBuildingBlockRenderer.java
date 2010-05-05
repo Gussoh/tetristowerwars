@@ -42,6 +42,7 @@ public class RectangularBuildingBlockRenderer {
     private final float flatSquareRatio = 0.8f;
     private final boolean lightingEffects;
     private FloatBuffer lineVertexBuffer;
+    private FloatBuffer lineColorBuffer;
     private FloatBuffer animationVertexBuffer;
     private FloatBuffer animationColorBuffer;
     private int numLines;
@@ -56,6 +57,7 @@ public class RectangularBuildingBlockRenderer {
     private final static float NON_OWNED_BLOCK_COLOR_FACTOR = 1.0f;
     private final static float NON_OWNED_BLOCK_ALPHA_FACTOR = 0.6f;
     private final Map<BuildingBlock, Path> animations = new LinkedHashMap<BuildingBlock, Path>();
+    private final Map<BuildingBlock, Path> lineHilightAnimations = new LinkedHashMap<BuildingBlock, Path>();
 
     public RectangularBuildingBlockRenderer(GL gl, boolean lightingEffects) throws IOException {
         this.lightingEffects = lightingEffects;
@@ -71,6 +73,7 @@ public class RectangularBuildingBlockRenderer {
         createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
+        lineColorBuffer = BufferUtil.newFloatBuffer(200);
         animationVertexBuffer = BufferUtil.newFloatBuffer(4 * 2 * 20);
         animationColorBuffer = BufferUtil.newFloatBuffer(4 * 4 * 20);
     }
@@ -113,6 +116,7 @@ public class RectangularBuildingBlockRenderer {
 
         if (numVertices * 2 > lineVertexBuffer.capacity()) {
             lineVertexBuffer = BufferUtil.newFloatBuffer(numVertices * 2);
+            lineColorBuffer = BufferUtil.newFloatBuffer(numVertices * 4);
         }
 
 
@@ -164,7 +168,12 @@ public class RectangularBuildingBlockRenderer {
         bufferEntry.colorBuffer.put(color);
     }
 
-    private void createBufferData(Set<BuildingBlock> buildingBlocks) {
+    private void createBufferData(Set<BuildingBlock> buildingBlocks, float elapsedTimeS, GameModel gameModel) {
+
+        boolean hilightingEnabled = false;
+        if (gameModel.getWinningCondition() != null) {
+            hilightingEnabled = gameModel.getWinningCondition().timeLeftUntilGameOver() != -1;
+        }
         for (BuildingBlock buildingBlock : buildingBlocks) {
             if (buildingBlock instanceof RectangularBuildingBlock) {
                 RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
@@ -176,12 +185,12 @@ public class RectangularBuildingBlockRenderer {
 
                 float[] color;
                 if (rbb.getOwner() == null) {
-                    color = new float[] {
-                        bufferEntry.color[0] * NON_OWNED_BLOCK_COLOR_FACTOR,
-                        bufferEntry.color[1] * NON_OWNED_BLOCK_COLOR_FACTOR,
-                        bufferEntry.color[2] * NON_OWNED_BLOCK_COLOR_FACTOR,
-                        bufferEntry.color[3] * NON_OWNED_BLOCK_ALPHA_FACTOR
-                    };
+                    color = new float[]{
+                                bufferEntry.color[0] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                                bufferEntry.color[1] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                                bufferEntry.color[2] * NON_OWNED_BLOCK_COLOR_FACTOR,
+                                bufferEntry.color[3] * NON_OWNED_BLOCK_ALPHA_FACTOR
+                            };
                 } else {
                     color = bufferEntry.color;
                 }
@@ -214,14 +223,14 @@ public class RectangularBuildingBlockRenderer {
                         Vec2 ibr = XForm.mul(xForm, new Vec2(internalMaxX, internalMinY));
                         Vec2 itr = XForm.mul(xForm, new Vec2(internalMaxX, internalMaxY));
                         Vec2 itl = XForm.mul(xForm, new Vec2(internalMinX, internalMaxY));
-                       
+
 
                         Vec2 texIntBl = new Vec2(internalMinX * TEXTURE_COORD_FACTOR, internalMinY * TEXTURE_COORD_FACTOR);
                         Vec2 texIntBr = new Vec2(internalMaxX * TEXTURE_COORD_FACTOR, internalMinY * TEXTURE_COORD_FACTOR);
                         Vec2 texIntTr = new Vec2(internalMaxX * TEXTURE_COORD_FACTOR, internalMaxY * TEXTURE_COORD_FACTOR);
                         Vec2 texIntTl = new Vec2(internalMinX * TEXTURE_COORD_FACTOR, internalMaxY * TEXTURE_COORD_FACTOR);
 
-                         // create the Middle
+                        // create the Middle
                         Vec3 normal = new Vec3(0.0f, 0.0f, 1.0f);
                         putDataIntoBuffers(bufferEntry, ibl, ibr, itr, itl, normal, color);
                         putTextureData(bufferEntry, texIntBl, texIntBr, texIntTr, texIntTl);
@@ -278,6 +287,31 @@ public class RectangularBuildingBlockRenderer {
                                 end.x, end.y
                             });
 
+                    
+                    if (buildingBlock.isHilighted() && hilightingEnabled) {
+
+                        Path colorPath = lineHilightAnimations.get(buildingBlock);
+                        if (colorPath == null) {
+                            colorPath = new Path(new Vec2(-0.8f, 0.0f), new Vec2(0.9f, 0.0f), 2.0f);
+                            lineHilightAnimations.put(buildingBlock, colorPath);
+
+                        }
+                        colorPath.addTime(elapsedTimeS);
+
+                        float lineColor = Math.max(colorPath.getCurrentPosition().x, 0);
+                        lineColorBuffer.put(new float[]{
+                                    lineColor, lineColor, lineColor, 1.0f,
+                                    lineColor, lineColor, lineColor, 1.0f
+                                });
+                    } else {
+
+                        lineHilightAnimations.remove(buildingBlock);
+                        lineColorBuffer.put(new float[]{
+                                    0.0f, 0.0f, 0.0f, 1.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f
+                                });
+                    }
+
                     start = end;
                 }
             }
@@ -288,12 +322,13 @@ public class RectangularBuildingBlockRenderer {
         ensureBufferCapacity(gameModel);
         updateAnimationsAndBufferCapacity(elapsedTimeS);
 
-        createBufferData(gameModel.getBuildingBlockPool());
+        createBufferData(gameModel.getBuildingBlockPool(), elapsedTimeS, gameModel);
         for (Player player : gameModel.getPlayers()) {
-            createBufferData(player.getBuildingBlocks());
+            createBufferData(player.getBuildingBlocks(), elapsedTimeS, gameModel);
         }
 
         lineVertexBuffer.rewind();
+        lineColorBuffer.rewind();
         animationVertexBuffer.rewind();
         animationColorBuffer.rewind();
 
@@ -323,9 +358,9 @@ public class RectangularBuildingBlockRenderer {
             if (lightingEffects) {
                 bufferEntry.normalBuffer.rewind();
                 gl.glNormalPointer(GL_FLOAT, 0, bufferEntry.normalBuffer);
-              //  gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bufferEntry.color, 0);
+                //  gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bufferEntry.color, 0);
                 gl.glMaterialfv(GL_FRONT, GL_SPECULAR, bufferEntry.specular, 0);
-            } 
+            }
 
             bufferEntry.texture.bind();
             gl.glDrawArrays(GL_QUADS, 0, bufferEntry.numSquares * NUM_VERTICES_PER_SQUARE);
@@ -345,9 +380,14 @@ public class RectangularBuildingBlockRenderer {
 
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl.glLineWidth(lineWidth);
-        gl.glColor4fv(outlineColor, 0);
+
+        gl.glEnableClientState(GL_COLOR_ARRAY);
+
         gl.glVertexPointer(2, GL_FLOAT, 0, lineVertexBuffer);
+        gl.glColorPointer(4, GL_FLOAT, 0, lineColorBuffer);
         gl.glDrawArrays(GL_LINES, 0, numLines * 2);
+
+        gl.glDisableClientState(GL_COLOR_ARRAY);
     }
 
     public void renderOverlay(GL gl) {
