@@ -23,6 +23,7 @@ import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.RectangularBuildingBlock;
+import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.SteelMaterial;
@@ -168,12 +169,8 @@ public class RectangularBuildingBlockRenderer {
         bufferEntry.colorBuffer.put(color);
     }
 
-    private void createBufferData(Set<BuildingBlock> buildingBlocks, float elapsedTimeS, GameModel gameModel) {
+    private void createBufferData(Set<BuildingBlock> buildingBlocks, float elapsedTimeS, boolean hilightingEnabled) {
 
-        boolean hilightingEnabled = false;
-        if (gameModel.getWinningCondition() != null) {
-            hilightingEnabled = gameModel.getWinningCondition().timeLeftUntilGameOver() != -1;
-        }
         for (BuildingBlock buildingBlock : buildingBlocks) {
             if (buildingBlock instanceof RectangularBuildingBlock) {
                 RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
@@ -292,7 +289,7 @@ public class RectangularBuildingBlockRenderer {
 
                         Path colorPath = lineHilightAnimations.get(buildingBlock);
                         if (colorPath == null) {
-                            colorPath = new Path(new Vec2(-0.8f, 0.0f), new Vec2(0.9f, 0.0f), 2.0f);
+                            colorPath = new Path(new Vec2(-0.8f, 0.0f), new Vec2(0.5f, 0.0f), 2.0f);
                             lineHilightAnimations.put(buildingBlock, colorPath);
 
                         }
@@ -322,9 +319,18 @@ public class RectangularBuildingBlockRenderer {
         ensureBufferCapacity(gameModel);
         updateAnimationsAndBufferCapacity(elapsedTimeS);
 
-        createBufferData(gameModel.getBuildingBlockPool(), elapsedTimeS, gameModel);
+        WinningCondition wc = gameModel.getWinningCondition();
+        Player leader = null;
+        boolean countingDown = false;
+        if (wc != null) {
+            countingDown = wc.timeLeftUntilGameOver() != -1;
+            leader = wc.getLeader().getPlayer();
+        }
+
+
+        createBufferData(gameModel.getBuildingBlockPool(), elapsedTimeS, false);
         for (Player player : gameModel.getPlayers()) {
-            createBufferData(player.getBuildingBlocks(), elapsedTimeS, gameModel);
+            createBufferData(player.getBuildingBlocks(), elapsedTimeS, player == leader && countingDown);
         }
 
         lineVertexBuffer.rewind();
