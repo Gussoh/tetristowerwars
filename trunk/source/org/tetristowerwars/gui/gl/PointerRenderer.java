@@ -113,15 +113,23 @@ public class PointerRenderer {
                 float fader;
                 if (entry.getValue().hit) {
                     fader = 1.0f - p.getRatio();
+
+                    colorBuffer.put(new float[]{
+                                fader, 1.0f, fader, alpha,
+                                fader, 1.0f, fader, alpha,
+                                fader, 1.0f, fader, alpha,
+                                fader, 1.0f, fader, alpha
+                            });
                 } else {
-                    fader = 0.0f;
+
+                    colorBuffer.put(new float[]{
+                                1.0f, 1.0f, 0, alpha,
+                                1.0f, 1.0f, 0, alpha,
+                                1.0f, 1.0f, 0, alpha,
+                                1.0f, 1.0f, 0, alpha
+                            });
                 }
-                colorBuffer.put(new float[]{
-                            fader, 1.0f, fader, alpha,
-                            fader, 1.0f, fader, alpha,
-                            fader, 1.0f, fader, alpha,
-                            fader, 1.0f, fader, alpha
-                        });
+
             }
 
         }

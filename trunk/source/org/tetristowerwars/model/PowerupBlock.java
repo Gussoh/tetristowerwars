@@ -1,6 +1,17 @@
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
+ *
+ * rubber walls
+ * lower countdown
+ * own block pool
+ * more cannons
+ * cannon pool stacks
+
+ * rubber blocks
+ * ghost blocks - cannon balls go through
+ * invounrable blocks
+ *
  */
 
 package org.tetristowerwars.model;
