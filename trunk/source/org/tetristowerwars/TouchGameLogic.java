@@ -47,7 +47,7 @@ public class TouchGameLogic {
 
     public TouchGameLogic(final MainFrame mainFrame) {
 
-        mainFrame.disableMouseEmulation();
+
 
         DisplayMode displayMode = mainFrame.getJFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
@@ -91,6 +91,9 @@ public class TouchGameLogic {
         CompoundWinningCondition.LogicType logicType = settings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;
         CompoundWinningCondition cwc = new CompoundWinningCondition(gameModel, winningConditions, logicType);
         cwc.setWinningCondition();
+
+        mainFrame.setMousePosition(screenDimensions.height, screenDimensions.width);
+        mainFrame.disableMouseEmulation();
 
         glRenderer.getInputComponent().addKeyListener(new KeyAdapter() {
 
@@ -141,21 +144,21 @@ public class TouchGameLogic {
 
                 TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
 
-                            private long timePressed;
+                    private long timePressed;
 
-                            @Override
-                            public void onTriggerPressed(TriggerBlock triggerBlock) {
-                                timePressed = System.currentTimeMillis();
-                            }
+                    @Override
+                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                        timePressed = System.currentTimeMillis();
+                    }
 
-                            @Override
-                            public void onTriggerReleased(TriggerBlock triggerBlock) {
-                                if (timePressed + 200 < System.currentTimeMillis()) {
-                                    triggerBlock.setVisible(false);
-                                    resetGame = true;
-                                }
-                            }
-                        });
+                    @Override
+                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                        if (timePressed + 200 < System.currentTimeMillis()) {
+                            triggerBlock.setVisible(false);
+                            resetGame = true;
+                        }
+                    }
+                });
 
                 while (alive) {
                     Thread.yield();
@@ -168,11 +171,7 @@ public class TouchGameLogic {
                         stepTimeNano = (long) (constantStepTimeS * 1000000000.0f);
                     }
 
-                    if (resetGame) {
-                        gameModel.reset();
-                        resetGame = false;
-                        timedReset = true;
-                    }
+
 
                     while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
                         mouseController.pumpEvents();
@@ -181,6 +180,26 @@ public class TouchGameLogic {
                         gameModel.update();
                         numTimesStepped++;
                         stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
+
+                        if (resetGame) {
+                            gameModel.reset();
+                            resetGame = false;
+                            timedReset = true;
+                        }
+
+                        if (gameModel.getWinningCondition().gameIsOver() && !restartTrigger.isVisible()) {
+                            restartTrigger.setVisible(true);
+
+                            //reset timer at end of game
+//                        if (timedReset) {
+//                            resetTime = System.currentTimeMillis() + 20000;
+//                            timedReset = false;
+//                        } else if (System.currentTimeMillis() >= resetTime) {
+//                            System.out.println("RESETTING");
+//                            timedReset = true;
+//                            gameModel.reset();
+//                        }
+                        }
                     }
 
                     lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
@@ -195,19 +214,7 @@ public class TouchGameLogic {
                         }
                     }
 
-                    if (gameModel.getWinningCondition().gameIsOver() && !restartTrigger.isVisible()) {
-                        restartTrigger.setVisible(true);
-                        
-                         //reset timer at end of game
-//                        if (timedReset) {
-//                            resetTime = System.currentTimeMillis() + 20000;
-//                            timedReset = false;
-//                        } else if (System.currentTimeMillis() >= resetTime) {
-//                            System.out.println("RESETTING");
-//                            timedReset = true;
-//                            gameModel.reset();
-//                        }
-                    }
+
                 }
                 soundPlayer.stopAllMusic();
                 soundPlayer.unloadAllSounds();

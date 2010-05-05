@@ -101,6 +101,12 @@ public class MainFrame {
             frame.add(component);
             frame.pack();
         }
+
+        if (settings.isMouseEmulationEnabled()) {
+            enableMouseEmulation();
+        } else {
+            disableMouseEmulation();
+        }
     }
 
     public JFrame getJFrame() {
@@ -122,10 +128,22 @@ public class MainFrame {
         }
         frame.add(componentStack.peek());
         frame.pack();
+
+        if (settings.isMouseEmulationEnabled()) {
+            enableMouseEmulation();
+        } else {
+            disableMouseEmulation();
+        }
     }
 
     public Settings getSettings() {
         return settings;
+    }
+
+    public void setMousePosition(int x, int y) {
+        if (emulator != null) {
+            emulator.setMousePosition(x, y);
+        }
     }
 
     public void enableMouseEmulation() {
