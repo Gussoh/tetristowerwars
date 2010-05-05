@@ -32,7 +32,7 @@ public class BulletRenderer {
     private final int NUM_VERTICES_PER_BULLET = 4;
     private final boolean lightingEffects;
     private final float[] color = {1.0f, 1.0f, 1.0f, 1.0f};
-    private final float[] specular = {1.0f, 1.0f, 1.0f, 1.0f};
+    private final float[] specular = {0.0f, 0.0f, 0.0f, 1.0f};
 
     public BulletRenderer(GL gl, boolean lightingEffects) throws IOException {
         texture = TextureIO.newTexture(new File("res/gfx/bullet.png"), true);
