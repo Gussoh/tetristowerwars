@@ -167,7 +167,7 @@ public class Player {
         return towerHeight;
     }
 
-    protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock, float groundLevel) {
+    protected void calcHighestBuildingBlockInTower(GroundBlock groundBlock, boolean hilightHighestBlock, float groundLevel) {
 
         if (highestBuilingBlockInTower != null) {
             highestBuilingBlockInTower.setHilighted(false);
@@ -237,7 +237,9 @@ public class Player {
 
         if (highestConnectedBody.getUserData() instanceof BuildingBlock) {
             highestBuilingBlockInTower = (BuildingBlock) highestConnectedBody.getUserData();
-            highestBuilingBlockInTower.setHilighted(true);
+            if (hilightHighestBlock) {
+                highestBuilingBlockInTower.setHilighted(true);
+            }
             towerHeight = highestPositionInBody - groundLevel;
         } else {
             highestBuilingBlockInTower = null;
@@ -269,5 +271,4 @@ public class Player {
         }
         return neighbours;
     }
-
 }

@@ -208,11 +208,11 @@ public class TouchGameLogic {
                             }
                         }
 
-//                        if (loopCount % 5000 == 0) {
-//                            for (Player player : gameModel.getPlayers()) {
-//                                gameModel.getPowerupFactory().createPowerUp(player);
-//                            }
-//                        }
+                        if (loopCount % 500 == 0) {
+                            for (Player player : gameModel.getPlayers()) {
+                                gameModel.getPowerupFactory().createPowerUp(player);
+                            }
+                        }
 
                         loopCount++;
                     }

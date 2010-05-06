@@ -208,7 +208,7 @@ public class CannonRenderer {
                         });
 
                 float[] hilightColor;
-                if (cannonBlock.isHilighted()) {
+                if (cannonBlock.isPowerupHilighted() || cannonBlock.isHilighted()) {
                     if (lightingEffects) {
                         hilightColor = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
                     } else {
