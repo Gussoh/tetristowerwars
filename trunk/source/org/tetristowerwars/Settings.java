@@ -43,6 +43,7 @@ public class Settings {
     public static final String KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET = "must_all_winning_conditions_be_met";
     public static final String KEY_MOUSE_EMULATION = "mouse_emulation";
     public static final String KEY_FULLSCREEN = "fullscreen";
+    public static final String KEY_POWERUPS = "powerups";
 
     private final Properties properties = new Properties();
 
@@ -164,6 +165,10 @@ public class Settings {
 
     public boolean isFullscreen() {
         return Boolean.parseBoolean(properties.getProperty(KEY_FULLSCREEN, "true"));
+    }
+
+    public boolean isPowerups() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_POWERUPS, "true"));
     }
 
     private float getFloatProperty(String key, float defaultValue) {
