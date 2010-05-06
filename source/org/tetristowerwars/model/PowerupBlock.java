@@ -22,16 +22,20 @@
 
 package org.tetristowerwars.model;
 
+import java.awt.geom.Rectangle2D;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
  * @author Gussoh
  */
-public class PowerupBlock extends Block {
+public class PowerupBlock extends RectangularBuildingBlock {
 
-    public PowerupBlock(Body body) {
-        super(body);
+    public PowerupBlock(Body body, Material material, Rectangle2D[] rectangles, Vec2[] outline) {
+        super(body, material, rectangles, outline);
     }
 
 }

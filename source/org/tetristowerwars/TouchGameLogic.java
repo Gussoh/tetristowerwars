@@ -123,10 +123,16 @@ public class TouchGameLogic {
                     public void onTriggerPressed(TriggerBlock triggerBlock) {
                         timePressed = System.currentTimeMillis();
                         triggerBlock.setText("Hold");
+                        System.out.println("LELEL: " + timePressed);
                     }
 
                     @Override
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
+                        triggerBlock.setText("Exit");
+                    }
+
+                    @Override
+                    public void onTriggerHold(TriggerBlock triggerBlock) {
                         if (timePressed + 2000 < System.currentTimeMillis()) {
                             alive = false;
                             SwingUtilities.invokeLater(new Runnable() {
@@ -137,9 +143,9 @@ public class TouchGameLogic {
                                 }
                             });
                         }
-
-                        triggerBlock.setText("Exit");
                     }
+
+
                 }).setVisible(true);
 
                 TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
@@ -155,8 +161,15 @@ public class TouchGameLogic {
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
                         triggerBlock.setVisible(false);
                     }
+
+                    @Override
+                    public void onTriggerHold(TriggerBlock triggerBlock) {
+                    }
+
+
                 });
 
+                int loopCount = 0;
                 while (alive) {
                     Thread.yield();
 
@@ -187,6 +200,21 @@ public class TouchGameLogic {
                         if (gameModel.isGameOver() && !restartTrigger.isVisible()) {
                             restartTrigger.setVisible(true);
                         }
+
+                        if (gameModel.getBuildingBlockPool().size() <= 2) {
+                            for (int i = 0; i < 7; i++) {
+
+                                createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
+                            }
+                        }
+
+//                        if (loopCount % 5000 == 0) {
+//                            for (Player player : gameModel.getPlayers()) {
+//                                gameModel.getPowerupFactory().createPowerUp(player);
+//                            }
+//                        }
+
+                        loopCount++;
                     }
 
                     lastStepTimeNano = currentTimeNano - stepTimeNano; // Save remaining step time
@@ -194,13 +222,6 @@ public class TouchGameLogic {
                     if (numTimesStepped > 0) {
                         glRenderer.renderFrame();
                     }
-
-                    if (gameModel.getBuildingBlockPool().size() <= 2) {
-                        for (int i = 0; i < 7; i++) {
-                            createRandomBuildingBlock(gameModel, playerAreaWidth, settings.getWorldWidth() - playerAreaWidth);
-                        }
-                    }
-
 
                 }
                 soundPlayer.stopAllMusic();

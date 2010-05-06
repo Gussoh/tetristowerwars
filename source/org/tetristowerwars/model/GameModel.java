@@ -47,6 +47,7 @@ public class GameModel {
     private final CannonFactory cannonFactory;
     private final BulletFactory bulletFactory;
     private final TriggerBlockFactory triggerBlockFactory;
+    private final PowerupFactory powerupFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private final Map<BuildingBlock, CannonBlock> blocksOverlappingCannon = new LinkedHashMap<BuildingBlock, CannonBlock>();
@@ -96,6 +97,7 @@ public class GameModel {
         cannonFactory = new CannonFactory(this, blockSize);
         bulletFactory = new BulletFactory(this, blockSize);
         triggerBlockFactory = new TriggerBlockFactory(this);
+        powerupFactory = new PowerupFactory(this);
         world.setBoundaryListener(physicsEngineListener);
         world.setContactListener(physicsEngineListener);
         world.setContactFilter(physicsEngineListener);
@@ -474,6 +476,7 @@ public class GameModel {
         for (Iterator<Map.Entry<BuildingBlock, CannonBlock>> it = blocksOverlappingCannon.entrySet().iterator(); it.hasNext();) {
             Map.Entry<BuildingBlock, CannonBlock> entry = it.next();
             BuildingBlock bb = entry.getKey();
+            CannonBlock cannon = entry.getValue();
             XForm xForm = bb.getBody().getXForm();
 
             boolean found = false;
@@ -486,13 +489,12 @@ public class GameModel {
 
                 for (Shape shape : foundShapes) {
                     Object userData = shape.getBody().getUserData();
-                    if (userData instanceof CannonBlock) {
+                    if (userData == cannon) {
                         found = true;
-                        CannonBlock cannonBlock = (CannonBlock) userData;
-                        if (cannonBlock.isArmed()) {
-                            cannonBlock.setHilighted(false);
+                        if (cannon.isArmed()) {
+                            cannon.setHilighted(false);
                         } else {
-                            cannonBlock.setHilighted(true);
+                            cannon.setHilighted(true);
                             //TODO: Graphical feedback of block rejection
                         }
                         break;
@@ -534,6 +536,10 @@ public class GameModel {
      */
     public CannonFactory getCannonFactory() {
         return cannonFactory;
+    }
+
+    public PowerupFactory getPowerupFactory() {
+        return powerupFactory;
     }
 
     /**

@@ -14,4 +14,6 @@ public interface TriggerListener {
     public void onTriggerPressed(TriggerBlock triggerBlock);
 
     public void onTriggerReleased(TriggerBlock triggerBlock);
+
+    public void onTriggerHold(TriggerBlock triggerBlock);
 }

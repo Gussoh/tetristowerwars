@@ -26,6 +26,7 @@ import org.tetristowerwars.model.RectangularBuildingBlock;
 import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.PowerupMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.util.MathUtil;
@@ -48,9 +49,8 @@ public class RectangularBuildingBlockRenderer {
     private FloatBuffer animationColorBuffer;
     private int numLines;
     private int numAnimationVertices;
-    private final float[] outlineColor = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
     private final float[] overlayColor = new float[]{0.9f, 1.0f, 0.9f};
-    private static final float TEXTURE_COORD_FACTOR = 0.08f;
+    private final static float TEXCOORD_FACTOR = 0.08f;
     private final static float START_INTENSITY = 1.0f;
     private final static float END_INTENSITY = 0.0f;
     private final static float ANIMATION_TIME_S = 1.5f;
@@ -69,9 +69,10 @@ public class RectangularBuildingBlockRenderer {
         }
 
         float color = 0.9f;
-        createBufferEntry(WoodMaterial.class, "res/gfx/textures/wood2.png", new float[]{color, color, color, 1.0f}, 0.0f);
-        createBufferEntry(SteelMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f);
-        createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f);
+        createBufferEntry(WoodMaterial.class, "res/gfx/textures/wood2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(SteelMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(PowerupMaterial.class, "res/gfx/textures/powerup.png", new float[]{color, color, color, 1.0f}, 0.0f, true);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
         lineColorBuffer = BufferUtil.newFloatBuffer(200);
@@ -79,9 +80,9 @@ public class RectangularBuildingBlockRenderer {
         animationColorBuffer = BufferUtil.newFloatBuffer(4 * 4 * 20);
     }
 
-    private void createBufferEntry(Class<? extends Material> materialClass, String textureFile, float[] materialColor, float shinyFactor) throws IOException {
+    private void createBufferEntry(Class<? extends Material> materialClass, String textureFile, float[] materialColor, float shinyFactor, boolean noTextureRepeat) throws IOException {
         Texture texture = TextureIO.newTexture(new File(textureFile), true);
-        bufferEntries.put(materialClass, new BufferEntry(texture, materialColor, shinyFactor));
+        bufferEntries.put(materialClass, new BufferEntry(texture, materialColor, shinyFactor, noTextureRepeat));
         GLUtil.fixTextureParameters(texture);
         GLUtil.mirrorTexture(texture);
     }
@@ -176,6 +177,7 @@ public class RectangularBuildingBlockRenderer {
                 RectangularBuildingBlock rbb = (RectangularBuildingBlock) buildingBlock;
 
                 BufferEntry bufferEntry = bufferEntries.get(rbb.getMaterial().getClass());
+                boolean noTextureRepeat = bufferEntry.noTextureRepeat;
                 XForm xForm = rbb.getBody().getXForm();
                 Vec2[] outline = rbb.getOutline();
                 Path p = animations.get(buildingBlock);
@@ -204,10 +206,22 @@ public class RectangularBuildingBlockRenderer {
                     Vec2 tr = XForm.mul(xForm, new Vec2(maxX, maxY));
                     Vec2 tl = XForm.mul(xForm, new Vec2(minX, maxY));
 
-                    Vec2 texBl = new Vec2(minX * TEXTURE_COORD_FACTOR, minY * TEXTURE_COORD_FACTOR);
-                    Vec2 texBr = new Vec2(maxX * TEXTURE_COORD_FACTOR, minY * TEXTURE_COORD_FACTOR);
-                    Vec2 texTr = new Vec2(maxX * TEXTURE_COORD_FACTOR, maxY * TEXTURE_COORD_FACTOR);
-                    Vec2 texTl = new Vec2(minX * TEXTURE_COORD_FACTOR, maxY * TEXTURE_COORD_FACTOR);
+                    Vec2 texBl;
+                    Vec2 texBr;
+                    Vec2 texTr;
+                    Vec2 texTl;
+
+                    if (noTextureRepeat) {
+                        texBl = new Vec2(0, 1);
+                        texBr = new Vec2(1, 1);
+                        texTr = new Vec2(1, 0);
+                        texTl = new Vec2(0, 0);
+                    } else {
+                        texBl = new Vec2(minX * TEXCOORD_FACTOR, minY * TEXCOORD_FACTOR);
+                        texBr = new Vec2(maxX * TEXCOORD_FACTOR, minY * TEXCOORD_FACTOR);
+                        texTr = new Vec2(maxX * TEXCOORD_FACTOR, maxY * TEXCOORD_FACTOR);
+                        texTl = new Vec2(minX * TEXCOORD_FACTOR, maxY * TEXCOORD_FACTOR);
+                    }
 
 
                     if (lightingEffects) {
@@ -222,10 +236,22 @@ public class RectangularBuildingBlockRenderer {
                         Vec2 itl = XForm.mul(xForm, new Vec2(internalMinX, internalMaxY));
 
 
-                        Vec2 texIntBl = new Vec2(internalMinX * TEXTURE_COORD_FACTOR, internalMinY * TEXTURE_COORD_FACTOR);
-                        Vec2 texIntBr = new Vec2(internalMaxX * TEXTURE_COORD_FACTOR, internalMinY * TEXTURE_COORD_FACTOR);
-                        Vec2 texIntTr = new Vec2(internalMaxX * TEXTURE_COORD_FACTOR, internalMaxY * TEXTURE_COORD_FACTOR);
-                        Vec2 texIntTl = new Vec2(internalMinX * TEXTURE_COORD_FACTOR, internalMaxY * TEXTURE_COORD_FACTOR);
+                        Vec2 texIntBl;
+                        Vec2 texIntBr;
+                        Vec2 texIntTr;
+                        Vec2 texIntTl;
+
+                        if (noTextureRepeat) {
+                            texIntBl = new Vec2(1f - flatSquareRatio, flatSquareRatio);
+                            texIntBr = new Vec2(flatSquareRatio, flatSquareRatio);
+                            texIntTr = new Vec2(flatSquareRatio, 1f - flatSquareRatio);
+                            texIntTl = new Vec2(1f - flatSquareRatio, 1f - flatSquareRatio);
+                        } else {
+                            texIntBl = new Vec2(internalMinX * TEXCOORD_FACTOR, internalMinY * TEXCOORD_FACTOR);
+                            texIntBr = new Vec2(internalMaxX * TEXCOORD_FACTOR, internalMinY * TEXCOORD_FACTOR);
+                            texIntTr = new Vec2(internalMaxX * TEXCOORD_FACTOR, internalMaxY * TEXCOORD_FACTOR);
+                            texIntTl = new Vec2(internalMinX * TEXCOORD_FACTOR, internalMaxY * TEXCOORD_FACTOR);
+                        }
 
                         // create the Middle
                         Vec3 normal = new Vec3(0.0f, 0.0f, 1.0f);
@@ -284,7 +310,7 @@ public class RectangularBuildingBlockRenderer {
                                 end.x, end.y
                             });
 
-                    
+
                     if (buildingBlock.isHilighted() && hilightingEnabled) {
 
                         Path colorPath = lineHilightAnimations.get(buildingBlock);
@@ -450,9 +476,10 @@ public class RectangularBuildingBlockRenderer {
         private int numSquares = 0;
         private final float[] color;
         private final float[] specular;
+        private final boolean noTextureRepeat;
         // TODO: Define material properties
 
-        public BufferEntry(Texture texture, float[] materialColor, float shinyFactor) {
+        public BufferEntry(Texture texture, float[] materialColor, float shinyFactor, boolean noTextureRepeat) {
             this.texture = texture;
             this.color = materialColor;
             specular = new float[]{shinyFactor, shinyFactor, shinyFactor, 1.0f};
@@ -467,6 +494,7 @@ public class RectangularBuildingBlockRenderer {
             }
 
             colorBuffer = BufferUtil.newFloatBuffer(32 * NUM_VERTICES_PER_SQUARE * 4);
+            this.noTextureRepeat = noTextureRepeat;
         }
     }
 }
