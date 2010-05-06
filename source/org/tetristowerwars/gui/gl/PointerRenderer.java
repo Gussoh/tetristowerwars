@@ -123,10 +123,10 @@ public class PointerRenderer {
                 } else {
 
                     colorBuffer.put(new float[]{
-                                1.0f, 1.0f, 0, alpha,
-                                1.0f, 1.0f, 0, alpha,
-                                1.0f, 1.0f, 0, alpha,
-                                1.0f, 1.0f, 0, alpha
+                                1.0f, .5f, 0, alpha,
+                                1.0f, .5f, 0, alpha,
+                                1.0f, .5f, 0, alpha,
+                                1.0f, .5f, 0, alpha
                             });
                 }
 

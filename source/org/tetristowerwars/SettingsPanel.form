@@ -16,19 +16,19 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="statusLabel" pref="248" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="statusLabel" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="194" max="-2" attributes="0"/>
                       <Component id="saveButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jPanel3" alignment="0" pref="380" max="32767" attributes="0"/>
-                  <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
+                  <Component id="jPanel2" alignment="0" max="32767" attributes="2"/>
+                  <Component id="jPanel3" alignment="0" pref="325" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -38,16 +38,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cancelButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="saveButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -79,12 +79,12 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="gravityField" pref="237" max="32767" attributes="0"/>
-                      <Component id="buildingBlockSizeField" alignment="0" pref="237" max="32767" attributes="0"/>
-                      <Component id="worldWidthField" alignment="0" pref="237" max="32767" attributes="0"/>
-                      <Component id="worldHeightField" alignment="0" pref="237" max="32767" attributes="0"/>
-                      <Component id="playerAreaField" alignment="0" pref="237" max="32767" attributes="0"/>
-                      <Component id="groundHeightField" alignment="0" pref="237" max="32767" attributes="0"/>
+                      <Component id="gravityField" pref="182" max="32767" attributes="0"/>
+                      <Component id="buildingBlockSizeField" alignment="0" pref="182" max="32767" attributes="0"/>
+                      <Component id="worldWidthField" alignment="0" pref="182" max="32767" attributes="0"/>
+                      <Component id="worldHeightField" alignment="0" pref="182" max="32767" attributes="0"/>
+                      <Component id="playerAreaField" alignment="0" pref="182" max="32767" attributes="0"/>
+                      <Component id="groundHeightField" alignment="0" pref="182" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -122,7 +122,7 @@
                       <Component id="groundHeightField" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="34" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -190,7 +190,7 @@
                       <Component id="musicCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="soundCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="247" max="32767" attributes="0"/>
+                  <EmptySpace pref="214" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -208,12 +208,12 @@
       <SubComponents>
         <Component class="javax.swing.JCheckBox" name="musicCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Play music"/>
+            <Property name="text" type="java.lang.String" value="Music"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="soundCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Play sound effects"/>
+            <Property name="text" type="java.lang.String" value="Sound effects"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -233,6 +233,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="fullscreenCheckbox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="particleCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel6" min="-2" max="-2" attributes="1"/>
@@ -247,7 +248,7 @@
                       </Group>
                       <Component id="lightingCheckBox" alignment="0" min="-2" max="-2" attributes="2"/>
                   </Group>
-                  <EmptySpace min="-2" pref="133" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="112" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -265,6 +266,8 @@
                   <Component id="lightingCheckBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="particleCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fullscreenCheckbox" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -272,7 +275,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Window dimensions:"/>
+            <Property name="text" type="java.lang.String" value="Window size:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="windowWidthField">
@@ -291,12 +294,17 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="lightingCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Enable lighting effects"/>
+            <Property name="text" type="java.lang.String" value="Lighting effects"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="particleCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Enable particle effects"/>
+            <Property name="text" type="java.lang.String" value="Particle effects"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="fullscreenCheckbox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Fullscreen"/>
           </Properties>
         </Component>
       </SubComponents>

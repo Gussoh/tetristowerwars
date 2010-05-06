@@ -3,14 +3,20 @@
  * and open the template in the editor.
  *
  * rubber walls
- * lower countdown
+ *
+   dra till kanon: lower countdown
  * own block pool
  * more cannons
  * cannon pool stacks
 
+ * dra till ett annat block:
  * rubber blocks
  * ghost blocks - cannon balls go through
  * invounrable blocks
+ *
+ * n'r man drar dem ska de inte kollidera med n[gonting?
+ * n'r de bara ligger ska de fungera som vanliga block
+ *
  *
  */
 
