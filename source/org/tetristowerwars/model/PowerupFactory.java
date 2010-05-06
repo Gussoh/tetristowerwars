@@ -30,7 +30,7 @@ public class PowerupFactory {
     public PowerupBlock createPowerUp(Player player) {
         float centerX = (player.getRightLimit() + player.getLeftLimit()) / 2;
         float blockSize = gameModel.getBlockSize();
-        float y = 50; //gameModel.getWorldBoundries().upperBound.y - blockSize * 5;
+        float y = gameModel.getWorldBoundries().upperBound.y - blockSize * 5;
         Vec2 pos = new Vec2(centerX, y);
         Material mat = new PowerupMaterial();
 
@@ -78,7 +78,7 @@ public class PowerupFactory {
         PolygonDef shapeDef = new PolygonDef();
         shapeDef.density = mat.getDensity();
         shapeDef.vertices = vertices;
-        shapeDef.isSensor = false;
+        shapeDef.isSensor = true;
         shapeDef.friction = 0.8f;
         shapeDef.restitution = 0.1f;
         body.createShape(shapeDef);

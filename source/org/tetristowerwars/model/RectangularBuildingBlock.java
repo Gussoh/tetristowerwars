@@ -23,12 +23,12 @@ public class RectangularBuildingBlock extends BuildingBlock {
         this.rectangles = rectangles;
         this.outline = outline;
 
-        calcMassData();
-        body.setMass(massData);
+        updateMassData();
+        
     }
 
     @Override
-    protected void calcMassData() {
+    protected void updateMassData() {
         massData.I = 0;
         massData.mass = 0;
         massData.center.setZero();
@@ -45,6 +45,7 @@ public class RectangularBuildingBlock extends BuildingBlock {
             massData.I += inertiaCenter + mass * distanceSq;
             massData.mass += mass;
         }
+        getBody().setMass(massData);
     }
 
     public Rectangle2D[] getRectangles() {

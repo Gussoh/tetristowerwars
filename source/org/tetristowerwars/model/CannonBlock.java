@@ -12,7 +12,7 @@ import org.tetristowerwars.util.MathUtil;
  *
  * @author magnus
  */
-public class CannonBlock extends Block {
+public class CannonBlock extends Block implements Upgradable {
 
     private final float force;
     private float remainingCoolDown;
@@ -23,7 +23,7 @@ public class CannonBlock extends Block {
     private float timeUntilShooting = 0;
     private Material shotMaterial;
     private final BulletFactory bulletFactory;
-    private final float shootTime;
+    private float shootTime;
     
     public CannonBlock(Body body, float force, float shootTime, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
         super(body);
@@ -38,6 +38,16 @@ public class CannonBlock extends Block {
         return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 10.0f, 0.7f, 6.0f);
     }
 
+
+    @Override
+    public void upgrade() {
+        shootTime = Math.max(shootTime - 1, 0);
+    }
+
+    @Override
+    public boolean isUpgradable() {
+        return shootTime > 0;
+    }
 
     public float getAngleInRadians() {
         return MathUtil.lerp((float)Math.sin(angleValue * speedFactor), -1f, 1f, 0f, (float)Math.PI * 0.5f);

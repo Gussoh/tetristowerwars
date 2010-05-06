@@ -22,13 +22,13 @@ public class TriangularBuildingBlock extends BuildingBlock {
         super(body, material);
         this.triangles = triangles;
 
-        calcMassData();
+        updateMassData();
         body.setMass(massData);
     }
 
     //TODO: right now triangles must be symmetrical around the y-axis - fix so any orientation works!
     @Override
-    protected void calcMassData() {
+    protected void updateMassData() {
         massData.I = 0;
         massData.mass = 0;
         massData.center.setZero();

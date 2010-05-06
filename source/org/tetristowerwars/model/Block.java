@@ -16,6 +16,7 @@ public abstract class Block {
     private final Body body;
     private Player owner;
     private boolean destroyed = false;
+    private boolean powerupHilighted = false;
     private boolean hilighted = false;
 
     public Block(Body body) {
@@ -23,12 +24,21 @@ public abstract class Block {
         body.setUserData(this);
     }
 
-    public boolean isHilighted() {
-        return hilighted;
+    public boolean isPowerupHilighted() {
+        return powerupHilighted;
     }
 
-    public void setHilighted(boolean hilighted) {
-        this.hilighted = hilighted;
+    public void setPowerupHilighted(boolean hilighted) {
+        this.powerupHilighted = hilighted;
+    }
+
+
+    public void setHilighted(boolean b) {
+        hilighted = b;
+    }
+
+    public boolean isHilighted() {
+        return hilighted;
     }
 
     protected void destroyBody(World world) {
@@ -37,6 +47,12 @@ public abstract class Block {
             world.destroyBody(body);
         }
     }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    
 
     public Body getBody() {
         return body;

@@ -51,6 +51,7 @@ public class GameModel {
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private final Map<BuildingBlock, CannonBlock> blocksOverlappingCannon = new LinkedHashMap<BuildingBlock, CannonBlock>();
+    private final Map<PowerupBlock, Block> powerupOverlappingBlock = new LinkedHashMap<PowerupBlock, Block>();
     private float timeTakenToExecuteUpdateMs;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
@@ -128,7 +129,7 @@ public class GameModel {
         }
 
         blocksOverlappingCannon.clear();
-        
+
         winningNotificationTriggered = false;
 
         if (winningCondition != null) {
@@ -311,10 +312,6 @@ public class GameModel {
         }
 
 
-        for (Player player : players) {
-            player.calcHighestBuildingBlockInTower(groundBlock, groundLevel);
-        }
-
         if (winningCondition != null) {
             if (winningCondition.getLeader().getPlayer() != leader) {
                 leader = winningCondition.getLeader().getPlayer();
@@ -322,6 +319,11 @@ public class GameModel {
                     gameModelListener.onLeaderChanged(leader);
                 }
             }
+        }
+
+        for (Player player : players) {
+            boolean hilightHighestBlock = (player == leader && winningCondition.timeLeftUntilGameOver() != -1);
+            player.calcHighestBuildingBlockInTower(groundBlock, hilightHighestBlock, groundLevel);
         }
 
         timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
@@ -397,6 +399,24 @@ public class GameModel {
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onJointCreation(bbj);
         }
+
+        if (buildingBlock instanceof PowerupBlock) {
+            Player owner = buildingBlock.getOwner();
+            if (owner != null) {
+                for (BuildingBlock bb : owner.getBuildingBlocks()) {
+                    if (bb.isUpgradable()) {
+                        bb.setPowerupHilighted(true);
+                    }
+                }
+
+                for (CannonBlock cannonBlock : owner.getCannons()) {
+                    if (cannonBlock.isUpgradable()) {
+                        cannonBlock.setPowerupHilighted(true);
+                    }
+                }
+            }
+        }
+
         return bbj;
     }
 
@@ -430,35 +450,37 @@ public class GameModel {
             boolean isLastJointForThisBlock = getAttachedJoint(bb) == null;
             buildingBlockJoint.destroy(isLastJointForThisBlock);
 
-            //Cannon-loading code
 
-
-            /*
-            for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
-                AABB aabb = new AABB();
-                s.computeAABB(aabb, xForm);
-                Shape foundShapes[] = world.query(aabb, 10);
-
-                for (Shape shape : foundShapes) {
-                    Object userData = shape.getBody().getUserData();
-                    if (userData instanceof CannonBlock) {
-                        CannonBlock cannonBlock = (CannonBlock) userData;
-                        if (cannonBlock.getTimeUntilShooting() == 0) {
-                            cannonBlock.shoot(bb.getMaterial());
-                            blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
-                        } else {
-                            //TODO: Graphical feedback of block rejection
-                        }
-                        return;
+            if (bb instanceof PowerupBlock) {
+                Player owner = bb.getOwner();
+                if (owner != null) {
+                    for (BuildingBlock buildingBlock : owner.getBuildingBlocks()) {
+                        buildingBlock.setPowerupHilighted(false);
+                    }
+                    for (CannonBlock cannonBlock : owner.getCannons()) {
+                        cannonBlock.setPowerupHilighted(false);
                     }
                 }
-            }*/
 
+                Block overlappedBlock = powerupOverlappingBlock.remove((PowerupBlock) bb);
 
-            CannonBlock cannon = blocksOverlappingCannon.get(bb);
-            if (cannon != null && !cannon.isArmed()) {
-                blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
-                cannon.shoot(bb.getMaterial());
+                if (overlappedBlock != null) {
+                    if (overlappedBlock instanceof Upgradable) {
+                        Upgradable upgradable = (Upgradable) overlappedBlock;
+                        if (upgradable.isUpgradable()) {
+                            upgradable.upgrade();
+                            blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                        }
+                    }
+                }
+            } else if (isLastJointForThisBlock) {
+
+                //Cannon-loading code
+                CannonBlock cannon = blocksOverlappingCannon.get(bb);
+                if (cannon != null && !cannon.isArmed()) {
+                    blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                    cannon.shoot(bb.getMaterial());
+                }
             }
 
 
@@ -479,6 +501,11 @@ public class GameModel {
             CannonBlock cannon = entry.getValue();
             XForm xForm = bb.getBody().getXForm();
 
+            if (bb.isDestroyed()) {
+                it.remove();
+                continue;
+            }
+
             boolean found = false;
             for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
 
@@ -490,13 +517,46 @@ public class GameModel {
                 for (Shape shape : foundShapes) {
                     Object userData = shape.getBody().getUserData();
                     if (userData == cannon) {
+
                         found = true;
                         if (cannon.isArmed()) {
                             cannon.setHilighted(false);
                         } else {
                             cannon.setHilighted(true);
-                            //TODO: Graphical feedback of block rejection
                         }
+                        break;
+                    }
+                }
+            }
+
+            if (!found) {
+                it.remove();
+            }
+        }
+    }
+
+    public void updatePowerupIntersections() {
+
+
+
+        for (Iterator<Map.Entry<PowerupBlock, Block>> it = powerupOverlappingBlock.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<PowerupBlock, Block> entry = it.next();
+            PowerupBlock powerupBlock = entry.getKey();
+            Block block = entry.getValue();
+            XForm xForm = powerupBlock.getBody().getXForm();
+
+            boolean found = false;
+            for (Shape s = powerupBlock.getBody().getShapeList(); s != null; s = s.m_next) {
+
+                AABB aabb = new AABB();
+                s.computeAABB(aabb, xForm);
+                Shape foundShapes[] = world.query(aabb, 10);
+
+
+                for (Shape shape : foundShapes) {
+                    Object userData = shape.getBody().getUserData();
+                    if (userData == block) {
+                        found = true;
                         break;
                     }
                 }
@@ -572,6 +632,7 @@ public class GameModel {
      * Creates a new player in a given area of the game world.
      *
      * @param name The name of the player.
+     * @param playerIndex 
      * @param leftLimit The left limit/border of this player in world coordinates.
      * @param rightLimit The right limit/border of this player in world coordinates.
      * @return The created player object.
@@ -626,7 +687,7 @@ public class GameModel {
     }
 
     protected void fireBodyCreationNotification(Block block) {
-        if (block instanceof BulletBlock) {
+        if (block instanceof BulletBlock || block instanceof PowerupBlock) {
             blocksToModify.add(new MutableEntry<Block, Integer>(block, 60));
         }
         for (GameModelListener gameModelListener : gameModelListeners) {
@@ -710,9 +771,7 @@ public class GameModel {
             }
 
             if (userData1 instanceof BuildingBlock && userData2 instanceof CannonBlock) {
-
             } else if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {
-
             }
         }
 
@@ -781,6 +840,19 @@ public class GameModel {
             Object userData1 = shape1.getBody().getUserData();
             Object userData2 = shape2.getBody().getUserData();
 
+            if (userData1 instanceof PowerupBlock) {
+                if (userData2 instanceof Block) {
+                    return shouldPowerUpCollide((PowerupBlock) userData1, (Block) userData2);
+                }
+
+            }
+
+            if (userData2 instanceof PowerupBlock) {
+                if (userData1 instanceof Block) {
+                    return shouldPowerUpCollide((PowerupBlock) userData2, (Block) userData1);
+                }
+            }
+
             if (userData1 instanceof TriggerBlock || userData2 instanceof TriggerBlock) {
                 return false;
             }
@@ -812,6 +884,27 @@ public class GameModel {
                 }
             }
 
+            return true;
+
+        }
+
+        private boolean shouldPowerUpCollide(PowerupBlock powerupBlock, Block block) {
+            System.out.println("POWER");
+
+            boolean noCollision = false;
+            if (getAttachedJoint(powerupBlock) != null) {
+                noCollision = true;
+            } else if (block instanceof PowerupBlock) {
+                if (getAttachedJoint((BuildingBlock) block) != null) {
+                    noCollision = true;
+                }
+            }
+            if (noCollision) {
+                if (block instanceof BuildingBlock || block instanceof CannonBlock) {
+                    powerupOverlappingBlock.put(powerupBlock, block);
+                    return false;
+                }
+            }
             return true;
         }
     }

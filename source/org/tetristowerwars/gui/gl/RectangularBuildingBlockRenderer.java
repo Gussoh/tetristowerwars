@@ -23,10 +23,12 @@ import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.RectangularBuildingBlock;
-import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
+import org.tetristowerwars.model.material.GhostMaterial;
+import org.tetristowerwars.model.material.InvulnerableMaterial;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.PowerupMaterial;
+import org.tetristowerwars.model.material.RubberMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.util.MathUtil;
@@ -73,6 +75,9 @@ public class RectangularBuildingBlockRenderer {
         createBufferEntry(SteelMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
         createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
         createBufferEntry(PowerupMaterial.class, "res/gfx/textures/powerup.png", new float[]{color, color, color, 1.0f}, 0.0f, true);
+        createBufferEntry(RubberMaterial.class, "res/gfx/textures/steel2.png", new float[]{1.0f, 0.2f, 0.2f, .9f}, 0.0f, false);
+        createBufferEntry(GhostMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 0.3f}, 0.0f, false);
+        createBufferEntry(InvulnerableMaterial.class, "res/gfx/textures/steel2.png", new float[]{0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, false);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
         lineColorBuffer = BufferUtil.newFloatBuffer(200);
@@ -170,7 +175,7 @@ public class RectangularBuildingBlockRenderer {
         bufferEntry.colorBuffer.put(color);
     }
 
-    private void createBufferData(Set<BuildingBlock> buildingBlocks, float elapsedTimeS, boolean hilightingEnabled) {
+    private void createBufferData(Set<BuildingBlock> buildingBlocks, float elapsedTimeS) {
 
         for (BuildingBlock buildingBlock : buildingBlocks) {
             if (buildingBlock instanceof RectangularBuildingBlock) {
@@ -311,7 +316,7 @@ public class RectangularBuildingBlockRenderer {
                             });
 
 
-                    if (buildingBlock.isHilighted() && hilightingEnabled) {
+                    if (buildingBlock.isPowerupHilighted() || buildingBlock.isHilighted()) {
 
                         Path colorPath = lineHilightAnimations.get(buildingBlock);
                         if (colorPath == null) {
@@ -345,18 +350,10 @@ public class RectangularBuildingBlockRenderer {
         ensureBufferCapacity(gameModel);
         updateAnimationsAndBufferCapacity(elapsedTimeS);
 
-        WinningCondition wc = gameModel.getWinningCondition();
-        Player leader = null;
-        boolean countingDown = false;
-        if (wc != null) {
-            countingDown = wc.timeLeftUntilGameOver() != -1;
-            leader = wc.getLeader().getPlayer();
-        }
 
-
-        createBufferData(gameModel.getBuildingBlockPool(), elapsedTimeS, false);
+        createBufferData(gameModel.getBuildingBlockPool(), elapsedTimeS);
         for (Player player : gameModel.getPlayers()) {
-            createBufferData(player.getBuildingBlocks(), elapsedTimeS, player == leader && countingDown);
+            createBufferData(player.getBuildingBlocks(), elapsedTimeS);
         }
 
         lineVertexBuffer.rewind();
