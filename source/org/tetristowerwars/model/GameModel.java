@@ -754,13 +754,10 @@ public class GameModel {
 
         private boolean shouldBulletCollide(BulletBlock bullet, Block otherBlock) {
             if (bullet.getCannon() == otherBlock) {
-                System.out.println("bullet is hitting cannon");
                 return false; // dont allow the bullet to hit its own cannon
             } else if (otherBlock.getOwner() == null && otherBlock != groundBlock) {
-                System.out.println("bullet is hitting non-owned block but not ground");
                 return false;
             } else {
-                System.out.println("bullet hit something else.");
                 return true;
             }
         }
