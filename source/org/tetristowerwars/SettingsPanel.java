@@ -40,13 +40,17 @@ public class SettingsPanel extends javax.swing.JPanel {
         worldHeightField.setText(Float.toString(settings.getWorldHeight()));
         playerAreaField.setText(Float.toString(settings.getPlayerArea()));
         groundHeightField.setText(Float.toString(settings.getGroundHeight()));
+        powerupCheckBox.setSelected(settings.isPowerups());
+
         musicCheckBox.setSelected(settings.isPlayMusicEnabled());
         soundCheckBox.setSelected(settings.isPlaySoundEffectsEnabled());
+        
         windowWidthField.setText(Integer.toString(settings.getWindowWidth()));
         windowHeightField.setText(Integer.toString(settings.getWindowHeight()));
         lightingCheckBox.setSelected(settings.isLightingEnabled());
         particleCheckBox.setSelected(settings.isParticlesEnabled());
-        fullscreenCheckbox.setSelected(settings.isFullscreen());
+        fullscreenCheckBox.setSelected(settings.isFullscreen());
+        
         this.mainFrame = mainFrame;
     }
 
@@ -111,6 +115,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         playerAreaField = new javax.swing.JTextField();
         groundHeightField = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
+        powerupCheckBox = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         musicCheckBox = new javax.swing.JCheckBox();
         soundCheckBox = new javax.swing.JCheckBox();
@@ -122,7 +127,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         lightingCheckBox = new javax.swing.JCheckBox();
         particleCheckBox = new javax.swing.JCheckBox();
-        fullscreenCheckbox = new javax.swing.JCheckBox();
+        fullscreenCheckBox = new javax.swing.JCheckBox();
         cancelButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         statusLabel = new javax.swing.JLabel();
@@ -141,6 +146,8 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         jLabel9.setText("Ground height (m):");
 
+        powerupCheckBox.setText("Powerups");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -148,20 +155,23 @@ public class SettingsPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(gravityField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addComponent(buildingBlockSizeField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addComponent(worldWidthField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addComponent(worldHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addComponent(playerAreaField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                    .addComponent(groundHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(gravityField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(buildingBlockSizeField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(worldWidthField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(worldHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(playerAreaField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(groundHeightField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)))
+                    .addComponent(powerupCheckBox))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -190,7 +200,9 @@ public class SettingsPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(groundHeightField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(powerupCheckBox)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sound Options"));
@@ -231,7 +243,7 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         particleCheckBox.setText("Particle effects");
 
-        fullscreenCheckbox.setText("Fullscreen");
+        fullscreenCheckBox.setText("Fullscreen");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -240,7 +252,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(fullscreenCheckbox)
+                    .addComponent(fullscreenCheckBox)
                     .addComponent(particleCheckBox)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel6)
@@ -269,7 +281,7 @@ public class SettingsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(particleCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fullscreenCheckbox))
+                .addComponent(fullscreenCheckBox))
         );
 
         cancelButton.setText("Cancel");
@@ -293,18 +305,18 @@ public class SettingsPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(194, 194, 194)
                         .addComponent(saveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -312,7 +324,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -359,7 +371,6 @@ public class SettingsPanel extends javax.swing.JPanel {
             return;
         }
 
-
         // If correct, save to settings
         settings.setProperty(Settings.KEY_BUILDING_BLOCK_SIZE, buildingBlockSizeField.getText());
         settings.setProperty(Settings.KEY_GRAVITY, gravityField.getText());
@@ -367,6 +378,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         settings.setProperty(Settings.KEY_WORLD_HEIGHT, worldHeightField.getText());
         settings.setProperty(Settings.KEY_PLAYER_AREA, playerAreaField.getText());
         settings.setProperty(Settings.KEY_GROUND_HEIGHT, groundHeightField.getText());
+        settings.setProperty(Settings.KEY_POWERUPS, Boolean.toString(powerupCheckBox.isSelected()));
 
         settings.setProperty(Settings.KEY_PLAY_MUSIC, Boolean.toString(musicCheckBox.isSelected()));
         settings.setProperty(Settings.KEY_PLAY_SOUND_EFFECTS, Boolean.toString(soundCheckBox.isSelected()));
@@ -375,7 +387,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         settings.setProperty(Settings.KEY_WINDOW_HEIGHT, windowHeightField.getText());
         settings.setProperty(Settings.KEY_LIGHTING_EFFECTS, Boolean.toString(lightingCheckBox.isSelected()));
         settings.setProperty(Settings.KEY_PARTICLE_EFFECTS, Boolean.toString(particleCheckBox.isSelected()));
-        settings.setProperty(Settings.KEY_FULLSCREEN, Boolean.toString(fullscreenCheckbox.isSelected()));
+        settings.setProperty(Settings.KEY_FULLSCREEN, Boolean.toString(fullscreenCheckBox.isSelected()));
         try {
             settings.save();
         } catch (IOException ex) {
@@ -393,7 +405,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField buildingBlockSizeField;
     private javax.swing.JButton cancelButton;
-    private javax.swing.JCheckBox fullscreenCheckbox;
+    private javax.swing.JCheckBox fullscreenCheckBox;
     private javax.swing.JTextField gravityField;
     private javax.swing.JTextField groundHeightField;
     private javax.swing.JLabel jLabel1;
@@ -412,6 +424,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox musicCheckBox;
     private javax.swing.JCheckBox particleCheckBox;
     private javax.swing.JTextField playerAreaField;
+    private javax.swing.JCheckBox powerupCheckBox;
     private javax.swing.JButton saveButton;
     private javax.swing.JCheckBox soundCheckBox;
     private javax.swing.JLabel statusLabel;
