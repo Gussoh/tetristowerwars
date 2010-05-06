@@ -86,5 +86,9 @@ public class CannonBlock extends Block {
             remainingCoolDown = Math.max(0, remainingCoolDown);
         }
     }
+
+    public void abort() {
+        cannonLoaded = false;
+    }
     // TODO: Fix cannon reset
 }

@@ -7,9 +7,11 @@ package org.tetristowerwars.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
@@ -47,6 +49,7 @@ public class GameModel {
     private final TriggerBlockFactory triggerBlockFactory;
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
+    private final Map<BuildingBlock, CannonBlock> blocksOverlappingCannon = new LinkedHashMap<BuildingBlock, CannonBlock>();
     private float timeTakenToExecuteUpdateMs;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
@@ -117,8 +120,13 @@ public class GameModel {
                 blocksToRemove.add(new MutableEntry<Block, Integer>(bulletBlock, i));
                 i += 2;
             }
+            for (CannonBlock cannonBlock : player.getCannons()) {
+                cannonBlock.abort();
+            }
         }
 
+        blocksOverlappingCannon.clear();
+        
         winningNotificationTriggered = false;
 
         if (winningCondition != null) {
@@ -138,10 +146,10 @@ public class GameModel {
 
         long currentTimeNano = System.nanoTime();
 
-
         if (gameOver) {
-            if (!winningNotificationTriggered)
-            winningNotificationTriggered = true;
+            if (!winningNotificationTriggered) {
+                winningNotificationTriggered = true;
+            }
             for (GameModelListener gameModelListener : gameModelListeners) {
                 gameModelListener.onWinningConditionFulfilled(winningCondition);
             }
@@ -173,6 +181,8 @@ public class GameModel {
 
         world.step(1f / 60f, ITERATIONS_PER_STEP);
 
+        updateBlocksIntersectingWithCannon();
+
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
             buildingBlockJoint.dampAngularVelocity();
         }
@@ -195,6 +205,7 @@ public class GameModel {
                         buildingBlockPool.remove(buildingBlock);
                     } else {
                         owner.removeBuildingBlock(buildingBlock);
+
                     }
 
                     BuildingBlockJoint bbj;
@@ -204,7 +215,9 @@ public class GameModel {
                     for (GameModelListener gameModelListener : gameModelListeners) {
                         gameModelListener.onBlockDestruction(buildingBlock);
                     }
+                    blocksOverlappingCannon.remove(buildingBlock);
                     buildingBlock.destroyBody(world);
+
 
                 } else if (block instanceof BulletBlock) {
                     BulletBlock bulletBlock = (BulletBlock) block;
@@ -273,6 +286,7 @@ public class GameModel {
 
             for (BuildingBlock buildingBlock : playerBlocksToRemove) {
                 player.removeBuildingBlock(buildingBlock);
+                blocksOverlappingCannon.remove(buildingBlock);
                 for (GameModelListener gameModelListener : gameModelListeners) {
                     gameModelListener.onBlockDestruction(buildingBlock);
                 }
@@ -415,6 +429,9 @@ public class GameModel {
             buildingBlockJoint.destroy(isLastJointForThisBlock);
 
             //Cannon-loading code
+
+
+            /*
             for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
                 AABB aabb = new AABB();
                 s.computeAABB(aabb, xForm);
@@ -433,9 +450,60 @@ public class GameModel {
                         return;
                     }
                 }
+            }*/
+
+
+            CannonBlock cannon = blocksOverlappingCannon.get(bb);
+            if (cannon != null && cannon.getTimeUntilShooting() == 0) {
+                blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
+                cannon.shoot(bb.getMaterial());
             }
 
 
+        }
+    }
+
+    private void updateBlocksIntersectingWithCannon() {
+
+        for (Player player : players) {
+            for (CannonBlock cannonBlock : player.getCannons()) {
+                cannonBlock.setHilighted(false);
+            }
+        }
+
+        for (Iterator<Map.Entry<BuildingBlock, CannonBlock>> it = blocksOverlappingCannon.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<BuildingBlock, CannonBlock> entry = it.next();
+            BuildingBlock bb = entry.getKey();
+            CannonBlock cannon = entry.getValue();
+            XForm xForm = bb.getBody().getXForm();
+
+            boolean found = false;
+            for (Shape s = bb.getBody().getShapeList(); s != null; s = s.m_next) {
+
+                AABB aabb = new AABB();
+                s.computeAABB(aabb, xForm);
+                Shape foundShapes[] = world.query(aabb, 10);
+
+
+                for (Shape shape : foundShapes) {
+                    Object userData = shape.getBody().getUserData();
+                    if (userData instanceof CannonBlock) {
+                        found = true;
+                        CannonBlock cannonBlock = (CannonBlock) userData;
+                        if (cannonBlock.getTimeUntilShooting() == 0) {
+                            cannonBlock.setHilighted(true);
+                        } else {
+                            cannonBlock.setHilighted(false);
+                            //TODO: Graphical feedback of block rejection
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (!found) {
+                it.remove();
+            }
         }
     }
 
@@ -635,6 +703,12 @@ public class GameModel {
                     gameModelListener.onBlockCollision((Block) userData1, (Block) userData2, normalSpeed, tangentSpeed, point.position);
                 }
             }
+
+            if (userData1 instanceof BuildingBlock && userData2 instanceof CannonBlock) {
+
+            } else if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {
+
+            }
         }
 
         /**
@@ -716,9 +790,24 @@ public class GameModel {
             }
 
             if (userData1 instanceof CannonBlock && userData2 instanceof BuildingBlock) {
-                return shouldBuildingBlockCollideWithCannon((BuildingBlock) userData2);
+                CannonBlock cannon = (CannonBlock) userData1;
+                BuildingBlock bb = (BuildingBlock) userData2;
+                if (shouldBuildingBlockCollideWithCannon(bb)) {
+                    return true;
+                } else {
+                    blocksOverlappingCannon.put(bb, cannon);
+                    return false;
+                }
             } else if (userData2 instanceof CannonBlock && userData1 instanceof BuildingBlock) {
-                return shouldBuildingBlockCollideWithCannon((BuildingBlock) userData1);
+
+                CannonBlock cannon = (CannonBlock) userData1;
+                BuildingBlock bb = (BuildingBlock) userData2;
+                if (shouldBuildingBlockCollideWithCannon(bb)) {
+                    return true;
+                } else {
+                    blocksOverlappingCannon.put(bb, cannon);
+                    return false;
+                }
             }
 
             return true;
