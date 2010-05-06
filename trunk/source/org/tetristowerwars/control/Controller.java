@@ -84,7 +84,7 @@ public class Controller implements InputListener {
         } else if (selectedBlock instanceof BulletBlock) {
         } else if (selectedBlock instanceof TriggerBlock) {
             TriggerBlock triggerBlock = (TriggerBlock) selectedBlock;
-            if (triggerBlock.isVisible()) {
+            if (triggerBlock.isVisible() && !actionIdToTrigger.containsKey(actionId)) {
                 triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock);
                 actionIdToTrigger.put(actionId, triggerBlock);
             }
@@ -178,8 +178,11 @@ public class Controller implements InputListener {
 
 
         for (Map.Entry<Integer, Point> entry : currentCursorPositions.entrySet()) {
-
             selectBlock(entry.getKey(), entry.getValue());
+        }
+
+        for (TriggerBlock triggerBlock : actionIdToTrigger.values()) {
+            triggerBlock.getTriggerListener().onTriggerHold(triggerBlock);
         }
     }
 }
