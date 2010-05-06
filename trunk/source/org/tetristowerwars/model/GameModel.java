@@ -489,10 +489,10 @@ public class GameModel {
                     if (userData instanceof CannonBlock) {
                         found = true;
                         CannonBlock cannonBlock = (CannonBlock) userData;
-                        if (cannonBlock.getTimeUntilShooting() == 0) {
-                            cannonBlock.setHilighted(true);
-                        } else {
+                        if (cannonBlock.isArmed()) {
                             cannonBlock.setHilighted(false);
+                        } else {
+                            cannonBlock.setHilighted(true);
                             //TODO: Graphical feedback of block rejection
                         }
                         break;
