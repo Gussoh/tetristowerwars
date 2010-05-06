@@ -113,7 +113,7 @@ public class MessageRenderer {
             renderText(texts, playerCenterPos, gameModel.getGroundLevel() - 7, false, true, 1.0f);
 
             for (CannonBlock cannonBlock : player.getCannons()) {
-                if (cannonBlock.isCannonLoaded()) {
+                if (cannonBlock.isArmed()) {
                     textRenderer.setColor(1.0f, 0.0f, 0.0f, 0.8f);
                     texts.clear();
                     texts.add(new TextEntry((int) Math.ceil(cannonBlock.getTimeUntilShooting()) + ""));

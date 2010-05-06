@@ -454,7 +454,7 @@ public class GameModel {
 
 
             CannonBlock cannon = blocksOverlappingCannon.get(bb);
-            if (cannon != null && cannon.getTimeUntilShooting() == 0) {
+            if (cannon != null && !cannon.isArmed()) {
                 blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
                 cannon.shoot(bb.getMaterial());
             }
@@ -474,7 +474,6 @@ public class GameModel {
         for (Iterator<Map.Entry<BuildingBlock, CannonBlock>> it = blocksOverlappingCannon.entrySet().iterator(); it.hasNext();) {
             Map.Entry<BuildingBlock, CannonBlock> entry = it.next();
             BuildingBlock bb = entry.getKey();
-            CannonBlock cannon = entry.getValue();
             XForm xForm = bb.getBody().getXForm();
 
             boolean found = false;
