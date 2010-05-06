@@ -15,23 +15,23 @@ import org.tetristowerwars.util.MathUtil;
 public class CannonBlock extends Block {
 
     private final float force;
-    private final float coolDown;
     private float remainingCoolDown;
     private float angleValue = 0;
     private float speedFactor = 1f;
     private final boolean shootingToLeft;
-    private boolean cannonLoaded = false;
+    private boolean armed = false;
     private float timeUntilShooting = 0;
     private Material shotMaterial;
     private final BulletFactory bulletFactory;
+    private final float shootTime;
     
-    public CannonBlock(Body body, float force, float coolDown, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
+    public CannonBlock(Body body, float force, float shootTime, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
         super(body);
         this.force = force;
-        this.coolDown = coolDown;
         player.addCannon(this);
         this.shootingToLeft = shootToLeft;
         this.bulletFactory = bulletFactory;
+        this.shootTime = shootTime;
     }
 
     public float getForce() {
@@ -54,12 +54,12 @@ public class CannonBlock extends Block {
 
     protected void shoot(Material material) {
         shotMaterial = material;
-        cannonLoaded = true;
-        timeUntilShooting = 3.0f;
+        armed = true;
+        timeUntilShooting = shootTime;
     }
 
-    public boolean isCannonLoaded() {
-        return cannonLoaded;
+    public boolean isArmed() {
+        return armed;
     }
 
     public float getTimeUntilShooting() {
@@ -72,23 +72,19 @@ public class CannonBlock extends Block {
     public void update(float timeElapsedS) {
         angleValue += timeElapsedS;
 
-        if (cannonLoaded) {
+        if (armed) {
             timeUntilShooting -= timeElapsedS;
 
             if (timeUntilShooting < 0) {
                 timeUntilShooting = 0;
                 bulletFactory.createBullet(this, shotMaterial);
-                cannonLoaded = false;
-                remainingCoolDown = coolDown;
+                armed = false;
             }
-        } else {
-            remainingCoolDown -= timeElapsedS;
-            remainingCoolDown = Math.max(0, remainingCoolDown);
-        }
+        } 
     }
 
     public void abort() {
-        cannonLoaded = false;
+        armed = false;
     }
     // TODO: Fix cannon reset
 }
