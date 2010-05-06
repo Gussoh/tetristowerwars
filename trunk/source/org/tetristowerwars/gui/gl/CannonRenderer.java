@@ -40,6 +40,9 @@ public class CannonRenderer {
     private FloatBuffer baseNormalBuffer;
     private FloatBuffer topNormalBuffer;
     private FloatBuffer pipeNormalBuffer;
+    private FloatBuffer baseSecondaryColorBuffer;
+    private FloatBuffer topSecondaryColorBuffer;
+    private FloatBuffer pipeSecondaryColorBuffer;
     private final Vec2 pipeLeftBottom;
     private final Vec2 pipeRightBottom;
     private final Vec2 pipeRightTop;
@@ -47,7 +50,7 @@ public class CannonRenderer {
     private final int NUM_VERTICES_PER_PART = 4;
     private final boolean lightingEffects;
     private final float[] color = {0.9f, 0.9f, 0.9f, 1.0f};
-    private final float[] specular = {0.0f, 0.0f, 0.0f, 1.0f};
+    //private final float[] specular = {0.0f, 0.0f, 0.0f, 1.0f};
 
     public CannonRenderer(GL gl, float blockSize, boolean lightingEffects) throws IOException {
         baseTexture = TextureIO.newTexture(new File("res/gfx/cannon_base.png"), true);
@@ -72,6 +75,10 @@ public class CannonRenderer {
             topNormalBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 3);
             pipeNormalBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 3);
         }
+
+        baseSecondaryColorBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 4);
+        topSecondaryColorBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 4);
+        pipeSecondaryColorBuffer = BufferUtil.newFloatBuffer(2 * NUM_VERTICES_PER_PART * 4);
 
         pipeLeftBottom = new Vec2(-2 * blockSize, -blockSize * 0.5f);
         pipeRightBottom = new Vec2(0, -blockSize * 0.5f);
@@ -103,6 +110,11 @@ public class CannonRenderer {
                 topNormalBuffer = BufferUtil.newFloatBuffer(numCoords * 3);
                 pipeNormalBuffer = BufferUtil.newFloatBuffer(numCoords * 3);
             }
+            baseSecondaryColorBuffer = BufferUtil.newFloatBuffer(numCoords * 4);
+            topSecondaryColorBuffer = BufferUtil.newFloatBuffer(numCoords * 4);
+            pipeSecondaryColorBuffer = BufferUtil.newFloatBuffer(numCoords * 4);
+
+
         }
 
         float blockSize = gameModel.getBlockSize();
@@ -195,6 +207,36 @@ public class CannonRenderer {
                             0.0f, 0.0f
                         });
 
+                float[] hilightColor;
+                if (cannonBlock.isHilighted()) {
+                    if (lightingEffects) {
+                        hilightColor = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
+                    } else {
+                        hilightColor = new float[]{0.3f, 0.3f, 0.3f};
+                    }
+                } else {
+                    if (lightingEffects) {
+                        hilightColor = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+                    } else {
+                        hilightColor = new float[]{0.0f, 0.0f, 0.0f};
+                    }
+                }
+
+                pipeSecondaryColorBuffer.put(hilightColor);
+                pipeSecondaryColorBuffer.put(hilightColor);
+                pipeSecondaryColorBuffer.put(hilightColor);
+                pipeSecondaryColorBuffer.put(hilightColor);
+
+                baseSecondaryColorBuffer.put(hilightColor);
+                baseSecondaryColorBuffer.put(hilightColor);
+                baseSecondaryColorBuffer.put(hilightColor);
+                baseSecondaryColorBuffer.put(hilightColor);
+
+                topSecondaryColorBuffer.put(hilightColor);
+                topSecondaryColorBuffer.put(hilightColor);
+                topSecondaryColorBuffer.put(hilightColor);
+                topSecondaryColorBuffer.put(hilightColor);
+
                 if (lightingEffects) {
                     Vec3 nBottom = MathUtil.rotateNormal(xf, new Vec3(0.0f, -0.9f, 0.4f));
                     Vec3 nTop = MathUtil.rotateNormal(xf, new Vec3(0.0f, 0.9f, 0.4f));
@@ -224,6 +266,9 @@ public class CannonRenderer {
         baseTexCoordBuffer.rewind();
         topTexCoordBuffer.rewind();
         pipeTexCoordBuffer.rewind();
+        pipeSecondaryColorBuffer.rewind();
+        baseSecondaryColorBuffer.rewind();
+        topSecondaryColorBuffer.rewind();
 
         if (lightingEffects) {
             baseNormalBuffer.rewind();
@@ -231,15 +276,22 @@ public class CannonRenderer {
             pipeNormalBuffer.rewind();
 
             gl.glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color, 0);
-            gl.glMaterialfv(GL_FRONT, GL_SPECULAR, specular, 0);
+            gl.glColorMaterial(GL_FRONT, GL_SPECULAR);
+            gl.glEnable(GL_COLOR_MATERIAL);
+            gl.glEnableClientState(GL_COLOR_ARRAY);
         } else {
             gl.glColor4fv(color, 0);
+            gl.glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
         }
 
         gl.glVertexPointer(2, GL_FLOAT, 0, pipeVertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, pipeTexCoordBuffer);
+
         if (lightingEffects) {
             gl.glNormalPointer(GL_FLOAT, 0, pipeNormalBuffer);
+            gl.glColorPointer(4, GL_FLOAT, 0, pipeSecondaryColorBuffer);
+        } else {
+            gl.glSecondaryColorPointer(3, GL_FLOAT, 0, pipeSecondaryColorBuffer);
         }
         pipeTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
@@ -249,6 +301,9 @@ public class CannonRenderer {
         gl.glTexCoordPointer(2, GL_FLOAT, 0, baseTexCoordBuffer);
         if (lightingEffects) {
             gl.glNormalPointer(GL_FLOAT, 0, baseNormalBuffer);
+            gl.glColorPointer(4, GL_FLOAT, 0, baseSecondaryColorBuffer);
+        } else {
+            gl.glSecondaryColorPointer(3, GL_FLOAT, 0, baseSecondaryColorBuffer);
         }
         baseTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
@@ -257,6 +312,9 @@ public class CannonRenderer {
         gl.glTexCoordPointer(2, GL_FLOAT, 0, topTexCoordBuffer);
         if (lightingEffects) {
             gl.glNormalPointer(GL_FLOAT, 0, topNormalBuffer);
+            gl.glColorPointer(4, GL_FLOAT, 0, topSecondaryColorBuffer);
+        } else {
+            gl.glSecondaryColorPointer(3, GL_FLOAT, 0, topSecondaryColorBuffer);
         }
         topTexture.bind();
         gl.glDrawArrays(GL_QUADS, 0, numCoords);
@@ -264,9 +322,16 @@ public class CannonRenderer {
         gl.glDisable(GL_TEXTURE_2D);
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+        // Draw everything again if lighting is enabled
+
+
         if (lightingEffects) {
             gl.glDisable(GL_LIGHTING);
             gl.glDisableClientState(GL_NORMAL_ARRAY);
+            gl.glDisable(GL_COLOR_MATERIAL);
+        } else {
+            gl.glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
+            gl.glSecondaryColor3fv(new float[]{0, 0, 0}, 0);
         }
 
     }
