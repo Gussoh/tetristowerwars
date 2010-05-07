@@ -128,7 +128,7 @@ public class GameModel {
                 i += 2;
             }
             for (CannonBlock cannonBlock : player.getCannons()) {
-                cannonBlock.abort();
+                cannonBlock.reset();
             }
         }
 
@@ -758,19 +758,20 @@ public class GameModel {
                     maybeExplodeBullet(bullet, (Block) userData2);
 
                     if (userData2 instanceof BuildingBlock) {
-                        maybeDestroyBuildingBlock((BuildingBlock) userData2);
+                        maybeDestroyBuildingBlock((BuildingBlock) userData2, bullet);
                     }
                 }
 
                 if (userData2 instanceof BulletBlock) {
                     BulletBlock bullet = (BulletBlock) userData2;
-                    if (!shouldBulletCollide((BulletBlock) userData2, (Block) userData1)) {
+                    
+                    if (!shouldBulletCollide(bullet, (Block) userData1)) {
                         return;
                     }
 
                     maybeExplodeBullet(bullet, (Block) userData1);
                     if (userData1 instanceof BuildingBlock) {
-                        maybeDestroyBuildingBlock((BuildingBlock) userData1);
+                        maybeDestroyBuildingBlock((BuildingBlock) userData1, bullet);
                     }
                 }
 
@@ -939,14 +940,22 @@ public class GameModel {
             }
         }
 
-        private void maybeDestroyBuildingBlock(BuildingBlock bb) {
+        private void maybeDestroyBuildingBlock(BuildingBlock bb, BulletBlock bullet) {
 
             Material material = bb.getMaterial();
+            boolean remove = false;
             if (material instanceof RubberMaterial) {
                 // Do not destroy
             } else if (material instanceof InvulnerableMaterial) {
-                // Do not destroy
+                if (bullet.getMaterial() instanceof InvulnerableMaterial) {
+                    remove = true;
+                }
             } else {
+                remove = true;
+            }
+
+
+            if (remove) {
                 blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 6));
             }
         }

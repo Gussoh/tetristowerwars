@@ -25,6 +25,7 @@ public class CannonBlock extends Block implements Upgradable {
     private Material shotMaterial;
     private final BulletFactory bulletFactory;
     private float shootTime;
+    private final float initialShootTime;
     
     public CannonBlock(Body body, float force, float shootTime, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
         super(body, new SteelMaterial());
@@ -33,6 +34,7 @@ public class CannonBlock extends Block implements Upgradable {
         this.shootingToLeft = shootToLeft;
         this.bulletFactory = bulletFactory;
         this.shootTime = shootTime;
+        this.initialShootTime = shootTime;
     }
 
     public float getForce() {
@@ -97,5 +99,10 @@ public class CannonBlock extends Block implements Upgradable {
     public void abort() {
         armed = false;
     }
-    // TODO: Fix cannon reset
+
+    public void reset() {
+        abort();
+        timeUntilShooting = 0;
+        shootTime = initialShootTime;
+    }
 }
