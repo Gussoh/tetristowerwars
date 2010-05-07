@@ -44,6 +44,7 @@ public class Settings {
     public static final String KEY_MOUSE_EMULATION = "mouse_emulation";
     public static final String KEY_FULLSCREEN = "fullscreen";
     public static final String KEY_POWERUPS = "powerups";
+    public static final String KEY_SECONDS_BETWEEN_POWERUPS = "seconds_between_powerups";
 
     private final Properties properties = new Properties();
 
@@ -169,6 +170,10 @@ public class Settings {
 
     public boolean isPowerups() {
         return Boolean.parseBoolean(properties.getProperty(KEY_POWERUPS, "true"));
+    }
+
+    public int getSecondsBetweenPowerups() {
+        return getIntProperty(KEY_SECONDS_BETWEEN_POWERUPS, 30);
     }
 
     private float getFloatProperty(String key, float defaultValue) {
