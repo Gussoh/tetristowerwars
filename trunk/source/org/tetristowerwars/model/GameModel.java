@@ -691,7 +691,7 @@ public class GameModel {
     }
 
     protected void fireBodyCreationNotification(Block block) {
-        if (block instanceof BulletBlock || block instanceof PowerupBlock) {
+        if (block instanceof BulletBlock) {
             blocksToModify.add(new MutableEntry<Block, Integer>(block, 60));
         }
         for (GameModelListener gameModelListener : gameModelListeners) {
@@ -738,7 +738,7 @@ public class GameModel {
         @Override
         public void add(ContactPoint point) {
 
-            
+
             //throw new UnsupportedOperationException("Not supported yet.");
             Object userData1 = point.shape1.getBody().getUserData();
             Object userData2 = point.shape2.getBody().getUserData();
@@ -764,7 +764,7 @@ public class GameModel {
 
                 if (userData2 instanceof BulletBlock) {
                     BulletBlock bullet = (BulletBlock) userData2;
-                    
+
                     if (!shouldBulletCollide(bullet, (Block) userData1)) {
                         return;
                     }
@@ -844,9 +844,15 @@ public class GameModel {
                     }
                 } else if (otherMaterial instanceof GhostMaterial) {
                     return false;
+                } else if (bulletMaterial instanceof InvulnerableMaterial) {
+                    if (otherMaterial instanceof InvulnerableMaterial) {
+                        return true;
+                    } else {
+                        blocksToRemove.add(new MutableEntry<Block, Integer>(otherBlock, 0));
+                        return false;
+                    }
                 }
             }
-
             return true;
         }
 

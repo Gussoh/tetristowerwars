@@ -13,7 +13,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.material.PowerupMaterial;
-import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -27,11 +26,12 @@ public class PowerupFactory {
         this.gameModel = gameModel;
     }
 
-    public PowerupBlock createPowerUp(Player player) {
-        float centerX = (player.getRightLimit() + player.getLeftLimit()) / 2;
+    public PowerupBlock createPowerUp(Player player, boolean leftSide) {
+        
         float blockSize = gameModel.getBlockSize();
-        float y = gameModel.getWorldBoundries().upperBound.y - blockSize * 5;
-        Vec2 pos = new Vec2(centerX, y);
+        float x = leftSide ? player.getLeftLimit() + blockSize : player.getRightLimit() - blockSize;
+        float y = gameModel.getGroundLevel();
+        Vec2 pos = new Vec2(x, y);
         Material mat = new PowerupMaterial();
 
 
@@ -59,8 +59,6 @@ public class PowerupFactory {
 
         gameModel.fireBodyCreationNotification(block);
 
-        System.out.println("CREATEING POWERUP: pos: " + pos);
-
         return block;
     }
 
@@ -78,7 +76,7 @@ public class PowerupFactory {
         PolygonDef shapeDef = new PolygonDef();
         shapeDef.density = mat.getDensity();
         shapeDef.vertices = vertices;
-        shapeDef.isSensor = true;
+        shapeDef.isSensor = false;
         shapeDef.friction = 0.8f;
         shapeDef.restitution = 0.1f;
         body.createShape(shapeDef);
