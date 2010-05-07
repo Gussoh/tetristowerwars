@@ -391,8 +391,16 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void onGameReset() {
     }
 
+    @Override
     public void onTimerBeat(int beatsLeft) {
     }
+
+    @Override
+    public void onPowerupHoverChanged(BuildingBlock hoveredBlock) {
+        
+    }
+
+
 
     @Override
     public float getRenderWorldHeight() {
