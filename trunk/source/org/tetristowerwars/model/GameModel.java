@@ -919,7 +919,6 @@ public class GameModel {
         }
 
         private boolean shouldPowerUpCollide(PowerupBlock powerupBlock, Block block) {
-            System.out.println("POWER");
 
             boolean noCollision = false;
             if (getAttachedJoint(powerupBlock) != null) {
@@ -932,6 +931,11 @@ public class GameModel {
             if (noCollision) {
                 if (block instanceof BuildingBlock || block instanceof CannonBlock) {
                     powerupOverlappingBlock.put(powerupBlock, block);
+                    if (block instanceof BuildingBlock) {
+                        for (GameModelListener gameModelListener : gameModelListeners) {
+                            gameModelListener.onPowerupHoverChanged((BuildingBlock) block);
+                        }
+                    }
                     return false;
                 }
             }

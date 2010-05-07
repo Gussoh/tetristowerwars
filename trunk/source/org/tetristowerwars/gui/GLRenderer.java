@@ -397,7 +397,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onPowerupHoverChanged(BuildingBlock hoveredBlock) {
-        
+        rectangularBuildingBlockRenderer.addBuildingBlockOverlayAnimation(hoveredBlock);
     }
 
 
