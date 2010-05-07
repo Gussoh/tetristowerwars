@@ -43,6 +43,11 @@ public class BulletBlock extends Block {
         } else if (mat instanceof GhostMaterial && otherBlock.getMaterial() instanceof GhostMaterial) {
             return true;
         } else if (mat instanceof InvulnerableMaterial) {
+            if (otherBlock instanceof GroundBlock || otherBlock instanceof CannonBlock) {
+                return true;
+            } else if (otherBlock.getMaterial() instanceof InvulnerableMaterial) {
+                return true;
+            }
             return otherBlock instanceof GroundBlock || otherBlock instanceof CannonBlock;
         } else if (otherBlock.getMaterial() instanceof RubberMaterial) {
             return false;
