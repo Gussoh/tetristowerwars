@@ -13,7 +13,11 @@ public class RubberMaterial extends Material {
 
     @Override
     public float getDensity() {
-        return 1.5f;
+        return 3.0f;
     }
 
+    @Override
+    public float getRestitution() {
+        return 0.5f;
+    }
 }

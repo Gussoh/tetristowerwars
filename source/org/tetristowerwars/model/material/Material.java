@@ -26,4 +26,10 @@ public abstract class Material {
             return new SteelMaterial();
         }
     }
+
+    public float getRestitution() {
+        return 0.1f;
+    }
+
+
 }

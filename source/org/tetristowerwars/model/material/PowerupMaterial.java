@@ -11,11 +11,10 @@ package org.tetristowerwars.model.material;
  */
 public class PowerupMaterial extends Material {
 
-    private final SteelMaterial material = new SteelMaterial();
 
     @Override
     public float getDensity() {
-        return material.getDensity();
+        return 0.2f;
     }
 
 }

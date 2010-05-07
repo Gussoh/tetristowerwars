@@ -17,7 +17,7 @@ import org.tetristowerwars.model.material.RubberMaterial;
  */
 public abstract class BuildingBlock extends Block implements Upgradable {
 
-    protected Material material;
+    
     protected MassData massData;
 
     public static final int NORMAL = 0, RUBBER = 1, GHOST = 2, INVULNERABLE = 3;
@@ -25,16 +25,12 @@ public abstract class BuildingBlock extends Block implements Upgradable {
     
 
     protected BuildingBlock(Body body, Material material) {
-        super(body);
-        this.material = material;
+        super(body, material);
         this.massData = new MassData();
     }
 
     protected abstract void updateMassData();
 
-    public Material getMaterial() {
-        return material;
-    }
 
     public MassData getOriginalMassData() {
         return massData;
@@ -51,16 +47,22 @@ public abstract class BuildingBlock extends Block implements Upgradable {
 
         switch (mode) {
             case RUBBER:
-                material = new RubberMaterial();
+                setMaterial(new RubberMaterial());
                 break;
             case GHOST:
-                material = new GhostMaterial();
+                setMaterial(new GhostMaterial());
                 break;
             case INVULNERABLE:
-                material = new InvulnerableMaterial();
+                setMaterial(new InvulnerableMaterial());
                 break;
         }
+    }
+
+    @Override
+    public void setMaterial(Material material) {
+        super.setMaterial(material);
         updateMassData();
     }
+
 
 }

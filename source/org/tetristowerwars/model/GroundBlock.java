@@ -6,6 +6,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.model.material.GroundMaterial;
 
 /**
  *
@@ -14,6 +15,6 @@ import org.jbox2d.dynamics.Body;
 public class GroundBlock extends Block {
 
     public GroundBlock(Body body) {
-        super(body);
+        super(body, new GroundMaterial());
     }
 }

@@ -75,9 +75,9 @@ public class RectangularBuildingBlockRenderer {
         createBufferEntry(SteelMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
         createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
         createBufferEntry(PowerupMaterial.class, "res/gfx/textures/powerup.png", new float[]{color, color, color, 1.0f}, 0.0f, true);
-        createBufferEntry(RubberMaterial.class, "res/gfx/textures/steel2.png", new float[]{1.0f, 0.2f, 0.2f, .9f}, 0.0f, false);
-        createBufferEntry(GhostMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 0.3f}, 0.0f, false);
-        createBufferEntry(InvulnerableMaterial.class, "res/gfx/textures/steel2.png", new float[]{0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, false);
+        createBufferEntry(RubberMaterial.class, "res/gfx/textures/rubber.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(GhostMaterial.class, "res/gfx/textures/ghost.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(InvulnerableMaterial.class, "res/gfx/textures/invulnerable.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
         lineColorBuffer = BufferUtil.newFloatBuffer(200);

@@ -5,6 +5,7 @@
 package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
+import org.tetristowerwars.model.material.WoodMaterial;
 
 /**
  *
@@ -21,7 +22,7 @@ public class TriggerBlock extends Block {
     }
 
     public TriggerBlock(Body body, String text, TriggerListener triggerListener) {
-        super(body);
+        super(body, new WoodMaterial());
         this.text = text;
         this.triggerListener = triggerListener;
     }

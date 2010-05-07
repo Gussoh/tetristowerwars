@@ -37,7 +37,7 @@ public class RectangularBuildingBlock extends BuildingBlock {
             float width = (float) rectangle.getWidth();
             float height = (float) rectangle.getHeight();
 
-            float mass = (float) (width * height * material.getDensity());
+            float mass = (float) (width * height * getMaterial().getDensity());
             float inertiaCenter = mass * (width * width + height * height) / 12.0f;
 
             float distanceSq = (float) Point2D.distanceSq(0, 0, rectangle.getCenterX(), rectangle.getCenterY());
