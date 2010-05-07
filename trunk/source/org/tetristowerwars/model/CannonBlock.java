@@ -6,6 +6,7 @@ package org.tetristowerwars.model;
 
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.util.MathUtil;
 
 /**
@@ -26,7 +27,7 @@ public class CannonBlock extends Block implements Upgradable {
     private float shootTime;
     
     public CannonBlock(Body body, float force, float shootTime, Player player, boolean shootToLeft, BulletFactory bulletFactory) {
-        super(body);
+        super(body, new SteelMaterial());
         this.force = force;
         player.addCannon(this);
         this.shootingToLeft = shootToLeft;
@@ -35,7 +36,7 @@ public class CannonBlock extends Block implements Upgradable {
     }
 
     public float getForce() {
-        return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 10.0f, 0.7f, 6.0f);
+        return force * MathUtil.lerp(shotMaterial.getDensity(), 0.7f, 40.0f, 0.7f, 24.0f);
     }
 
 

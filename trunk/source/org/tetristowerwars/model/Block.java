@@ -4,8 +4,10 @@
  */
 package org.tetristowerwars.model;
 
+import org.jbox2d.collision.Shape;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
+import org.tetristowerwars.model.material.Material;
 
 /**
  *
@@ -13,15 +15,17 @@ import org.jbox2d.dynamics.World;
  */
 public abstract class Block {
 
+    private Material material;
     private final Body body;
     private Player owner;
     private boolean destroyed = false;
     private boolean powerupHilighted = false;
     private boolean hilighted = false;
 
-    public Block(Body body) {
+    public Block(Body body, Material material) {
         this.body = body;
         body.setUserData(this);
+        this.material = material;
     }
 
     public boolean isPowerupHilighted() {
@@ -52,8 +56,6 @@ public abstract class Block {
         return destroyed;
     }
 
-    
-
     public Body getBody() {
         return body;
     }
@@ -65,4 +67,17 @@ public abstract class Block {
     protected void setOwner(Player owner) {
         this.owner = owner;
     }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+        for (Shape s = body.getShapeList(); s != null; s = s.getNext()) {
+            s.setRestitution(material.getRestitution());
+        }
+    }
+
+    
 }

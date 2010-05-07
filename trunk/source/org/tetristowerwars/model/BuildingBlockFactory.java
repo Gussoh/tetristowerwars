@@ -453,7 +453,7 @@ public class BuildingBlockFactory {
         shapeDef.vertices = vertices;
         shapeDef.isSensor = false;
         shapeDef.friction = 0.8f;
-        shapeDef.restitution = 0.1f;
+        shapeDef.restitution = mat.getRestitution();
         body.createShape(shapeDef);
 
     }

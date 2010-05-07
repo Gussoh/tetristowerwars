@@ -51,7 +51,7 @@ public class BulletFactory {
 
         body.applyImpulse(impulse, body.getPosition());
 
-        BulletBlock block = new BulletBlock(body, cannon);
+        BulletBlock block = new BulletBlock(body, cannon, material);
         gameModel.fireBodyCreationNotification(block);
 
         return block;
@@ -73,7 +73,7 @@ public class BulletFactory {
         shapeDef.radius = radius;
         shapeDef.isSensor = true;
         shapeDef.friction = 0.8f;
-        shapeDef.restitution = 0.1f;
+        shapeDef.restitution = mat.getRestitution();
         body.createShape(shapeDef);
         body.setMassFromShapes();
     }

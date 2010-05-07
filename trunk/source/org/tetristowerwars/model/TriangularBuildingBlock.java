@@ -63,7 +63,7 @@ public class TriangularBuildingBlock extends BuildingBlock {
             float height = Math.abs((coordinates[5] - coordinates[1]) / 2);
             float a = width / 2; //all triangles must be symmetrical!
 
-            float mass = ((width * height) / 2) * material.getDensity();
+            float mass = ((width * height) / 2) * getMaterial().getDensity();
 
             // Moment of inertia calculation taken from http://www.efunda.com/math/areas/triangle.cfm
             // Calculation used is 'Polar Moment of Inertia about the Zc axis'

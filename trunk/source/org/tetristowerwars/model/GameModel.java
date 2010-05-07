@@ -26,6 +26,10 @@ import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.contacts.ContactResult;
+import org.tetristowerwars.model.material.GhostMaterial;
+import org.tetristowerwars.model.material.InvulnerableMaterial;
+import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.RubberMaterial;
 import org.tetristowerwars.util.MutableEntry;
 
 /**
@@ -733,6 +737,8 @@ public class GameModel {
          */
         @Override
         public void add(ContactPoint point) {
+
+            
             //throw new UnsupportedOperationException("Not supported yet.");
             Object userData1 = point.shape1.getBody().getUserData();
             Object userData2 = point.shape2.getBody().getUserData();
@@ -744,24 +750,27 @@ public class GameModel {
             if (userData1 instanceof Block && userData2 instanceof Block) {
 
                 if (userData1 instanceof BulletBlock) {
-                    if (!shouldBulletCollide((BulletBlock) userData1, (Block) userData2)) {
+                    BulletBlock bullet = (BulletBlock) userData1;
+                    if (!shouldBulletCollide(bullet, (Block) userData2)) {
                         return;
                     }
 
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 4));
-                    if (userData2 != groundBlock && !(userData2 instanceof CannonBlock)) {
-                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 6));
+                    maybeExplodeBullet(bullet, (Block) userData2);
+
+                    if (userData2 instanceof BuildingBlock) {
+                        maybeDestroyBuildingBlock((BuildingBlock) userData2);
                     }
                 }
 
                 if (userData2 instanceof BulletBlock) {
+                    BulletBlock bullet = (BulletBlock) userData2;
                     if (!shouldBulletCollide((BulletBlock) userData2, (Block) userData1)) {
                         return;
                     }
 
-                    blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData2, 4));
-                    if (userData1 != groundBlock && !(userData1 instanceof CannonBlock)) {
-                        blocksToRemove.add(new MutableEntry<Block, Integer>((Block) userData1, 6));
+                    maybeExplodeBullet(bullet, (Block) userData1);
+                    if (userData1 instanceof BuildingBlock) {
+                        maybeDestroyBuildingBlock((BuildingBlock) userData1);
                     }
                 }
 
@@ -821,9 +830,23 @@ public class GameModel {
                 return false; // dont allow the bullet to hit its own cannon
             } else if (otherBlock.getOwner() == null && otherBlock != groundBlock) {
                 return false;
-            } else {
-                return true;
+            } else if (otherBlock instanceof BuildingBlock) {
+                BuildingBlock bb = (BuildingBlock) otherBlock;
+                Material bulletMaterial = bullet.getMaterial();
+                Material otherMaterial = bb.getMaterial();
+
+                if (bulletMaterial instanceof GhostMaterial) {
+                    if (otherMaterial instanceof GhostMaterial) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if (otherMaterial instanceof GhostMaterial) {
+                    return false;
+                }
             }
+
+            return true;
         }
 
         private boolean shouldBuildingBlockCollideWithCannon(BuildingBlock bb) {
@@ -906,6 +929,26 @@ public class GameModel {
                 }
             }
             return true;
+        }
+
+        private void maybeExplodeBullet(BulletBlock bullet, Block otherBlock) {
+            boolean destroyBullet = bullet.addCollision(otherBlock);
+
+            if (destroyBullet) {
+                blocksToRemove.add(new MutableEntry<Block, Integer>(bullet, 4));
+            }
+        }
+
+        private void maybeDestroyBuildingBlock(BuildingBlock bb) {
+
+            Material material = bb.getMaterial();
+            if (material instanceof RubberMaterial) {
+                // Do not destroy
+            } else if (material instanceof InvulnerableMaterial) {
+                // Do not destroy
+            } else {
+                blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 6));
+            }
         }
     }
 }
