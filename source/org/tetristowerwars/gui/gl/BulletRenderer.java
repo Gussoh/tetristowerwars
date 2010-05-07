@@ -10,6 +10,8 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
 import javax.media.opengl.GL;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.Shape;
@@ -17,6 +19,7 @@ import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
+import org.tetristowerwars.model.material.Material;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -34,7 +37,10 @@ public class BulletRenderer {
     private final float[] color = {1.0f, 1.0f, 1.0f, 1.0f};
     private final float[] specular = {0.0f, 0.0f, 0.0f, 1.0f};
 
+    private final Map<Class<? extends Material>, Texture> textures = new HashMap<Class<? extends Material>, Texture>();
+
     public BulletRenderer(GL gl, boolean lightingEffects) throws IOException {
+        
         texture = TextureIO.newTexture(new File("res/gfx/bullet.png"), true);
         vertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);
         texCoordBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);

@@ -68,8 +68,8 @@ public class TouchGameLogic {
         final float playerAreaWidth = settings.getWorldWidth() * (settings.getPlayerArea() * 0.005f);
 
 
-        Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 1, 0, playerAreaWidth);
-        Player player2 = gameModel.createPlayer(settings.getRightTeamName(), 2, settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
+        final Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 1, 0, playerAreaWidth);
+        final Player player2 = gameModel.createPlayer(settings.getRightTeamName(), 2, settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
@@ -209,9 +209,10 @@ public class TouchGameLogic {
                         }
 
                         if (settings.isPowerups() && loopCount % (settings.getSecondsBetweenPowerups() * 60) == 0) {
-                            for (Player player : gameModel.getPlayers()) {
-                                gameModel.getPowerupFactory().createPowerUp(player);
-                            }
+                            
+                                gameModel.getPowerupFactory().createPowerUp(player1, true);
+                                gameModel.getPowerupFactory().createPowerUp(player2, false);
+                            
                         }
 
                         loopCount++;
