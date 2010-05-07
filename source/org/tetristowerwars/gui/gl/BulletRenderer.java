@@ -19,7 +19,13 @@ import org.jbox2d.common.Vec2;
 import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.Player;
+import org.tetristowerwars.model.material.BrickMaterial;
+import org.tetristowerwars.model.material.GhostMaterial;
+import org.tetristowerwars.model.material.InvulnerableMaterial;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.RubberMaterial;
+import org.tetristowerwars.model.material.SteelMaterial;
+import org.tetristowerwars.model.material.WoodMaterial;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -28,7 +34,6 @@ import static javax.media.opengl.GL.*;
  */
 public class BulletRenderer {
 
-    private final Texture texture;
     private FloatBuffer vertexBuffer;
     private FloatBuffer texCoordBuffer;
     private FloatBuffer normalBuffer;
@@ -40,8 +45,18 @@ public class BulletRenderer {
     private final Map<Class<? extends Material>, Texture> textures = new HashMap<Class<? extends Material>, Texture>();
 
     public BulletRenderer(GL gl, boolean lightingEffects) throws IOException {
-        
-        texture = TextureIO.newTexture(new File("res/gfx/bullet.png"), true);
+        String basePath = "res/gfx/bullets/";
+        textures.put(WoodMaterial.class, TextureIO.newTexture(new File(basePath + "wood.png"), true));
+        textures.put(BrickMaterial.class, TextureIO.newTexture(new File(basePath + "brick.png"), true));
+        textures.put(SteelMaterial.class, TextureIO.newTexture(new File(basePath + "steel.png"), true));
+        textures.put(RubberMaterial.class, TextureIO.newTexture(new File(basePath + "rubber.png"), true));
+        textures.put(GhostMaterial.class, TextureIO.newTexture(new File(basePath + "ghost.png"), true));
+        textures.put(InvulnerableMaterial.class, TextureIO.newTexture(new File(basePath + "invulnerable.png"), true));
+
+        for (Texture texture : textures.values()) {
+            GLUtil.fixTextureParameters(texture);
+        }
+
         vertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);
         texCoordBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 2 * 16);
 
@@ -49,7 +64,6 @@ public class BulletRenderer {
             normalBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_BULLET * 3 * 16);
         }
 
-        GLUtil.fixTextureParameters(texture);
         this.lightingEffects = lightingEffects;
     }
 
@@ -124,8 +138,14 @@ public class BulletRenderer {
         gl.glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         gl.glTexCoordPointer(2, GL_FLOAT, 0, texCoordBuffer);
 
-        texture.bind();
-        gl.glDrawArrays(GL_QUADS, 0, numBullets * NUM_VERTICES_PER_BULLET);
+        int currentPos = 0;
+        for (Player player : gameModel.getPlayers()) {
+            for (BulletBlock bulletBlock : player.getBullets()) {
+                textures.get(bulletBlock.getMaterial().getClass()).bind();
+                gl.glDrawArrays(GL_QUADS, currentPos, 4);
+                currentPos += 4;
+            }
+        }
 
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glDisable(GL_TEXTURE_2D);

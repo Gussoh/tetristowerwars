@@ -31,4 +31,6 @@ public interface GameModelListener {
     public void onGameReset();
 
     public void onTimerBeat(int beatsLeft);
+
+    public void onPowerupHoverChanged(BuildingBlock hoveredBlock);
 }

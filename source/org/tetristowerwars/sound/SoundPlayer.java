@@ -343,6 +343,13 @@ public class SoundPlayer implements GameModelListener {
         playSound(beep, 0.5f);
     }
 
+    @Override
+    public void onPowerupHoverChanged(BuildingBlock hoveredBlock) {
+        
+    }
+
+
+
     private class AudioData {
 
         private final byte[] data;
