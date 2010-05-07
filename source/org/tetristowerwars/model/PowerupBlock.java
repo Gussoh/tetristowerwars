@@ -26,7 +26,6 @@ import java.awt.geom.Rectangle2D;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.material.Material;
-import org.tetristowerwars.model.material.SteelMaterial;
 
 /**
  *
@@ -38,4 +37,8 @@ public class PowerupBlock extends RectangularBuildingBlock {
         super(body, material, rectangles, outline);
     }
 
+    @Override
+    public boolean isUpgradable() {
+        return false;
+    }
 }
