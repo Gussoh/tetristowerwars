@@ -208,7 +208,7 @@ public class TouchGameLogic {
                             }
                         }
 
-                        if (loopCount % 500 == 0) {
+                        if (settings.isPowerups() && loopCount % (settings.getSecondsBetweenPowerups() * 60) == 0) {
                             for (Player player : gameModel.getPlayers()) {
                                 gameModel.getPowerupFactory().createPowerUp(player);
                             }
