@@ -79,7 +79,7 @@ public class NetworkGameLogic {
                         }
                         final NetworkClient networkClient = new NetworkClient("Player", result, 25001);
 
-
+                        
 
                         networkClient.addNetworkClientListener(new NetworkClientListener() {
 
@@ -97,6 +97,16 @@ public class NetworkGameLogic {
                                     networkServer.startGame(mainFrame.getSettings());
                                 }
                             }
+
+                            @Override
+                            public void onOwnClientIdSet(short ownClientId) {
+                                if (numClientConnected == 1) {
+                                    networkClient.setPlayerIndex((short) 0);
+                                } else if (numClientConnected == 2) {
+                                    networkClient.setPlayerIndex((short) 1);
+                                }
+                            }
+
 
                             @Override
                             public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
@@ -338,6 +348,10 @@ public class NetworkGameLogic {
 
         @Override
         public void clientConnected(ClientEntry clientEntry) {
+        }
+
+        @Override
+        public void onOwnClientIdSet(short ownClientId) {
         }
 
         @Override

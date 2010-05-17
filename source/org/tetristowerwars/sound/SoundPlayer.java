@@ -28,7 +28,6 @@ import org.tetristowerwars.model.Block;
 import org.tetristowerwars.model.BuildingBlock;
 import org.tetristowerwars.model.BuildingBlockJoint;
 import org.tetristowerwars.model.BulletBlock;
-import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.GameModelListener;
 import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.WinningCondition;

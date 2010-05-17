@@ -108,6 +108,9 @@ public class NetworkClientModel implements NetworkMessageListener {
         }
         
         this.ownClientId = clientId;
+        for (NetworkClientListener networkClientListener : networkClientListeners) {
+            networkClientListener.onOwnClientIdSet(ownClientId);
+        }
     }
 
     public void postChatMessage(short clientId, String message) {
@@ -173,5 +176,10 @@ public class NetworkClientModel implements NetworkMessageListener {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.spawnBuildingBlock(position, material, shape);
         }
+    }
+
+    public void setPlayerIndex(short clientId, short playerIndex) {
+        ClientEntry clientEntry = clients.get(clientId);
+        clientEntry.setPlayerIndex(playerIndex);
     }
 }
