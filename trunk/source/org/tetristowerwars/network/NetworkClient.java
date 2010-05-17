@@ -17,6 +17,7 @@ import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.network.message.LoginMessage;
 import org.tetristowerwars.network.message.ReadyMessage;
+import org.tetristowerwars.network.message.SetPlayerIndexMessage;
 
 /**
  *
@@ -104,11 +105,10 @@ public class NetworkClient {
     }
 
     public void ready() throws IOException {
-        if (connection == null || !connection.isAlive()) {
-            throw new IOException("Not connected to server.");
-        }
+        connection.send(new ReadyMessage());
+    }
 
-        ReadyMessage readyMessage = new ReadyMessage();
-        connection.send(readyMessage);
+    public void setPlayerIndex(short playerIndex) {
+        connection.send(new SetPlayerIndexMessage(clientModel.getOwnClientId(), playerIndex));
     }
 }

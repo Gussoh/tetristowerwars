@@ -14,7 +14,7 @@ public class ClientEntry {
 
     private String name;
     private final ClientInputManager networkClientInputManager = new ClientInputManager();
-    private short player;
+    private short player = 0;
 
     public ClientEntry(String name) {
         this.name = name;
@@ -32,7 +32,7 @@ public class ClientEntry {
         this.name = name;
     }
 
-    public void setPlayer(short player) {
+    public void setPlayerIndex(short player) {
         this.player = player;
     }
 

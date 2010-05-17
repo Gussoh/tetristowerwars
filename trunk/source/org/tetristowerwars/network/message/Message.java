@@ -36,6 +36,7 @@ public abstract class Message {
         type2Class.add(InputEventMessage.class);
         type2Class.add(LoginMessage.class);
         type2Class.add(ReadyMessage.class);
+        type2Class.add(SetPlayerIndexMessage.class);
         type2Class.add(SettingsMessage.class);
         type2Class.add(SpawnBuildingBlockMessage.class);
         type2Class.add(StartGameMessage.class);

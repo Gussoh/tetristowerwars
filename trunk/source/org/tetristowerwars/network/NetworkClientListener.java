@@ -32,4 +32,6 @@ public interface NetworkClientListener {
     public void onConnectionClosed();
 
     public void allClientsReady();
+
+    public void onOwnClientIdSet(short ownClientId);
 }
