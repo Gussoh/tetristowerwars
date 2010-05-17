@@ -641,8 +641,8 @@ public class GameModel {
      * @param rightLimit The right limit/border of this player in world coordinates.
      * @return The created player object.
      */
-    public Player createPlayer(String name, int playerIndex, float leftLimit, float rightLimit) {
-        Player player = new Player(name, playerIndex, leftLimit, rightLimit);
+    public Player createPlayer(String name, float leftLimit, float rightLimit) {
+        Player player = new Player(name, players.size(), leftLimit, rightLimit);
         players.add(player);
 
         return player;
@@ -699,9 +699,9 @@ public class GameModel {
         }
     }
 
-    protected void fireTimeLeftBeat(int timeLestS) {
+    protected void fireTimeLeftBeat(int timeLeftS) {
         for (GameModelListener gameModelListener : gameModelListeners) {
-            gameModelListener.onTimerBeat(timeLestS);
+            gameModelListener.onTimerBeat(timeLeftS);
         }
     }
 
@@ -727,6 +727,10 @@ public class GameModel {
 
     public boolean isGameOver() {
         return gameOver;
+    }
+
+    public void destroyBuildingBlock(BuildingBlock block, int numFramesDelay) {
+        blocksToRemove.add(new MutableEntry<Block, Integer>(block, numFramesDelay));
     }
 
     private class PhysicsEngineListener implements ContactListener, BoundaryListener, ContactFilter {

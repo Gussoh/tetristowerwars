@@ -4,7 +4,6 @@
  */
 package org.tetristowerwars.control;
 
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -27,13 +26,13 @@ import org.tetristowerwars.model.TriggerBlock;
  */
 public class Controller implements InputListener {
 
-    private final GameModel gameModel;
+    protected final GameModel gameModel;
     private final InputManager inputManager;
     private final Renderer renderer;
-    private final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
+    protected final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
     private final Map<Integer, TriggerBlock> actionIdToTrigger = new HashMap<Integer, TriggerBlock>();
     private final Queue<InputEvent> eventQueue = new LinkedList<InputEvent>();
-    private final Map<Integer, Point> currentCursorPositions = new LinkedHashMap<Integer, Point>();
+    private final Map<Integer, Vec2> currentCursorPositions = new LinkedHashMap<Integer, Vec2>();
 
     public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
         this.gameModel = dataModel;
@@ -55,21 +54,26 @@ public class Controller implements InputListener {
             return; // Ignore TUIO bugs where an ID can appear twice on the screen
         }
 
-        selectBlock(event.getActionId(), event.getPosition());
+        Block b = selectBlock(event.getActionId(), event.getPosition());
+        handleSelectedBlock(event.getActionId(), event.getPosition(), b);
     }
 
-    private void selectBlock(int actionId, Point position) {
+    protected Block selectBlock(int actionId, Vec2 position) {
         if (actionIdToJoint.containsKey(actionId)) {
-            return;
+            return null;
         }
 
-        Block selectedBlock = gameModel.getBlockFromCoordinates(renderer.convertWindowToWorldCoordinates(position));
+        Block selectedBlock = gameModel.getBlockFromCoordinates(position);
 
         if (selectedBlock == null) {
             renderer.putCursorPoint(actionId, position, false);
-            return;
+            return null;
         }
 
+        return selectedBlock;
+    }
+
+    protected void handleSelectedBlock(int actionId, Vec2 position, Block selectedBlock) {
         if (selectedBlock instanceof BuildingBlock) {
 
             if (gameModel.getWinningCondition() != null && gameModel.getWinningCondition().isGameOver()) {
@@ -77,7 +81,7 @@ public class Controller implements InputListener {
             }
 
             renderer.putCursorPoint(actionId, position, true);
-            actionIdToJoint.put(actionId, gameModel.createBuildingBlockJoint((BuildingBlock) selectedBlock, renderer.convertWindowToWorldCoordinates(position)));
+            actionIdToJoint.put(actionId, gameModel.createBuildingBlockJoint((BuildingBlock) selectedBlock, position));
         } else if (selectedBlock instanceof CannonBlock) {
             // Add a new cannon block with applied force to the world
             //gameModel.getBulletFactory().createBullet((CannonBlock) collisionBlock);
@@ -99,20 +103,20 @@ public class Controller implements InputListener {
     private void handleInputDeviceReleased(InputEvent event) {
         currentCursorPositions.remove(event.getActionId());
 
-        performReleaseAction(event);
+        performReleaseAction(event.getActionId());
     }
 
-    private void performReleaseAction(InputEvent event) {
+    protected void performReleaseAction(int actionId) {
 
-        currentCursorPositions.remove(event.getActionId());
+        currentCursorPositions.remove(actionId);
 
         // If a building block joint exists for this very id
-        renderer.removeCursorPoint(event.getActionId());
-        BuildingBlockJoint bbj = actionIdToJoint.remove(event.getActionId());
+        renderer.removeCursorPoint(actionId);
+        BuildingBlockJoint bbj = actionIdToJoint.remove(actionId);
         if (bbj != null) {
             gameModel.removeBuldingBlockJoint(bbj);
         } else {
-            TriggerBlock triggerBlock = actionIdToTrigger.remove(event.getActionId());
+            TriggerBlock triggerBlock = actionIdToTrigger.remove(actionId);
             if (triggerBlock != null) {
                 triggerBlock.getTriggerListener().onTriggerReleased(triggerBlock);
             }
@@ -133,31 +137,28 @@ public class Controller implements InputListener {
         if (bbj != null) {
             hit = true;
 
-            Vec2 newPointerPosition = renderer.convertWindowToWorldCoordinates(event.getPosition());
-            if (newPointerPosition.sub(bbj.getPointerPosition()).length() > 40) {
-                performReleaseAction(event);
+            Vec2 newPos = event.getPosition();
+            if (newPos.sub(bbj.getPointerPosition()).length() > 40) {
+                performReleaseAction(event.getActionId());
             } else {
-                gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), renderer.convertWindowToWorldCoordinates(event.getPosition()));
+                gameModel.moveBuildingBlockJoint(actionIdToJoint.get(event.getActionId()), event.getPosition());
             }
         } else {
-            selectBlock(event.getActionId(), event.getPosition());
+            Block b = selectBlock(event.getActionId(), event.getPosition());
+            handleSelectedBlock(event.getActionId(), event.getPosition(), b);
         }
 
         renderer.putCursorPoint(event.getActionId(), event.getPosition(), hit);
     }
 
-    public void writeEvent(InputEvent event) {
-        System.out.print(event.toString());
-        System.out.println(", world: " + renderer.convertWindowToWorldCoordinates(event.getPosition()));
-    }
-
+    
     public synchronized void pumpEvents() {
 
         if (gameModel.getWinningCondition().isGameOver()) {
             LinkedHashSet<Integer> actionSet = new LinkedHashSet<Integer>(actionIdToJoint.keySet());
 
             for (Integer id : actionSet) {
-                performReleaseAction(new InputEvent(InputEvent.RELEASED, new Point(), id));
+                performReleaseAction(id);
             }
         }
 
@@ -177,8 +178,9 @@ public class Controller implements InputListener {
         }
 
 
-        for (Map.Entry<Integer, Point> entry : currentCursorPositions.entrySet()) {
-            selectBlock(entry.getKey(), entry.getValue());
+        for (Map.Entry<Integer, Vec2> entry : currentCursorPositions.entrySet()) {
+            Block b = selectBlock(entry.getKey(), entry.getValue());
+            handleSelectedBlock(entry.getKey(), entry.getValue(), b);
         }
 
         for (TriggerBlock triggerBlock : actionIdToTrigger.values()) {

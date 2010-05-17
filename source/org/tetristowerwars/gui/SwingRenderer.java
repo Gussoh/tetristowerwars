@@ -45,7 +45,7 @@ public class SwingRenderer extends Renderer {
     private final JFrame frame;
     private final RenderPanel renderPanel;
     private double scale = 5.0;
-    private LinkedHashMap<Integer, Point> cursorPoints = new LinkedHashMap<Integer, Point>();
+    private LinkedHashMap<Integer, Vec2> cursorPoints = new LinkedHashMap<Integer, Vec2>();
     private final List<Color> niceColors = new ArrayList<Color>();
     private final NumberFormat realNumberFormat = NumberFormat.getNumberInstance();
 
@@ -94,8 +94,12 @@ public class SwingRenderer extends Renderer {
         return new Vec2((float)(windowCoord.x / scale), (float) ((renderPanel.getHeight() - windowCoord.y) / scale));
     }
 
+    private Vec2 convertWorldToWindowCoordinates(Vec2 worldCoord) {
+        return new Vec2( (float)(scale * worldCoord.x), (float) (renderPanel.getHeight() - scale * worldCoord.y));
+    }
+
     @Override
-    public void putCursorPoint(int id, Point point, boolean hit) {
+    public void putCursorPoint(int id, Vec2 point, boolean hit) {
         cursorPoints.put(id, point);
     }
 
@@ -157,8 +161,9 @@ public class SwingRenderer extends Renderer {
 
             // Draw markers
             g2.setColor(Color.RED);
-            for (Point point : cursorPoints.values()) {
-                Ellipse2D ellipse = new Ellipse2D.Double(point.x / scale - 1, point.y / scale - 1, 3, 3);
+            for (Vec2 point : cursorPoints.values()) {
+                Vec2 windowCoord = convertWorldToWindowCoordinates(point);
+                Ellipse2D ellipse = new Ellipse2D.Double(windowCoord.x / scale - 1, windowCoord.y / scale - 1, 3, 3);
                 g2.fill(ellipse);
             }
 

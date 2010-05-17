@@ -51,7 +51,7 @@ public class MouseEmulator implements InputListener {
         if (!isActive) {
             isActive = true;
             activeId = event.getActionId();
-            robot.mouseMove(event.getPosition().x, event.getPosition().y);
+            robot.mouseMove((int) event.getPosition().x, (int) event.getPosition().y);
             robot.mousePress(java.awt.event.InputEvent.BUTTON1_MASK);
         }
     }
@@ -60,7 +60,7 @@ public class MouseEmulator implements InputListener {
     public synchronized void onInputDeviceReleased(InputEvent event) {
         if (isActive && activeId == event.getActionId()) {
             isActive = false;
-            robot.mouseMove(event.getPosition().x, event.getPosition().y);
+            robot.mouseMove((int) event.getPosition().x, (int) event.getPosition().y);
             robot.mouseRelease(java.awt.event.InputEvent.BUTTON1_MASK);
         }
     }
@@ -68,7 +68,7 @@ public class MouseEmulator implements InputListener {
     @Override
     public synchronized void onInputDeviceDragged(InputEvent event) {
         if (isActive && activeId == event.getActionId()) {
-            robot.mouseMove(event.getPosition().x, event.getPosition().y);
+            robot.mouseMove((int) event.getPosition().x, (int) event.getPosition().y);
         }
     }
 

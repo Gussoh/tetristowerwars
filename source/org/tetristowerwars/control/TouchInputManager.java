@@ -9,10 +9,11 @@ import TUIO.TuioCursor;
 import TUIO.TuioListener;
 import TUIO.TuioObject;
 import TUIO.TuioTime;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import javax.swing.SwingUtilities;
+import org.jbox2d.common.Vec2;
+import org.tetristowerwars.gui.Renderer;
 
 /**
  *
@@ -21,19 +22,18 @@ import javax.swing.SwingUtilities;
 public class TouchInputManager extends InputManager implements TuioListener {
 
     private final Dimension screenDimension;
-    private final Component gamePanel;
     private final TuioClient tuioClient;
-
+    private final Renderer renderer;
     /**
      *
      * @param client
      * @param screenDimension
-     * @param gamePanel if null, screen coordinates are reported instead of component coordinates.
+     * @param renderer if null, screen coordinates are reported instead of world coordinates.
      */
-    public TouchInputManager(TuioClient client, Dimension screenDimension, Component gamePanel) {
+    public TouchInputManager(TuioClient client, Dimension screenDimension, Renderer renderer) {
         this.tuioClient = client;
         this.screenDimension = screenDimension;
-        this.gamePanel = gamePanel;
+        this.renderer = renderer;
 
         client.addTuioListener(this);
     }
@@ -78,11 +78,15 @@ public class TouchInputManager extends InputManager implements TuioListener {
         int y = tc.getScreenY(screenDimension.height);
 
         Point point = new Point(x, y);
-        if (gamePanel != null) {
-            SwingUtilities.convertPointFromScreen(point, gamePanel);
+        Vec2 coords;
+        if (renderer != null) {
+            SwingUtilities.convertPointFromScreen(point, renderer.getInputComponent());
+            coords = renderer.convertWindowToWorldCoordinates(point);
+        } else {
+            coords = new Vec2(x, y);
         }
         
-        InputEvent evt = new InputEvent(type, point, tc.getCursorID());
+        InputEvent evt = new InputEvent(type, coords, tc.getCursorID());
 
         return evt;
     }

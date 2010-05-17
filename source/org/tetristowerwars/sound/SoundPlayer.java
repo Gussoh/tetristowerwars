@@ -286,7 +286,7 @@ public class SoundPlayer implements GameModelListener {
         if (triggerWin) {
             triggerWin = false;
             System.out.println("playing winningsound!");
-            playMusic(new File(musicLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex() - 1]));
+            playMusic(new File(musicLocation + winningMusic[condition.getLeader().getPlayer().getPlayerIndex()]));
         }
     }
 
@@ -339,7 +339,6 @@ public class SoundPlayer implements GameModelListener {
 
     @Override
     public void onTimerBeat(int beatsLeft) {
-        System.out.println("BEAT");
         playSound(beep, 0.5f);
     }
 
