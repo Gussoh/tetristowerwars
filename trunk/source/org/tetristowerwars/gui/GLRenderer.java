@@ -150,8 +150,8 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     }
 
     @Override
-    public void putCursorPoint(int id, Point point, boolean hit) {
-        id2Pointers.put(id, new Pointer(convertWindowToWorldCoordinates(point), hit));
+    public void putCursorPoint(int id, Vec2 point, boolean hit) {
+        id2Pointers.put(id, new Pointer(point, hit));
     }
 
     @Override

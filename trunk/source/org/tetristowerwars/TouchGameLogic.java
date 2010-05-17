@@ -59,17 +59,17 @@ public class TouchGameLogic {
         final SoundPlayer soundPlayer = new SoundPlayer(settings.isPlayMusicEnabled(), settings.isPlaySoundEffectsEnabled(), settings.getWorldTheme());
         gameModel.addGameModelListener(soundPlayer);
 
-        final InputManager mouseInputManager = new MouseInputManager(glRenderer.getInputComponent());
-        final InputManager touchInputManager = new TouchInputManager(mainFrame.getTuioClient(), screenDimensions, glRenderer.getInputComponent());
+        final InputManager mouseInputManager = new MouseInputManager(glRenderer);
+        final InputManager touchInputManager = new TouchInputManager(mainFrame.getTuioClient(), screenDimensions, glRenderer);
 
-        final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
-        final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
 
         final float playerAreaWidth = settings.getWorldWidth() * (settings.getPlayerArea() * 0.005f);
 
+        final Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 0, playerAreaWidth);
+        final Player player2 = gameModel.createPlayer(settings.getRightTeamName(), settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
 
-        final Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 1, 0, playerAreaWidth);
-        final Player player2 = gameModel.createPlayer(settings.getRightTeamName(), 2, settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
+        final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
+        final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
@@ -123,7 +123,6 @@ public class TouchGameLogic {
                     public void onTriggerPressed(TriggerBlock triggerBlock) {
                         timePressed = System.currentTimeMillis();
                         triggerBlock.setText("Hold");
-                        System.out.println("LELEL: " + timePressed);
                     }
 
                     @Override
@@ -144,13 +143,9 @@ public class TouchGameLogic {
                             });
                         }
                     }
-
-
                 }).setVisible(true);
 
                 TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
-
-                    private long timePressed;
 
                     @Override
                     public void onTriggerPressed(TriggerBlock triggerBlock) {
@@ -159,14 +154,11 @@ public class TouchGameLogic {
 
                     @Override
                     public void onTriggerReleased(TriggerBlock triggerBlock) {
-                        triggerBlock.setVisible(false);
                     }
 
                     @Override
                     public void onTriggerHold(TriggerBlock triggerBlock) {
                     }
-
-
                 });
 
                 int loopCount = 0;
@@ -192,6 +184,7 @@ public class TouchGameLogic {
                         stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
 
                         if (resetGame) {
+                            restartTrigger.setVisible(false);
                             gameModel.reset();
                             resetGame = false;
                             timedReset = true;
@@ -209,10 +202,10 @@ public class TouchGameLogic {
                         }
 
                         if (settings.isPowerups() && loopCount % (settings.getSecondsBetweenPowerups() * 60) == 0) {
-                            
-                                gameModel.getPowerupFactory().createPowerUp(player1, true);
-                                gameModel.getPowerupFactory().createPowerUp(player2, false);
-                            
+
+                            gameModel.getPowerupFactory().createPowerUp(player1, true);
+                            gameModel.getPowerupFactory().createPowerUp(player2, false);
+
                         }
 
                         loopCount++;

@@ -32,8 +32,8 @@ public abstract class Renderer {
     /**
      *
      * @param id An id for the point.
-     * @param point The point in window coordinates.
+     * @param point The point in world coordinates.
      */
-    public abstract void putCursorPoint(int id, Point point, boolean hit);
+    public abstract void putCursorPoint(int id, Vec2 position, boolean hit);
     public abstract void removeCursorPoint(int id);
 }

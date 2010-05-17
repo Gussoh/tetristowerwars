@@ -45,9 +45,9 @@ public class WinRenderer {
     private boolean shouldFlagExplode;
 
     public WinRenderer(GL gl, GameModel gameModel) throws IOException {
-        flagTextures = new Texture[gameModel.getPlayers().size() + 1];
+        flagTextures = new Texture[gameModel.getPlayers().size()];
         for (Player player : gameModel.getPlayers()) {
-            flagTextures[player.getPlayerIndex()] = TextureIO.newTexture(new File("res/gfx/THEME" + player.getPlayerIndex() + "/win.png"), true);
+            flagTextures[player.getPlayerIndex()] = TextureIO.newTexture(new File("res/gfx/THEME" + (player.getPlayerIndex() + 1) + "/win.png"), true);
             GLUtil.fixTextureParameters(flagTextures[player.getPlayerIndex()]);
         }
         particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);

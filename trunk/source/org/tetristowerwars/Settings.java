@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-
 /**
  *
  * @author Andreas
@@ -45,8 +44,16 @@ public class Settings {
     public static final String KEY_FULLSCREEN = "fullscreen";
     public static final String KEY_POWERUPS = "powerups";
     public static final String KEY_SECONDS_BETWEEN_POWERUPS = "seconds_between_powerups";
+    private final Properties properties;
 
-    private final Properties properties = new Properties();
+    public Settings() {
+        this(new Properties());
+    }
+
+    public Settings(Properties properties) {
+        this.properties = properties;
+
+    }
 
     public void load() throws IOException {
         File settingsFile = new File(SETTINGS_FILE);
@@ -60,12 +67,20 @@ public class Settings {
         }
     }
 
+    public void load(InputStream inputStream) throws IOException {
+        properties.load(inputStream);
+    }
+
     public void save() throws IOException {
         File file = new File(SETTINGS_FILE);
         System.out.println("Writing properties to file " + file.getCanonicalPath());
         FileOutputStream fos = new FileOutputStream(file);
         properties.store(fos, "Settings file for Tetris Tower Wars");
         fos.close();
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     public void setProperty(String key, String value) {
@@ -214,5 +229,4 @@ public class Settings {
             return defaultValue;
         }
     }
-
 }

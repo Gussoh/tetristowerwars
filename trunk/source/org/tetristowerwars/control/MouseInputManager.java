@@ -9,6 +9,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import org.jbox2d.common.Vec2;
+import org.tetristowerwars.gui.Renderer;
 
 /**
  *
@@ -17,10 +19,11 @@ import java.awt.event.MouseMotionListener;
 public class MouseInputManager extends InputManager implements MouseListener, MouseMotionListener {
 
     private static final int dummyId = 0;
-    private final Component component;
+    private final Renderer renderer;
 
-    public MouseInputManager(Component component) {
-        this.component = component;
+    public MouseInputManager(Renderer renderer) {
+        this.renderer = renderer;
+        Component component = renderer.getInputComponent();
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
     }
@@ -32,14 +35,16 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        InputEvent evt = new InputEvent(InputEvent.PRESSED, new Point(e.getX(), e.getY()), dummyId);
+        Vec2 worldCoordinates = renderer.convertWindowToWorldCoordinates(e.getPoint());
+        InputEvent evt = new InputEvent(InputEvent.PRESSED, worldCoordinates, dummyId);
         fireOnPressEvent(evt);
         
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
-        InputEvent evt = new InputEvent(InputEvent.RELEASED, new Point(e.getX(), e.getY()), dummyId);
+        Vec2 worldCoordinates = renderer.convertWindowToWorldCoordinates(e.getPoint());
+        InputEvent evt = new InputEvent(InputEvent.RELEASED, worldCoordinates, dummyId);
         fireOnReleaseEvent(evt);
     }
 
@@ -55,7 +60,8 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        InputEvent evt = new InputEvent(InputEvent.DRAGGED, new Point(e.getX(), e.getY()), dummyId);
+        Vec2 worldCoordinates = renderer.convertWindowToWorldCoordinates(e.getPoint());
+        InputEvent evt = new InputEvent(InputEvent.DRAGGED, worldCoordinates, dummyId);
         fireOnDragEvent(evt);
     }
 
@@ -66,6 +72,7 @@ public class MouseInputManager extends InputManager implements MouseListener, Mo
 
     @Override
     public void unregisterEventProvider() {
+        Component component = renderer.getInputComponent();
         component.removeMouseListener(this);
         component.removeMouseMotionListener(this);
     }
