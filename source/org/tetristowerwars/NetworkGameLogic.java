@@ -252,7 +252,6 @@ public class NetworkGameLogic {
 
             if (networkServer != null) {
                 networkServer.sendEndOfFrame();
-                networkServer.sendEndOfFrame();
             }
 
             final float constantStepTimeS = 1f / 60f;
