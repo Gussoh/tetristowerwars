@@ -79,7 +79,7 @@ public class NetworkGameLogic {
                         }
                         final NetworkClient networkClient = new NetworkClient("Player", result, 25001);
 
-                        
+
 
                         networkClient.addNetworkClientListener(new NetworkClientListener() {
 
@@ -106,7 +106,6 @@ public class NetworkGameLogic {
                                     networkClient.setPlayerIndex((short) 1);
                                 }
                             }
-
 
                             @Override
                             public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
@@ -209,8 +208,6 @@ public class NetworkGameLogic {
             CompoundWinningCondition cwc = new CompoundWinningCondition(gameModel, winningConditions, logicType);
             cwc.setWinningCondition();
 
-            final float constantStepTimeS = 1f / 60f;
-            long lastStepTimeNano = System.nanoTime();
 
 
             TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(networkSettings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
@@ -257,6 +254,9 @@ public class NetworkGameLogic {
                 networkServer.sendEndOfFrame();
                 networkServer.sendEndOfFrame();
             }
+
+            final float constantStepTimeS = 1f / 60f;
+            long lastStepTimeNano = System.nanoTime();
 
             int loopCount = 0;
             while (alive) {
@@ -305,11 +305,12 @@ public class NetworkGameLogic {
 
                     if (networkServer != null) {
                         // Running the server as well!
-                        if (gameModel.getBuildingBlockPool().size() <= 2) {
+                        if (gameModel.getBuildingBlockPool().size() + numBlockSpawning <= 2) {
                             float left = gameModel.getPlayers().get(0).getRightLimit();
                             float right = gameModel.getPlayers().get(1).getLeftLimit();
                             float yPos = gameModel.getWorldBoundries().upperBound.y - gameModel.getBlockSize() * 5;
                             for (int i = 0; i < 7; i++) {
+                                numBlockSpawning++;
                                 networkServer.createRandomBuildingBlock(left, right, yPos);
                             }
                         }
