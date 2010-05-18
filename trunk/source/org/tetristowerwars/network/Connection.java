@@ -41,7 +41,7 @@ public class Connection {
     }
 
     public Connection(Socket socket, NetworkMessageListener messageListener) throws IOException {
-        this(socket, messageListener, false);
+        this(socket, messageListener, true);
     }
 
     public boolean isAlive() {
