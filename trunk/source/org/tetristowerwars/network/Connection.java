@@ -4,6 +4,8 @@
  */
 package org.tetristowerwars.network;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,8 +33,8 @@ public class Connection {
 
     public Connection(Socket socket, NetworkMessageListener messageListener, boolean alwaysFlush) throws IOException {
         this.socket = socket;
-        dataInputStream = new DataInputStream(socket.getInputStream());
-        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        dataOutputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         this.messageListener = messageListener;
         this.alwaysFlush = alwaysFlush;
 
