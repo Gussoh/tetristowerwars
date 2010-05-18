@@ -265,7 +265,7 @@ public class NetworkGameLogic {
                 long currentTimeNano = System.nanoTime();
                 long stepTimeNano = currentTimeNano - lastStepTimeNano;
                 int numTimesStepped = 0;
-
+                System.out.println(networkClient.getNumUnprocessedFrames());
                 // This should hopefully make the client run smoothly
                 while (networkClient.getNumUnprocessedFrames() == 0) {
                     Thread.yield();
