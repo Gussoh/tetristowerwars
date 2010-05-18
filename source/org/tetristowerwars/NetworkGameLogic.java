@@ -181,6 +181,7 @@ public class NetworkGameLogic {
         private boolean alive = true;
         private Semaphore syncedStartSemaphore = new Semaphore(0);
         private int numBlockSpawning = 0;
+        private int numEndOfFrames;
 
         public GameLoop() {
             networkClient.addNetworkClientListener(this);
@@ -264,7 +265,6 @@ public class NetworkGameLogic {
                 long currentTimeNano = System.nanoTime();
                 long stepTimeNano = currentTimeNano - lastStepTimeNano;
                 int numTimesStepped = 0;
-                System.out.println(networkClient.getNumUnprocessedFrames());
                 // This should hopefully make the client run smoothly
                 while (networkClient.getNumUnprocessedFrames() == 0) {
                     Thread.yield();
@@ -395,6 +395,10 @@ public class NetworkGameLogic {
 
         @Override
         public void endOfFramePosted(int unprocessedFrames) {
+            numEndOfFrames++;
+            if (numEndOfFrames % 100 == 0) {
+                System.out.println("Num EOF: " + numEndOfFrames);
+            }
         }
 
         @Override
