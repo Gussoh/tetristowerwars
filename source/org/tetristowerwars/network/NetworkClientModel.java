@@ -90,11 +90,11 @@ public class NetworkClientModel implements NetworkMessageListener {
     }
 
     public synchronized void addEventQueueMessage(EventQueueMessage eventQueueMessage) {
-        currentEventQueue.add(eventQueueMessage);
+        currentEventQueue.offer(eventQueueMessage);
     }
 
     public synchronized void endCurrentFrame() {
-        eventQueues.add(currentEventQueue);
+        eventQueues.offer(currentEventQueue);
         currentEventQueue = new LinkedList<EventQueueMessage>();
 
         for (NetworkClientListener networkClientListener : networkClientListeners) {
