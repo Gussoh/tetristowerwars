@@ -43,21 +43,21 @@ public class NetworkClientModel implements NetworkMessageListener {
     }
 
     @Override
-    public void handleReceivedMessage(Connection connection, Message message) {
+    public synchronized void handleReceivedMessage(Connection connection, Message message) {
         if (message instanceof ClientMessage) {
             ((ClientMessage) message).processClientMessage(this);
         }
     }
 
     @Override
-    public void onConnectionClosed(Connection connection) {
+    public synchronized void onConnectionClosed(Connection connection) {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.onConnectionClosed();
         }
     }
 
     @Override
-    public void onConnectionError(Connection connection, String message) {
+    public synchronized void onConnectionError(Connection connection, String message) {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.onConnectionError(message);
         }
@@ -65,15 +65,15 @@ public class NetworkClientModel implements NetworkMessageListener {
 
 
 
-    public void addNetworkClientListeners(NetworkClientListener listener) {
+    public synchronized void addNetworkClientListeners(NetworkClientListener listener) {
         networkClientListeners.add(listener);
     }
 
-    public void removeNetworkClientListeners(NetworkClientListener listener) {
+    public synchronized void removeNetworkClientListeners(NetworkClientListener listener) {
         networkClientListeners.remove(listener);
     }
 
-    public void addClient(short clientId, String name) {
+    public synchronized void addClient(short clientId, String name) {
         ClientEntry clientEntry = new ClientEntry(name);
         clients.put(clientId, clientEntry);
 
@@ -82,18 +82,18 @@ public class NetworkClientModel implements NetworkMessageListener {
         }
     }
 
-    public void removeClient(short clientId) {
+    public synchronized void removeClient(short clientId) {
         ClientEntry clientEntry = clients.remove(clientId);
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.clientDisconnected(clientEntry);
         }
     }
 
-    public void addEventQueueMessage(EventQueueMessage eventQueueMessage) {
+    public synchronized void addEventQueueMessage(EventQueueMessage eventQueueMessage) {
         currentEventQueue.add(eventQueueMessage);
     }
 
-    public void endCurrentFrame() {
+    public synchronized void endCurrentFrame() {
         eventQueues.add(currentEventQueue);
         currentEventQueue = new LinkedList<EventQueueMessage>();
 
@@ -102,7 +102,7 @@ public class NetworkClientModel implements NetworkMessageListener {
         }
     }
 
-    public void setOwnClientId(short clientId) {
+    public synchronized void setOwnClientId(short clientId) {
         if (ownClientId != -1) {
             throw new IllegalStateException("Own client id already set.");
         }
@@ -113,33 +113,33 @@ public class NetworkClientModel implements NetworkMessageListener {
         }
     }
 
-    public void postChatMessage(short clientId, String message) {
+    public synchronized void postChatMessage(short clientId, String message) {
         ClientEntry entry = clients.get(clientId);
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.chatMessageReceive(entry, message);
         }
     }
 
-    public void setGameSettings(Settings settings) {
+    public synchronized void setGameSettings(Settings settings) {
         this.gameSettings = settings;
     }
 
-    public void fireGameStartedEvent() {
+    public synchronized void fireGameStartedEvent() {
         List<NetworkClientListener> copy = new ArrayList<NetworkClientListener>(networkClientListeners);
         for (NetworkClientListener networkClientListener : copy) {
             networkClientListener.gameStarted();
         }
     }
 
-    public short getOwnClientId() {
+    public synchronized short getOwnClientId() {
         return ownClientId;
     }
 
-    public Settings getSettings() {
+    public synchronized Settings getSettings() {
         return gameSettings;
     }
 
-    public List<Controller> createControllers(GameModel gameModel, Renderer renderer) {
+    public synchronized List<Controller> createControllers(GameModel gameModel, Renderer renderer) {
         List<Controller> controllers = new ArrayList<Controller>();
         for (Map.Entry<Short, ClientEntry> entry : clients.entrySet()) {
             ClientEntry ce = entry.getValue();
@@ -150,35 +150,35 @@ public class NetworkClientModel implements NetworkMessageListener {
         return controllers;
     }
 
-    public int getNumUnprocessedFrames() {
+    public synchronized int getNumUnprocessedFrames() {
         return eventQueues.size();
     }
 
-    public void processNextFrame() {
+    public synchronized void processNextFrame() {
         Queue<EventQueueMessage> frame = eventQueues.poll();
         for (EventQueueMessage eventQueueMessage : frame) {
             eventQueueMessage.executeMessage(this);
         }
     }
 
-    public void allClientsReady() {
+    public synchronized void allClientsReady() {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.allClientsReady();
         }
     }
 
-    public void executeInputEvent(short clientId, InputEvent inputEvent) {
+    public synchronized void executeInputEvent(short clientId, InputEvent inputEvent) {
         ClientEntry ce = clients.get(clientId);
         ce.getNetworkClientInputManager().handleIncomingEvent(inputEvent);
     }
 
-    public void executeCreateBuildingBlock(Vec2 position, Material material, short shape) {
+    public synchronized void executeCreateBuildingBlock(Vec2 position, Material material, short shape) {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.spawnBuildingBlock(position, material, shape);
         }
     }
 
-    public void setPlayerIndex(short clientId, short playerIndex) {
+    public synchronized void setPlayerIndex(short clientId, short playerIndex) {
         ClientEntry clientEntry = clients.get(clientId);
         clientEntry.setPlayerIndex(playerIndex);
     }
