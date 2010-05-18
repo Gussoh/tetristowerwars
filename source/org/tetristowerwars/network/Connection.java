@@ -88,8 +88,14 @@ public class Connection {
 
     private class SendThread extends Thread {
 
+        public SendThread() {
+            super("Send thread");
+        }
+
+
         @Override
         public void run() {
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             try {
                 while (isAlive()) {
                     try {
@@ -117,8 +123,14 @@ public class Connection {
 
     private class ReceiveThread extends Thread {
 
+        public ReceiveThread() {
+            super("Receive thread");
+        }
+
+
         @Override
         public void run() {
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             try {
                 while (isAlive()) {
                     Message message = Message.read(dataInputStream);
