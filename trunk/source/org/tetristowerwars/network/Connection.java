@@ -139,10 +139,15 @@ public class Connection {
         @Override
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            int numMessagesReceived = 0;
             try {
                 while (isAlive()) {
                     Message message = Message.read(dataInputStream);
+                    numMessagesReceived++;
                     messageListener.handleReceivedMessage(Connection.this, message);
+                    if (numMessagesReceived % 100 == 0) {
+                        System.out.println("Num messages received: " + numMessagesReceived);
+                    }
                 }
             } catch (IOException ex) {
                 synchronized (this) {
