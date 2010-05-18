@@ -97,15 +97,23 @@ public class Connection {
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             try {
+                int numMessagesSent = 0;
                 while (isAlive()) {
                     try {
                         Message message = sendQueue.take();
                         message.write(dataOutputStream);
+                        numMessagesSent++;
+
+                        if (numMessagesSent % 100 == 0) {
+                            System.out.println("Messages sent: " + numMessagesSent);
+                        }
                         if (alwaysFlush) {
                             dataOutputStream.flush();
                         } else if (sendQueue.isEmpty()) {
                             dataOutputStream.flush();
                         }
+
+
                     } catch (InterruptedException ex) {
                     }
                 }
