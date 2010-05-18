@@ -49,8 +49,6 @@ public class NetworkClient {
 
                     socket.setPerformancePreferences(0, 1, 0);
                     socket.setTcpNoDelay(true);
-                    socket.setReceiveBufferSize(8);
-                    socket.setSendBufferSize(8);
                     socket.connect(new InetSocketAddress(host, port));
                     connection = new Connection(socket, clientModel);
                     connection.send(new LoginMessage(name));

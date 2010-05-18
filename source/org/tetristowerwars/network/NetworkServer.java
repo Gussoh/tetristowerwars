@@ -78,7 +78,6 @@ public class NetworkServer {
                         if (serverSocket == null) {
                             serverSocket = new ServerSocket(port);
                             serverSocket.setSoTimeout(5000);
-                            serverSocket.setReceiveBufferSize(8);
                             serverSocket.setPerformancePreferences(0, 1, 0);
                         }
                     }
