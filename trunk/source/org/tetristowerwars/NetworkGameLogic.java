@@ -42,7 +42,6 @@ import org.tetristowerwars.sound.SoundPlayer;
  * @author Andreas
  */
 public class NetworkGameLogic {
-
     private final static int MAX_NUM_UNPROCESSED_FRAMES = 10;
     private final static float NANO_FACTOR = 1000000000.0f;
     private final MainFrame mainFrame;
