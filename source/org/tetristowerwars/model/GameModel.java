@@ -61,14 +61,15 @@ public class GameModel {
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
     private final float groundLevel;
     private final float blockSize;
+    private float elapsedGameTimeS = 0;
     private boolean winningNotificationTriggered = false;
     private WinningCondition winningCondition = null;
     private Player leader = null;
     private final Set<MutableEntry<Block, Integer>> blocksToModify = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private boolean bulletTimerValid;
-    private long bulletTimer;
+    private float bulletTimer;
     private boolean gameOver;
-    private final static long GAME_OVER_TIMER = 3000;
+    private final static float GAME_OVER_TIMER_S = 3;
 
     /**
      * Creates a new GameModel, the model for the game world. The game world uses the meters/seconds/kilograms units.
@@ -140,6 +141,7 @@ public class GameModel {
             winningCondition.reset();
         }
         gameOver = false;
+        elapsedGameTimeS = 0;
 
         for (GameModelListener gameModelListener : gameModelListeners) {
             gameModelListener.onGameReset();
@@ -151,7 +153,9 @@ public class GameModel {
      */
     public void update() {
 
-        long currentTimeNano = System.nanoTime();
+        final long currentTimeNano = System.nanoTime(); // only for measuring performance
+        final float stepTimeS = 1f / 60f;
+        elapsedGameTimeS += stepTimeS;
 
         if (gameOver) {
             if (!winningNotificationTriggered) {
@@ -163,30 +167,34 @@ public class GameModel {
             return;
         }
 
-        if (winningCondition != null && winningCondition.isGameOver()) {
+        if (winningCondition != null) {
+            winningCondition.update();
+            if (winningCondition.isGameOver()) {
 
-            boolean moreBulletsExist = false;
-            for (Player player : players) {
-                if (!player.getBullets().isEmpty()) {
-                    moreBulletsExist = true;
-                    break;
+
+                boolean moreBulletsExist = false;
+                for (Player player : players) {
+                    if (!player.getBullets().isEmpty()) {
+                        moreBulletsExist = true;
+                        break;
+                    }
                 }
-            }
 
-            if (moreBulletsExist) {
-                bulletTimerValid = false;
-            } else {
-                if (!bulletTimerValid) {
-                    bulletTimerValid = true;
-                    bulletTimer = System.currentTimeMillis() + GAME_OVER_TIMER;
-                } else if (System.currentTimeMillis() > bulletTimer) {
-                    gameOver = true;
+                if (moreBulletsExist) {
                     bulletTimerValid = false;
+                } else {
+                    if (!bulletTimerValid) {
+                        bulletTimerValid = true;
+                        bulletTimer = elapsedGameTimeS + GAME_OVER_TIMER_S;
+                    } else if (elapsedGameTimeS > bulletTimer) {
+                        gameOver = true;
+                        bulletTimerValid = false;
+                    }
                 }
             }
         }
 
-        world.step(1f / 60f, ITERATIONS_PER_STEP);
+        world.step(stepTimeS, ITERATIONS_PER_STEP);
 
         updateBlocksIntersectingWithCannon();
 
@@ -242,7 +250,7 @@ public class GameModel {
         for (Player player : players) {
 
             for (CannonBlock cannonBlock : player.getCannons()) {
-                cannonBlock.update(1f / 60f);
+                cannonBlock.update(stepTimeS);
             }
 
             // Check if non-owned blocks has passed into a player area and should be
@@ -331,6 +339,14 @@ public class GameModel {
         }
 
         timeTakenToExecuteUpdateMs = (float) (System.nanoTime() - currentTimeNano) / 1000000f;
+    }
+
+    /**
+     *
+     * @return the elapsed game time in seconds.
+     */
+    public float getElapsedGameTimeS() {
+        return elapsedGameTimeS;
     }
 
     /**

@@ -79,9 +79,12 @@ public class NetworkServer {
                             serverSocket = new ServerSocket(port);
                             serverSocket.setSoTimeout(5000);
                             serverSocket.setPerformancePreferences(0, 1, 0);
+
+
                         }
                     }
                     final Socket socket = serverSocket.accept();
+                    socket.setTrafficClass(0x10); // IPTOS_LOWDELAY
                     socket.setTcpNoDelay(true);
                     Connection c = new Connection(socket, networkServerModel);
                     networkServerModel.newClientConnection(c);

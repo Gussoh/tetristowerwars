@@ -18,20 +18,40 @@ import org.tetristowerwars.model.WinningCondition;
 public class LimitedBlocksWinningCondition extends WinningCondition {
 
     private final int maxBlocks;
-    private long startTimeMs;
-    private final long winningTimeMs;
+    private float startTimeS;
+    private final float winningTimeS;
     private BuildingBlock highestBlock = null;
+    private boolean candidateFound;
 
-    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks, long winningTimeS) {
+
+    public LimitedBlocksWinningCondition(GameModel model, int maxBlocks, float winningTimeS) {
         super(model);
         this.maxBlocks = maxBlocks;
-        this.winningTimeMs = winningTimeS * 1000;
+        this.winningTimeS = winningTimeS;
     }
 
     @Override
     public void reset() {
-        startTimeMs = 0;
+        startTimeS = 0;
     }
+
+    @Override
+    public void update() {
+        int numOwnedBlocks = maxBlocks;
+        candidateFound = false;
+        for (Player player : model.getPlayers()) {
+            if (player.getBuildingBlocks().size() > numOwnedBlocks) {
+                numOwnedBlocks = player.getBuildingBlocks().size();
+                candidateFound = true;
+                BuildingBlock block = getLeader().getPlayer().getHighestBuilingBlockInTower();
+                if (block != highestBlock) {
+                    highestBlock = block;
+                    startTimeS = model.getElapsedGameTimeS();
+                }
+            }
+        }
+    }
+
 
     @Override
     public List<MessageEntry> getStatusMessages() {
@@ -46,33 +66,22 @@ public class LimitedBlocksWinningCondition extends WinningCondition {
     }
 
     public boolean hasCandidate() {
-        for (Player player : model.getPlayers()) {
-            if (player.getBuildingBlocks().size() > maxBlocks) {
-                BuildingBlock block = getLeader().getPlayer().getHighestBuilingBlockInTower();
-                if (block != highestBlock) {
-                    highestBlock = block;
-                    startTimeMs = System.currentTimeMillis();
-                }
-                return true;
-            }
-        }
-
-        return false;
+        return candidateFound;
     }
     @Override
     public int timeLeftUntilGameOver() {
         if (hasCandidate()) {
-            long timeLeftMs = startTimeMs + winningTimeMs - System.currentTimeMillis();
+            int timeLeftS = (int) (startTimeS + winningTimeS - model.getElapsedGameTimeS());
 
-            if (timeLeftMs < 0) {
+            if (timeLeftS < 0) {
                 return 0;
-            } else if (timeLeftMs > winningTimeMs - 2000) {
-                return -1;
+            } else if (timeLeftS > winningTimeS - 2) {
+                return UNKNOWN_TIME_LEFT;
             } else {
-                return (int) (timeLeftMs / 1000) + 1;
+                return timeLeftS + 1;
             }
         } else {
-            return -1;
+            return UNKNOWN_TIME_LEFT;
         }
     }
 

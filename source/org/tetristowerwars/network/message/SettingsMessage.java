@@ -34,7 +34,7 @@ public class SettingsMessage extends Message implements ClientMessage {
 
             properties.put(key, value);
         }
-        settings = new Settings();
+        settings = new Settings(properties);
     }
 
     @Override

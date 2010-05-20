@@ -42,7 +42,7 @@ import org.tetristowerwars.sound.SoundPlayer;
  * @author Andreas
  */
 public class NetworkGameLogic {
-    private final static int MAX_NUM_UNPROCESSED_FRAMES = 10;
+    private final static int MAX_NUM_UNPROCESSED_FRAMES = 7;
     private final static float NANO_FACTOR = 1000000000.0f;
     private final MainFrame mainFrame;
     private final float playerAreaWidth;
@@ -61,10 +61,10 @@ public class NetworkGameLogic {
             @Override
             public void run() {
 
-                String result = JOptionPane.showInputDialog(null, "Enter hostname, leave empty for server", "Network test", JOptionPane.QUESTION_MESSAGE);
-                if (result != null) {
+                String hostname = JOptionPane.showInputDialog(null, "Enter hostname, leave empty for server", "Network test", JOptionPane.QUESTION_MESSAGE);
+                if (hostname != null) {
                     try {
-                        final boolean server = result.isEmpty();
+                        final boolean server = hostname.isEmpty();
                         final MainFrame mainFrame = new MainFrame();
                         final NetworkServer networkServer = server ? new NetworkServer(25001) : null;
                         if (server) {
@@ -76,7 +76,7 @@ public class NetworkGameLogic {
                                 return;
                             }
                         }
-                        final NetworkClient networkClient = new NetworkClient("Player", result, 25001);
+                        final NetworkClient networkClient = new NetworkClient("Player", hostname, 25001);
 
 
 
@@ -93,7 +93,17 @@ public class NetworkGameLogic {
                                 numClientConnected++;
 
                                 if (numClientConnected == 2 && server) {
-                                    networkServer.startGame(mainFrame.getSettings());
+                                    new Thread() {
+
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                Thread.sleep(1000); // To avoid racing when last client set player index.
+                                            } catch (InterruptedException ex) {
+                                            }
+                                            networkServer.startGame(mainFrame.getSettings());
+                                        }
+                                    }.start();
                                 }
                             }
 
@@ -180,7 +190,6 @@ public class NetworkGameLogic {
         private boolean alive = true;
         private Semaphore syncedStartSemaphore = new Semaphore(0);
         private int numBlockSpawning = 0;
-        private int numEndOfFrames;
 
         public GameLoop() {
             networkClient.addNetworkClientListener(this);
@@ -201,7 +210,7 @@ public class NetworkGameLogic {
             }
 
             if (networkSettings.isTimeConditionEnabled()) {
-                winningConditions.add(new TimedWinningCondition(gameModel, networkSettings.getTimeCondition()));
+                winningConditions.add(new TimedWinningCondition(gameModel, networkSettings.getTimeCondition(), 16));
             }
 
             CompoundWinningCondition.LogicType logicType = networkSettings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;
@@ -394,10 +403,7 @@ public class NetworkGameLogic {
 
         @Override
         public void endOfFramePosted(int unprocessedFrames) {
-            numEndOfFrames++;
-            if (numEndOfFrames % 100 == 0) {
-                System.out.println("Num EOF: " + numEndOfFrames);
-            }
+            
         }
 
         @Override

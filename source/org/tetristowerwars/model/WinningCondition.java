@@ -14,8 +14,9 @@ import java.util.List;
  */
 public abstract class WinningCondition {
 
+    public final static int UNKNOWN_TIME_LEFT = -1;
     protected final GameModel model;
-    private int lastTimeLeftUntilGameOver = -1;
+    private int lastTimeLeftUntilGameOver = UNKNOWN_TIME_LEFT;
 
     public WinningCondition(GameModel model) {
         this.model = model;
@@ -42,7 +43,7 @@ public abstract class WinningCondition {
 
     /**
      *
-     * @return -1 if unknown, otherwise the number of seconds.
+     * @return UNKNOWN_TIME_LEFT if unknown, otherwise the number of seconds.
      */
     public abstract int timeLeftUntilGameOver();
 
@@ -63,6 +64,7 @@ public abstract class WinningCondition {
     }
 
     public abstract void reset();
+    public abstract void update();
 
     public class ScoreEntry implements Comparable<ScoreEntry> {
 

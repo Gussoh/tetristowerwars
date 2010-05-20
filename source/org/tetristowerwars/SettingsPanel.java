@@ -51,6 +51,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         lightingCheckBox.setSelected(settings.isLightingEnabled());
         particleCheckBox.setSelected(settings.isParticlesEnabled());
         fullscreenCheckBox.setSelected(settings.isFullscreen());
+        antiAliasingCheckBox.setSelected(settings.isAntiAliasingEnabled());
         
         this.mainFrame = mainFrame;
     }
@@ -131,11 +132,12 @@ public class SettingsPanel extends javax.swing.JPanel {
         lightingCheckBox = new javax.swing.JCheckBox();
         particleCheckBox = new javax.swing.JCheckBox();
         fullscreenCheckBox = new javax.swing.JCheckBox();
+        antiAliasingCheckBox = new javax.swing.JCheckBox();
         cancelButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         statusLabel = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Game Options"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced Game Options"));
 
         jLabel1.setText("Building block size (m):");
 
@@ -265,6 +267,8 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         fullscreenCheckBox.setText("Fullscreen");
 
+        antiAliasingCheckBox.setText("Anti-aliasing");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -272,6 +276,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(antiAliasingCheckBox)
                     .addComponent(fullscreenCheckBox)
                     .addComponent(particleCheckBox)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -301,7 +306,9 @@ public class SettingsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(particleCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fullscreenCheckBox))
+                .addComponent(fullscreenCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1, Short.MAX_VALUE)
+                .addComponent(antiAliasingCheckBox))
         );
 
         cancelButton.setText("Cancel");
@@ -328,6 +335,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
@@ -335,8 +343,7 @@ public class SettingsPanel extends javax.swing.JPanel {
                         .addComponent(saveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -347,8 +354,8 @@ public class SettingsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(statusLabel)
                     .addComponent(cancelButton)
@@ -409,6 +416,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         settings.setProperty(Settings.KEY_LIGHTING_EFFECTS, Boolean.toString(lightingCheckBox.isSelected()));
         settings.setProperty(Settings.KEY_PARTICLE_EFFECTS, Boolean.toString(particleCheckBox.isSelected()));
         settings.setProperty(Settings.KEY_FULLSCREEN, Boolean.toString(fullscreenCheckBox.isSelected()));
+        settings.setProperty(Settings.KEY_ANTI_ALIASING, Boolean.toString(antiAliasingCheckBox.isSelected()));
         try {
             settings.save();
         } catch (IOException ex) {
@@ -424,6 +432,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox antiAliasingCheckBox;
     private javax.swing.JTextField buildingBlockSizeField;
     private javax.swing.JButton cancelButton;
     private javax.swing.JCheckBox fullscreenCheckBox;

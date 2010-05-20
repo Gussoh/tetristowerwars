@@ -17,50 +17,55 @@ import org.tetristowerwars.model.WinningCondition;
  */
 public class TimedWinningCondition extends WinningCondition {
 
-    private long endTimeMs;
-    private final long gameTime;
+    private final float endTimeS;
+    private final float winningTimeS;
 
     /**
      *
      * @param model
-     * @param gameTime Game time in s.
+     * @param endTimeS Game time in seconds.
      */
-    public TimedWinningCondition(GameModel model, long gameTime) {
+    public TimedWinningCondition(GameModel model, float endTimeS, float winningTimeS) {
         super(model);
-        this.gameTime = gameTime;
-        reset();
+        this.endTimeS = endTimeS;
+        this.winningTimeS = winningTimeS;
     }
 
     @Override
     public void reset() {
-        endTimeMs = System.currentTimeMillis() + gameTime * 1000;
     }
 
     @Override
+    public void update() {
+    }
+
+
+
+    @Override
     public boolean isGameOver() {
-        return System.currentTimeMillis() > endTimeMs;
+        return model.getElapsedGameTimeS() > endTimeS;
     }
 
     @Override
     public int timeLeftUntilGameOver() {
 
-            long timeLeftMs = endTimeMs - System.currentTimeMillis();
+            int timeLeftS = (int) (endTimeS - model.getElapsedGameTimeS());
 
-            if (timeLeftMs < 0) {
+            if (timeLeftS < 0) {
                 return 0;
-            } else if (timeLeftMs < 10000) {
-                return (int) (timeLeftMs / 1000) + 1;
+            } else if (timeLeftS < winningTimeS) {
+                return timeLeftS + 1;
             } else {
-                return -1;
+                return UNKNOWN_TIME_LEFT;
             }
     }
 
     @Override
     public List<MessageEntry> getStatusMessages() {
-        long time = endTimeMs - System.currentTimeMillis();
+        int timeLeft = (int) (endTimeS - model.getElapsedGameTimeS());
         ArrayList<MessageEntry> message = new ArrayList<MessageEntry>(1);
-        MessageType type = time < 10000 ? MessageType.CRITICAL : MessageType.NORMAL;
-        message.add(new MessageEntry("" + Math.max(time / 1000 + 1, 0), type, null));
+        MessageType type = timeLeft < winningTimeS ? MessageType.CRITICAL : MessageType.NORMAL;
+        message.add(new MessageEntry("" + Math.max(timeLeft + 1, 0), type, null));
         return message;
     }
 

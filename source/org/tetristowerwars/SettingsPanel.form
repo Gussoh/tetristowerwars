@@ -19,6 +19,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="jPanel3" alignment="0" pref="343" max="32767" attributes="1"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="statusLabel" pref="21" max="32767" attributes="0"/>
@@ -28,7 +29,6 @@
                       <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jPanel2" alignment="0" max="32767" attributes="2"/>
-                  <Component id="jPanel3" alignment="0" pref="343" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -42,8 +42,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="12" max="32767" attributes="0"/>
+              <Component id="jPanel3" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cancelButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -59,7 +59,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Game Options"/>
+            <TitledBorder title="Advanced Game Options"/>
           </Border>
         </Property>
       </Properties>
@@ -271,6 +271,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="antiAliasingCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="fullscreenCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="particleCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
@@ -306,6 +307,8 @@
                   <Component id="particleCheckBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="fullscreenCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="1" max="32767" attributes="0"/>
+                  <Component id="antiAliasingCheckBox" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -343,6 +346,11 @@
         <Component class="javax.swing.JCheckBox" name="fullscreenCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Fullscreen"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="antiAliasingCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Anti-aliasing"/>
           </Properties>
         </Component>
       </SubComponents>
