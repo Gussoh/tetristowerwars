@@ -30,6 +30,7 @@ public class Settings {
     public static final String KEY_WINDOW_HEIGHT = "window_height";
     public static final String KEY_LIGHTING_EFFECTS = "lighting_effects";
     public static final String KEY_PARTICLE_EFFECTS = "particle_effects";
+    public static final String KEY_ANTI_ALIASING = "anti_aliasing";
     public static final String KEY_GROUND_HEIGHT = "ground_height";
     public static final String KEY_USE_HEIGHT_CONDITION = "use_height_condition";
     public static final String KEY_USE_NUM_BLOCKS_CONDITION = "use_num_blocks_condition";
@@ -52,7 +53,6 @@ public class Settings {
 
     public Settings(Properties properties) {
         this.properties = properties;
-
     }
 
     public void load() throws IOException {
@@ -137,6 +137,10 @@ public class Settings {
 
     public boolean isParticlesEnabled() {
         return Boolean.parseBoolean(properties.getProperty(KEY_PARTICLE_EFFECTS, "true"));
+    }
+
+    public boolean isAntiAliasingEnabled() {
+        return Boolean.parseBoolean(properties.getProperty(KEY_ANTI_ALIASING, "true"));
     }
 
     public boolean isHeightConditionEnabled() {

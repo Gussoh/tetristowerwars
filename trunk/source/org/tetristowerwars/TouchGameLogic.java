@@ -85,7 +85,7 @@ public class TouchGameLogic {
         }
 
         if (settings.isTimeConditionEnabled()) {
-            winningConditions.add(new TimedWinningCondition(gameModel, settings.getTimeCondition()));
+            winningConditions.add(new TimedWinningCondition(gameModel, settings.getTimeCondition(), 16));
         }
 
         CompoundWinningCondition.LogicType logicType = settings.mustAllWinningConditionsBeMet() ? CompoundWinningCondition.LogicType.AND : CompoundWinningCondition.LogicType.OR;

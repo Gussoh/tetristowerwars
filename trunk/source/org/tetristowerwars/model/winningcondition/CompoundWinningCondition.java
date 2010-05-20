@@ -40,6 +40,14 @@ public class CompoundWinningCondition extends WinningCondition {
         }
     }
 
+    @Override
+    public void update() {
+        for (WinningCondition winningCondition : conditions) {
+            winningCondition.update();
+        }
+    }
+
+
 
     public LogicType getLogicType() {
         return logicType;

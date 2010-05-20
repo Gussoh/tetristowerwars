@@ -80,7 +80,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     private long lastTimeMillis;
     private final MainFrame mainFrame;
     private final boolean lightingEffects;
-    private final boolean sceneAntiAliasing;
     private long frameCounter = 0;
     private long performanceTimer = 0;
     private Semaphore renderingSemaphore = new Semaphore(0);
@@ -101,7 +100,7 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         this.useParticleEffects = settings.isParticlesEnabled();
 
         // Anti-aliasing is needed when using lighting for good looking gfx :)
-        this.sceneAntiAliasing = lightingEffects;
+        boolean sceneAntiAliasing = settings.isAntiAliasingEnabled();
 
 
         GLCapabilities capabilities = new GLCapabilities();
@@ -111,13 +110,13 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
         capabilities.setHardwareAccelerated(true);
         capabilities.setStereo(false);
         capabilities.setSampleBuffers(sceneAntiAliasing);
-        capabilities.setNumSamples(4);
+        capabilities.setNumSamples(sceneAntiAliasing ? 4 : 0);
+        capabilities.setDepthBits(0);
 
-        // Use 32-bit RGBA
         capabilities.setRedBits(8);
         capabilities.setGreenBits(8);
         capabilities.setBlueBits(8);
-        capabilities.setAlphaBits(8);
+        capabilities.setAlphaBits(0);
 
 
 
@@ -346,14 +345,17 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
     @Override
     public void onBlockDestruction(Block block) {
-        if (useParticleEffects) {
-            if (block instanceof BulletBlock) {
-                effectRenderer.createExplosionEffect(block.getBody().getPosition());
-                effectRenderer.createSmokeEffect(block.getBody().getPosition());
-            } else if (block instanceof BuildingBlock) {
+
+        if (block instanceof BulletBlock) {
+            // Explosions should always be rendered as they have a great impact on visibility.
+            effectRenderer.createExplosionEffect(block.getBody().getPosition());
+            effectRenderer.createSmokeEffect(block.getBody().getPosition());
+        } else if (block instanceof BuildingBlock) {
+            if (useParticleEffects) {
                 effectRenderer.createBuildingBlockDestructionEffect((BuildingBlock) block);
             }
         }
+
     }
 
     @Override
@@ -399,8 +401,6 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
     public void onPowerupHoverChanged(BuildingBlock hoveredBlock) {
         rectangularBuildingBlockRenderer.addBuildingBlockOverlayAnimation(hoveredBlock);
     }
-
-
 
     @Override
     public float getRenderWorldHeight() {

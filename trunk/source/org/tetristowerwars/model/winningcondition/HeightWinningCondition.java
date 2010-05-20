@@ -20,25 +20,26 @@ public class HeightWinningCondition extends WinningCondition {
 
     private final int height;
     private BuildingBlock highestBlock = null;
-    private long startTimeMs;
-    private final long winningTimeMs;
+    private float startTimeS;
+    private final float winningTimeS;
     private Player leader;
     private int leaderHeight;
 
-    public HeightWinningCondition(GameModel model, int height, long winningTimeS) {
+    public HeightWinningCondition(GameModel model, int height, float winningTimeS) {
         super(model);
         this.height = height;
-        this.winningTimeMs = winningTimeS * 1000;
+        this.winningTimeS = winningTimeS;
         reset();
     }
 
     @Override
     public void reset() {
-        startTimeMs = 0;
+        startTimeS = 0;
         highestBlock = null;
     }
-   
-    public boolean hasCandidate() {
+
+    @Override
+    public void update() {
         ScoreEntry score = getLeader();
         leader = score.getPlayer();
         leaderHeight = score.getScore();
@@ -47,13 +48,15 @@ public class HeightWinningCondition extends WinningCondition {
             BuildingBlock block = leader.getHighestBuilingBlockInTower();
             if (highestBlock != block) {
                 highestBlock = block;
-                startTimeMs = System.currentTimeMillis();
+                startTimeS = model.getElapsedGameTimeS();
             }
-            return true;
         } else {
             highestBlock = null;
-            return false;
         }
+    }
+
+    public boolean hasCandidate() {
+        return leaderHeight >= height;
     }
 
     @Override
@@ -69,17 +72,17 @@ public class HeightWinningCondition extends WinningCondition {
     @Override
     public int timeLeftUntilGameOver() {
         if (hasCandidate()) {
-            long timeLeftMs = startTimeMs + winningTimeMs - System.currentTimeMillis();
+            int timeLeftS = (int) (startTimeS + winningTimeS - model.getElapsedGameTimeS());
 
-            if (timeLeftMs < 0) {
+            if (timeLeftS < 0) {
                 return 0;
-            } else if(timeLeftMs > winningTimeMs - 2000) {
-                return -1;
+            } else if (timeLeftS > winningTimeS - 2) {
+                return UNKNOWN_TIME_LEFT;
             } else {
-                return (int) (timeLeftMs / 1000) + 1;
+                return timeLeftS + 1;
             }
         } else {
-            return -1;
+            return UNKNOWN_TIME_LEFT;
         }
     }
 
