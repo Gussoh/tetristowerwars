@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.PolygonShape;
+import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.tetristowerwars.model.BuildingBlockJoint;
@@ -91,11 +92,11 @@ public class SwingRenderer extends Renderer {
 
     @Override
     public Vec2 convertWindowToWorldCoordinates(Point windowCoord) {
-        return new Vec2((float)(windowCoord.x / scale), (float) ((renderPanel.getHeight() - windowCoord.y) / scale));
+        return new Vec2((float) (windowCoord.x / scale), (float) ((renderPanel.getHeight() - windowCoord.y) / scale));
     }
 
     private Vec2 convertWorldToWindowCoordinates(Vec2 worldCoord) {
-        return new Vec2( (float)(scale * worldCoord.x), (float) (renderPanel.getHeight() - scale * worldCoord.y));
+        return new Vec2((float) (scale * worldCoord.x), (float) (renderPanel.getHeight() - scale * worldCoord.y));
     }
 
     @Override
@@ -189,29 +190,33 @@ public class SwingRenderer extends Renderer {
         }
 
         private void drawBody(Graphics2D g2, Body body, boolean fill) {
-            for (PolygonShape shape = (PolygonShape) body.getShapeList(); shape != null; shape = (PolygonShape) shape.m_next) {
+            for (Shape abstractShape = body.getShapeList(); abstractShape != null; abstractShape = abstractShape.m_next) {
 
-                Vec2[] vertices = shape.getVertices();
-                AffineTransform currentTransform = g2.getTransform();
+                if (abstractShape instanceof PolygonShape) {
 
-                g2.translate(body.getPosition().x, getHeight() / scale - body.getPosition().y);
-                g2.rotate(-body.getAngle());
+                    PolygonShape shape = (PolygonShape) abstractShape;
+                    Vec2[] vertices = shape.getVertices();
+                    AffineTransform currentTransform = g2.getTransform();
 
-                Path2D path = new Path2D.Float();
+                    g2.translate(body.getPosition().x, getHeight() / scale - body.getPosition().y);
+                    g2.rotate(-body.getAngle());
 
-                path.moveTo(vertices[0].x, -vertices[0].y);
-                for (int i = 1; i < vertices.length; i++) {
-                    path.lineTo(vertices[i].x, -vertices[i].y);
+                    Path2D path = new Path2D.Float();
+
+                    path.moveTo(vertices[0].x, -vertices[0].y);
+                    for (int i = 1; i < vertices.length; i++) {
+                        path.lineTo(vertices[i].x, -vertices[i].y);
+                    }
+                    path.closePath();
+
+                    if (fill) {
+                        g2.fill(path);
+                    } else {
+                        g2.draw(path);
+                    }
+
+                    g2.setTransform(currentTransform);
                 }
-                path.closePath();
-
-                if (fill) {
-                    g2.fill(path);
-                } else {
-                    g2.draw(path);
-                }
-
-                g2.setTransform(currentTransform);
             }
         }
 
