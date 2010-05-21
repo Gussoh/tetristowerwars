@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class SoundPlayer implements GameModelListener {
     private static final String[] collisionHardSounds = new String[]{"collisionHard1.wav", "collisionHard2.wav", "collisionHard3.wav", "collisionHard4.wav", "collisionHard4.wav"};
     private static final String[] explosionSounds = new String[]{"explosion.mp3"};
     private static final String[] cannonFireSounds = new String[]{"cannonfire.mp3"};
-    private static final String[] music = new String[]{"music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3"};
+    private static String[] music;
     private static final String[] winningMusic = new String[]{"soviet.mp3", "usa.mp3"};
     private static final String select = "select.wav";
     private static final String deselect = "deselect.wav";
@@ -65,6 +66,7 @@ public class SoundPlayer implements GameModelListener {
         this.musicEnabled = musicEnabled;
         this.soundEffectsEnabled = soundEffectsEnabled;
         musicLocation = musicLocation.concat("THEME" + themeIndex + "/");
+        populateMusicArray();
         System.out.println("soundlocation: " + soundLocation);
         for (javax.sound.sampled.Mixer.Info info : AudioSystem.getMixerInfo()) {
             if (info.getName().contains("Java Sound Audio Engine")) {
@@ -93,6 +95,19 @@ public class SoundPlayer implements GameModelListener {
         }
         if (musicEnabled) {
             playMusic(new File(musicLocation + getRandomIndex(music)));
+        }
+    }
+
+    private void populateMusicArray() {
+        int i = 1;
+        for (; i < 100; i++) {
+            if (!new File(musicLocation + "music" + i + ".mp3").exists()) {
+                break;
+            }
+        }
+        music = new String[i - 1];
+        for (int j = 0; j < music.length; j++) {
+            music[j] = "music" + (j + 1) + ".mp3";
         }
     }
 
