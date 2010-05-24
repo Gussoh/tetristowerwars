@@ -144,7 +144,13 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
         statusLabel.setForeground(defaultTextColor);
         statusLabel.setText("Status: Connecting...");
         Settings settings = mainFrame.getSettings();
-        networkClient = new NetworkClient(settings.getPlayerName(), "localhost", settings.getNetworkPort());
+        String host;
+        if (networkServer == null) {
+            host = settings.getNetworkHostname();
+        } else {
+            host = "localhost";
+        }
+        networkClient = new NetworkClient(settings.getPlayerName(), host, settings.getNetworkPort());
         lobby = new NetworkLobby(mainFrame, networkClient, networkServer);
         networkClient.addNetworkClientListener(lobby);
         networkClient.addNetworkClientListener(this);
