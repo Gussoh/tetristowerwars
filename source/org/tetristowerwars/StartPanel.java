@@ -59,6 +59,11 @@ public class StartPanel extends javax.swing.JPanel {
         });
 
         networkButton.setText("Play network game");
+        networkButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                networkButtonActionPerformed(evt);
+            }
+        });
 
         emulatorCheckBox.setText("Enable TUIO mouse emulation");
         emulatorCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -110,6 +115,11 @@ public class StartPanel extends javax.swing.JPanel {
             Logger.getLogger(StartPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_emulatorCheckBoxActionPerformed
+
+    private void networkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_networkButtonActionPerformed
+        mainFrame.openComponent(new NetworkPanel(mainFrame), false);
+    }//GEN-LAST:event_networkButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox emulatorCheckBox;
     private javax.swing.JButton networkButton;

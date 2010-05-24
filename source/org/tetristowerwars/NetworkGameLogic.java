@@ -42,6 +42,7 @@ import org.tetristowerwars.sound.SoundPlayer;
  * @author Andreas
  */
 public class NetworkGameLogic {
+
     private final static int MAX_NUM_UNPROCESSED_FRAMES = 12;
     private final static float NANO_FACTOR = 1000000000.0f;
     private final MainFrame mainFrame;
@@ -63,92 +64,95 @@ public class NetworkGameLogic {
 
                 String hostname = JOptionPane.showInputDialog(null, "Enter hostname, leave empty for server", "Network test", JOptionPane.QUESTION_MESSAGE);
                 if (hostname != null) {
-                    try {
-                        final boolean server = hostname.isEmpty();
-                        final MainFrame mainFrame = new MainFrame();
-                        final NetworkServer networkServer = server ? new NetworkServer(25001) : null;
-                        if (server) {
-                            try {
-                                networkServer.start();
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(NetworkGameLogic.class.getName()).log(Level.SEVERE, null, ex);
-                                return;
+
+                    final boolean server = hostname.isEmpty();
+                    final MainFrame mainFrame = new MainFrame();
+                    final NetworkServer networkServer = server ? new NetworkServer(25001) : null;
+                    if (server) {
+                        try {
+                            networkServer.start();
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(NetworkGameLogic.class.getName()).log(Level.SEVERE, null, ex);
+                            return;
+                        }
+                    }
+                    final NetworkClient networkClient = new NetworkClient("Player", hostname, 25001);
+
+
+
+                    networkClient.addNetworkClientListener(new NetworkClientListener() {
+
+                        int numClientConnected = 0;
+
+                        @Override
+                        public void chatMessageReceive(ClientEntry clientEntry, String message) {
+                        }
+
+                        @Override
+                        public void clientConnected(ClientEntry clientEntry) {
+                            numClientConnected++;
+
+                            if (numClientConnected == 2 && server) {
+                                new Thread() {
+
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Thread.sleep(1000); // To avoid racing when last client set player index.
+                                        } catch (InterruptedException ex) {
+                                        }
+                                        networkServer.startGame(mainFrame.getSettings());
+                                    }
+                                }.start();
                             }
                         }
-                        final NetworkClient networkClient = new NetworkClient("Player", hostname, 25001);
 
-
-
-                        networkClient.addNetworkClientListener(new NetworkClientListener() {
-
-                            int numClientConnected = 0;
-
-                            @Override
-                            public void chatMessageReceive(ClientEntry clientEntry, String message) {
+                        @Override
+                        public void onOwnClientIdSet(short ownClientId) {
+                            if (numClientConnected == 1) {
+                                networkClient.setPlayerIndex((short) 0);
+                            } else if (numClientConnected == 2) {
+                                networkClient.setPlayerIndex((short) 1);
                             }
+                        }
 
-                            @Override
-                            public void clientConnected(ClientEntry clientEntry) {
-                                numClientConnected++;
+                        @Override
+                        public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
+                        }
 
-                                if (numClientConnected == 2 && server) {
-                                    new Thread() {
+                        @Override
+                        public void gameStarted() {
+                            new NetworkGameLogic(mainFrame, networkClient, networkServer);
+                        }
 
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                Thread.sleep(1000); // To avoid racing when last client set player index.
-                                            } catch (InterruptedException ex) {
-                                            }
-                                            networkServer.startGame(mainFrame.getSettings());
-                                        }
-                                    }.start();
-                                }
-                            }
+                        @Override
+                        public void endOfFramePosted(int unprocessedFrames) {
+                        }
 
-                            @Override
-                            public void onOwnClientIdSet(short ownClientId) {
-                                if (numClientConnected == 1) {
-                                    networkClient.setPlayerIndex((short) 0);
-                                } else if (numClientConnected == 2) {
-                                    networkClient.setPlayerIndex((short) 1);
-                                }
-                            }
+                        @Override
+                        public void clientDisconnected(ClientEntry clientEntry) {
+                        }
 
-                            @Override
-                            public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
-                            }
+                        @Override
+                        public void onConnectionError(String message) {
+                        }
 
-                            @Override
-                            public void gameStarted() {
-                                new NetworkGameLogic(mainFrame, networkClient, networkServer);
-                            }
+                        @Override
+                        public void onConnectionClosed() {
+                        }
 
-                            @Override
-                            public void endOfFramePosted(int unprocessedFrames) {
-                            }
+                        @Override
+                        public void allClientsReady() {
+                        }
 
-                            @Override
-                            public void clientDisconnected(ClientEntry clientEntry) {
-                            }
+                        @Override
+                        public void onClientPropertyChanged(ClientEntry clientEntry) {
+                        }
 
-                            @Override
-                            public void onConnectionError(String message) {
-                            }
 
-                            @Override
-                            public void onConnectionClosed() {
-                            }
-
-                            @Override
-                            public void allClientsReady() {
-                            }
-                        });
-                        networkClient.start();
-                    } catch (IOException ex) {
-                    }
-
+                    });
+                    networkClient.start();
 
                 }
 
@@ -403,7 +407,6 @@ public class NetworkGameLogic {
 
         @Override
         public void endOfFramePosted(int unprocessedFrames) {
-            
         }
 
         @Override
@@ -419,6 +422,12 @@ public class NetworkGameLogic {
         public void onConnectionClosed() {
             maybeGoBack(null);
         }
+
+        @Override
+        public void onClientPropertyChanged(ClientEntry clientEntry) {
+        }
+
+
 
         public synchronized void maybeGoBack(final String message) {
             if (alive) {
