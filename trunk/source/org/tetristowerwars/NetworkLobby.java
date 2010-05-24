@@ -164,15 +164,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void onConnectionClosed() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                networkClient.removeNetworkClientListener(NetworkLobby.this);
-                mainFrame.back();
-            }
-        });
-
     }
 
     @Override
@@ -182,7 +173,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(NetworkLobby.this, "Lost connection with the server.");
-
+                networkClient.removeNetworkClientListener(NetworkLobby.this);
+                mainFrame.back();
             }
         });
 
@@ -214,8 +206,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             chatMessageTextField.setText("");
         }
     }
-
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -478,7 +468,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private void chatMessageTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chatMessageTextFieldActionPerformed
         sendChatMessage();
     }//GEN-LAST:event_chatMessageTextFieldActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatHistoryTextArea;
     private javax.swing.JTextField chatMessageTextField;
