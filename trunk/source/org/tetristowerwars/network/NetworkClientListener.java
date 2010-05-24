@@ -34,4 +34,6 @@ public interface NetworkClientListener {
     public void allClientsReady();
 
     public void onOwnClientIdSet(short ownClientId);
+
+    public void onClientPropertyChanged(ClientEntry clientEntry);
 }

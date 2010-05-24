@@ -16,6 +16,7 @@ import org.tetristowerwars.control.Controller;
 import org.tetristowerwars.control.InputManager;
 import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.model.GameModel;
+import org.tetristowerwars.network.message.ChatMessage;
 import org.tetristowerwars.network.message.LoginMessage;
 import org.tetristowerwars.network.message.ReadyMessage;
 import org.tetristowerwars.network.message.SetPlayerIndexMessage;
@@ -33,7 +34,7 @@ public class NetworkClient {
     protected final int port;
     protected EventTransmitter eventTransmitter;
 
-    public NetworkClient(String name, String host, int port) throws IOException {
+    public NetworkClient(String name, String host, int port) {
         this.name = name;
         this.host = host;
         this.port = port;
@@ -116,5 +117,9 @@ public class NetworkClient {
 
     public void setPlayerIndex(short playerIndex) {
         connection.send(new SetPlayerIndexMessage(clientModel.getOwnClientId(), playerIndex));
+    }
+
+    public void sendChatMessage(String message) {
+        connection.send(new ChatMessage(clientModel.getOwnClientId(), message));
     }
 }

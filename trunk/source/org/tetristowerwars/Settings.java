@@ -45,6 +45,9 @@ public class Settings {
     public static final String KEY_FULLSCREEN = "fullscreen";
     public static final String KEY_POWERUPS = "powerups";
     public static final String KEY_SECONDS_BETWEEN_POWERUPS = "seconds_between_powerups";
+    public static final String KEY_PLAYER_NAME = "player_name";
+    public static final String KEY_NETWORK_HOSTNAME = "network_hostname";
+    public static final String KEY_NETWORK_PORT = "network_port";
     private final Properties properties;
 
     public Settings() {
@@ -85,6 +88,7 @@ public class Settings {
 
     public void setProperty(String key, String value) {
         properties.put(key, value);
+        System.out.println("Setting changed: " + key + " -> " + value);
     }
 
     public float getBlockSize() {
@@ -195,6 +199,19 @@ public class Settings {
         return getIntProperty(KEY_SECONDS_BETWEEN_POWERUPS, 30);
     }
 
+
+    public String getPlayerName() {
+        return getStringProperty(KEY_PLAYER_NAME, "Player");
+    }
+
+    public String getNetworkHostname() {
+        return getStringProperty(KEY_NETWORK_HOSTNAME, "");
+    }
+
+    public int getNetworkPort() {
+        return getIntProperty(KEY_NETWORK_PORT, 25001);
+    }
+
     private float getFloatProperty(String key, float defaultValue) {
         try {
             String value = properties.getProperty(key);
@@ -233,4 +250,5 @@ public class Settings {
             return defaultValue;
         }
     }
+
 }

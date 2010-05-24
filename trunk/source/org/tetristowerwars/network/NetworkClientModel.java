@@ -181,5 +181,8 @@ public class NetworkClientModel implements NetworkMessageListener {
     public synchronized void setPlayerIndex(short clientId, short playerIndex) {
         ClientEntry clientEntry = clients.get(clientId);
         clientEntry.setPlayerIndex(playerIndex);
+        for (NetworkClientListener networkClientListener : networkClientListeners) {
+            networkClientListener.onClientPropertyChanged(clientEntry);
+        }
     }
 }
