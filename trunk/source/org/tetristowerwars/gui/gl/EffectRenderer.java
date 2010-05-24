@@ -31,7 +31,11 @@ import org.tetristowerwars.model.BulletBlock;
 import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.RectangularBuildingBlock;
 import org.tetristowerwars.model.material.BrickMaterial;
+import org.tetristowerwars.model.material.GhostMaterial;
+import org.tetristowerwars.model.material.InvulnerableMaterial;
 import org.tetristowerwars.model.material.Material;
+import org.tetristowerwars.model.material.PowerupMaterial;
+import org.tetristowerwars.model.material.RubberMaterial;
 import org.tetristowerwars.model.material.SteelMaterial;
 import org.tetristowerwars.model.material.WoodMaterial;
 import org.tetristowerwars.util.MathUtil;
@@ -297,8 +301,16 @@ public class EffectRenderer {
                 dustParticleEngine.setColor(new Color(0.6f, 0.1f, 0.0f, alpha), new Color(0.8f, 0.2f, 0.0f, alpha), false);
             } else if (materialClass == SteelMaterial.class) {
                 dustParticleEngine.setColor(new Color(0.1f, 0.1f, 0.1f, alpha), new Color(0.3f, 0.3f, 0.3f, alpha), true);
+            } else if (materialClass == RubberMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.8f, 0.0f, 0.5f, alpha), new Color(1.0f, 0.0f, 1.0f, alpha), true);
+            } else if (materialClass == GhostMaterial.class) {
+                dustParticleEngine.setColor(new Color(1.0f, 1.0f, 1.0f, 0.2f), new Color(1.0f, 1.0f, 1.0f, 0.4f), true);
+            } else if (materialClass == InvulnerableMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.0f, 0.0f, 0.2f, alpha), new Color(0.7f, 0.5f, 1.0f, alpha), true);
+            } else if (materialClass == PowerupMaterial.class) {
+                dustParticleEngine.setColor(new Color(0.0f, 0.7f, 0.0f, alpha), new Color(0.0f, 1.0f, 0.0f, alpha), true);
             } else {
-                return;
+                dustParticleEngine.setColor(new Color(0.1f, 0.1f, 0.1f, alpha), new Color(0.3f, 0.3f, 0.3f, alpha), true);
             }
 
             XForm xForm = rbb.getBody().getXForm();
