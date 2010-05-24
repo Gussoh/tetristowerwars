@@ -55,7 +55,6 @@ public class GameModel {
     private final LinkedHashSet<BuildingBlockJoint> buildingBlockJoints = new LinkedHashSet<BuildingBlockJoint>();
     private final Set<MutableEntry<Block, Integer>> blocksToRemove = new LinkedHashSet<MutableEntry<Block, Integer>>();
     private final Map<BuildingBlock, CannonBlock> blocksOverlappingCannon = new LinkedHashMap<BuildingBlock, CannonBlock>();
-    private final Map<PowerupBlock, Block> powerupOverlappingBlock = new LinkedHashMap<PowerupBlock, Block>();
     private float timeTakenToExecuteUpdateMs;
     private final List<GameModelListener> gameModelListeners = new ArrayList<GameModelListener>();
     private final PhysicsEngineListener physicsEngineListener = new PhysicsEngineListener();
@@ -197,6 +196,7 @@ public class GameModel {
         world.step(stepTimeS, ITERATIONS_PER_STEP);
 
         updateBlocksIntersectingWithCannon();
+        updatePowerupIntersections();
 
         for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
             buildingBlockJoint.dampAngularVelocity();
@@ -482,17 +482,16 @@ public class GameModel {
                     }
                 }
 
-                Block overlappedBlock = powerupOverlappingBlock.remove((PowerupBlock) bb);
 
-                if (overlappedBlock != null) {
-                    if (overlappedBlock instanceof Upgradable) {
-                        Upgradable upgradable = (Upgradable) overlappedBlock;
-                        if (upgradable.isUpgradable()) {
-                            upgradable.upgrade();
-                            blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
-                        }
+                Upgradable upgradable = getUpgradableBlock(buildingBlockJoint);
+
+                if (upgradable != null) {
+                    if (upgradable.isUpgradable()) {
+                        upgradable.upgrade();
+                        blocksToRemove.add(new MutableEntry<Block, Integer>(bb, 0));
                     }
                 }
+
             } else if (isLastJointForThisBlock) {
 
                 //Cannon-loading code
@@ -557,35 +556,76 @@ public class GameModel {
 
     public void updatePowerupIntersections() {
 
+//        if (block instanceof BuildingBlock || block instanceof CannonBlock) {
+//            powerupOverlappingBlock.put(powerupBlock, block);
+//            if (block instanceof BuildingBlock) {
+//                for (GameModelListener gameModelListener : gameModelListeners) {
+//                    gameModelListener.onPowerupHoverChanged((BuildingBlock) block);
+//                }
+//            }
+//            return false;
+//        }
 
+        for (BuildingBlockJoint buildingBlockJoint : buildingBlockJoints) {
+            Upgradable upgradable = getUpgradableBlock(buildingBlockJoint);
 
-        for (Iterator<Map.Entry<PowerupBlock, Block>> it = powerupOverlappingBlock.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<PowerupBlock, Block> entry = it.next();
-            PowerupBlock powerupBlock = entry.getKey();
-            Block block = entry.getValue();
-            XForm xForm = powerupBlock.getBody().getXForm();
+            if (upgradable instanceof BuildingBlock) {
+                for (GameModelListener gameModelListener : gameModelListeners) {
+                    gameModelListener.onPowerupHoverChanged((BuildingBlock) upgradable);
+                }
+            }
+        }
+//
+//        for (Iterator<Map.Entry<PowerupBlock, Block>> it = powerupOverlappingBlock.entrySet().iterator(); it.hasNext();) {
+//            Map.Entry<PowerupBlock, Block> entry = it.next();
+//            PowerupBlock powerupBlock = entry.getKey();
+//            Block block = entry.getValue();
+//            XForm xForm = powerupBlock.getBody().getXForm();
+//
+//            boolean found = false;
+//            for (Shape s = powerupBlock.getBody().getShapeList(); s != null; s = s.m_next) {
+//
+//                AABB aabb = new AABB();
+//                s.computeAABB(aabb, xForm);
+//                Shape foundShapes[] = world.query(aabb, 10);
+//
+//
+//                for (Shape shape : foundShapes) {
+//                    Object userData = shape.getBody().getUserData();
+//                    if (userData == block) {
+//                        found = true;
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            if (!found) {
+//                it.remove();
+//            }
+//        }
+    }
 
-            boolean found = false;
-            for (Shape s = powerupBlock.getBody().getShapeList(); s != null; s = s.m_next) {
+    private Upgradable getUpgradableBlock(BuildingBlockJoint joint) {
+        BuildingBlock buildingBlock = joint.getBuildingBlock();
+        if (buildingBlock instanceof PowerupBlock) {
+            Vec2 pos = joint.getPointerPosition();
+            float margin = blockSize * 0.01f;
+            AABB aabb = new AABB(new Vec2(pos.x - margin, pos.y - margin), new Vec2(pos.x + margin, pos.y + margin));
 
-                AABB aabb = new AABB();
-                s.computeAABB(aabb, xForm);
-                Shape foundShapes[] = world.query(aabb, 10);
-
-
-                for (Shape shape : foundShapes) {
-                    Object userData = shape.getBody().getUserData();
-                    if (userData == block) {
-                        found = true;
-                        break;
+            Shape[] shapes = world.query(aabb, 5);
+            if (shapes != null) {
+                for (Shape shape : shapes) {
+                    Object foundObject = shape.getBody().getUserData();
+                    if (foundObject instanceof Upgradable) {
+                        Upgradable upgradable = (Upgradable) foundObject;
+                        if (upgradable.isUpgradable()) {
+                            return upgradable;
+                        }
                     }
                 }
             }
-
-            if (!found) {
-                it.remove();
-            }
         }
+        return null;
     }
 
     /**
@@ -652,7 +692,6 @@ public class GameModel {
      * Creates a new player in a given area of the game world.
      *
      * @param name The name of the player.
-     * @param playerIndex 
      * @param leftLimit The left limit/border of this player in world coordinates.
      * @param rightLimit The right limit/border of this player in world coordinates.
      * @return The created player object.
@@ -949,15 +988,7 @@ public class GameModel {
                 }
             }
             if (noCollision) {
-                if (block instanceof BuildingBlock || block instanceof CannonBlock) {
-                    powerupOverlappingBlock.put(powerupBlock, block);
-                    if (block instanceof BuildingBlock) {
-                        for (GameModelListener gameModelListener : gameModelListeners) {
-                            gameModelListener.onPowerupHoverChanged((BuildingBlock) block);
-                        }
-                    }
-                    return false;
-                }
+                return false;
             }
             return true;
         }
