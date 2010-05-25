@@ -10,6 +10,8 @@
  */
 package org.tetristowerwars;
 
+import java.awt.Color;
+import java.awt.event.ItemEvent;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -36,6 +38,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private final NetworkClient networkClient;
     private final NetworkServer networkServer;
     private final LinkedHashSet<ClientEntry> clients = new LinkedHashSet<ClientEntry>();
+    private final Color textFieldForegroundColor;
 
     /** Creates new form NetworkLobby
      * @param mainFrame
@@ -47,6 +50,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         this.mainFrame = mainFrame;
         this.networkClient = networkClient;
         this.networkServer = networkServer;
+        this.textFieldForegroundColor = timeLimitTextField.getForeground();
+        final Settings settings = mainFrame.getSettings();
 
         if (networkServer == null) {
             timeLimitCheckBox.setEnabled(false);
@@ -56,10 +61,10 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             startGameButton.setEnabled(false);
             conditionComboBox1.setEnabled(false);
         } else {
-            Settings settings = mainFrame.getSettings();
+
             timeLimitCheckBox.setSelected(settings.isTimeConditionEnabled());
             timeLimitTextField.setText(settings.getTimeCondition() + "");
-            heightCheckBox.setEnabled(settings.isHeightConditionEnabled());
+            heightCheckBox.setSelected(settings.isHeightConditionEnabled());
             heightTextField.setText(settings.getHeightCondition() + "");
         }
 
@@ -67,11 +72,38 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                chatHistoryTextArea.setCaretPosition(e.getLength());
+                chatHistoryTextArea.setCaretPosition(e.getDocument().getLength());
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+
+        timeLimitTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    int value = Integer.parseInt(timeLimitTextField.getText());
+                    if (value > 0) {
+                        settings.setProperty(Settings.KEY_TIME_CONDITION, timeLimitTextField.getText());
+                        timeLimitTextField.setForeground(textFieldForegroundColor);
+                    } else {
+                        timeLimitTextField.setForeground(Color.RED);
+                    }
+                } catch (NumberFormatException ex) {
+                    timeLimitTextField.setForeground(Color.RED);
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println(timeLimitTextField.getText());
             }
 
             @Override
@@ -96,8 +128,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         team1List.setListData(team1Vector);
         team2List.setListData(team2Vector);
 
-        System.out.println("Team1: " + team1Vector);
-        System.out.println("Team2: " + team2Vector);
     }
 
     @Override
@@ -110,13 +140,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
             @Override
             public void run() {
-                int length = chatHistoryTextArea.getDocument().getLength();
-                try {
-                    chatHistoryTextArea.getDocument().insertString(length, "<" + clientEntry.getName() + "> " + message + "\n", null);
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(NetworkLobby.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
+                addChatHistoryMessage("\n<" + clientEntry.getName() + "> " + message);
             }
         });
 
@@ -131,6 +155,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             public void run() {
                 clients.add(clientEntry);
                 updateTeamLists();
+                addChatHistoryMessage("\n * " + clientEntry.getName() + " has joined the game.");
             }
         });
     }
@@ -143,6 +168,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             public void run() {
                 clients.remove(clientEntry);
                 updateTeamLists();
+                addChatHistoryMessage("\n * " + clientEntry.getName() + " has left the game.");
             }
         });
     }
@@ -172,9 +198,11 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(NetworkLobby.this, "Lost connection with the server.");
-                networkClient.removeNetworkClientListener(NetworkLobby.this);
-                mainFrame.back();
+                if (mainFrame.getCurrentComponent() == NetworkLobby.this) {
+                    JOptionPane.showMessageDialog(NetworkLobby.this, "Lost connection with the server.");
+                    networkClient.removeNetworkClientListener(NetworkLobby.this);
+                    mainFrame.back();
+                }
             }
         });
 
@@ -186,6 +214,10 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
+    }
+
+    @Override
+    public void spawnPowerUpBlock() {
     }
 
     @Override
@@ -204,6 +236,24 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         if (message.length() > 0) {
             networkClient.sendChatMessage(message);
             chatMessageTextField.setText("");
+        }
+    }
+
+    private void addChatHistoryMessage(String message) {
+        int length = chatHistoryTextArea.getDocument().getLength();
+        try {
+            chatHistoryTextArea.getDocument().insertString(length, message, null);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(NetworkLobby.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void changeSelectedCondition(ItemEvent evt, String settingsKey) {
+        Settings settings = mainFrame.getSettings();
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            settings.setProperty(settingsKey, Boolean.toString(true));
+        } else {
+            settings.setProperty(settingsKey, Boolean.toString(false));
         }
     }
 
@@ -303,8 +353,24 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Game Settings"));
 
         timeLimitCheckBox.setText("Time limit (seconds)");
+        timeLimitCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                timeLimitCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        timeLimitTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                timeLimitTextFieldKeyTyped(evt);
+            }
+        });
 
         heightCheckBox.setText("Height limit (meters)");
+        heightCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                heightCheckBoxItemStateChanged(evt);
+            }
+        });
 
         conditionComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All selected conditions are fulfilled", "Any selected condition is fulfilled" }));
 
@@ -377,7 +443,9 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Chat"));
 
         chatHistoryTextArea.setColumns(20);
+        chatHistoryTextArea.setEditable(false);
         chatHistoryTextArea.setRows(5);
+        chatHistoryTextArea.setWrapStyleWord(true);
         jScrollPane3.setViewportView(chatHistoryTextArea);
 
         chatMessageTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -468,6 +536,17 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private void chatMessageTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chatMessageTextFieldActionPerformed
         sendChatMessage();
     }//GEN-LAST:event_chatMessageTextFieldActionPerformed
+
+    private void timeLimitCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_timeLimitCheckBoxItemStateChanged
+        changeSelectedCondition(evt, Settings.KEY_USE_TIME_CONDITION);
+    }//GEN-LAST:event_timeLimitCheckBoxItemStateChanged
+
+    private void heightCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_heightCheckBoxItemStateChanged
+        changeSelectedCondition(evt, Settings.KEY_USE_HEIGHT_CONDITION);
+    }//GEN-LAST:event_heightCheckBoxItemStateChanged
+
+    private void timeLimitTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_timeLimitTextFieldKeyTyped
+    }//GEN-LAST:event_timeLimitTextFieldKeyTyped
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatHistoryTextArea;
     private javax.swing.JTextField chatMessageTextField;

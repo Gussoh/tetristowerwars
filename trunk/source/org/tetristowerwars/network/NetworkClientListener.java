@@ -36,4 +36,6 @@ public interface NetworkClientListener {
     public void onOwnClientIdSet(short ownClientId);
 
     public void onClientPropertyChanged(ClientEntry clientEntry);
+
+    public void spawnPowerUpBlock();
 }

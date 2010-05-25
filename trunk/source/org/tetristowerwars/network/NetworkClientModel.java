@@ -185,4 +185,10 @@ public class NetworkClientModel implements NetworkMessageListener {
             networkClientListener.onClientPropertyChanged(clientEntry);
         }
     }
+
+    public void executeCreatePowerUpMessage() {
+        for (NetworkClientListener networkClientListener : networkClientListeners) {
+            networkClientListener.spawnPowerUpBlock();
+        }
+    }
 }

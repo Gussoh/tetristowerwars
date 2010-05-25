@@ -166,5 +166,9 @@ public class MainFrame {
         }
     }
 
+    public Component getCurrentComponent() {
+        return componentStack.peek();
+    }
+
 
 }
