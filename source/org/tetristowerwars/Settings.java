@@ -196,7 +196,7 @@ public class Settings {
     }
 
     public int getSecondsBetweenPowerups() {
-        return getIntProperty(KEY_SECONDS_BETWEEN_POWERUPS, 30);
+        return Math.max(1, getIntProperty(KEY_SECONDS_BETWEEN_POWERUPS, 30));
     }
 
 
