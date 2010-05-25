@@ -441,9 +441,10 @@ public class RectangularBuildingBlockRenderer {
         for (Iterator<Map.Entry<BuildingBlock, Path>> it = animations.entrySet().iterator(); it.hasNext();) {
             Map.Entry<BuildingBlock, Path> entry = it.next();
 
+            BuildingBlock bb = entry.getKey();
             Path p = entry.getValue();
 
-            if (p.isDone()) {
+            if (p.isDone() || bb.isDestroyed()) {
                 it.remove();
             } else {
                 p.addTime(elapsedTimeS);
