@@ -75,13 +75,6 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void clientConnected(ClientEntry clientEntry) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.openComponent(lobby, false);
-            }
-        });
         
     }
 
@@ -134,6 +127,14 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void onOwnClientIdSet(short ownClientId) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                mainFrame.openComponent(lobby, false);
+            }
+        });
+        
     }
 
     @Override
@@ -147,6 +148,12 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
     @Override
     public void onClientPropertyChanged(ClientEntry clientEntry) {
     }
+
+    @Override
+    public void onSettingsReceived(Settings settings) {
+    }
+
+
 
     private void tryConnect(NetworkServer networkServer) {
         
@@ -188,6 +195,7 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         nameTextField = new javax.swing.JTextField();
+        backButton = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Host game"));
 
@@ -297,6 +305,13 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -306,7 +321,8 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(backButton))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -318,7 +334,9 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(backButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -346,7 +364,15 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
         tryConnect(null);
     }//GEN-LAST:event_hostnameTextFieldActionPerformed
 
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        if (networkClient != null) {
+            networkClient.removeNetworkClientListener(this);
+        }
+        mainFrame.back();
+    }//GEN-LAST:event_backButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
     private javax.swing.JButton connectButton;
     private javax.swing.JButton createGameButton;
     private javax.swing.JTextField hostnameTextField;

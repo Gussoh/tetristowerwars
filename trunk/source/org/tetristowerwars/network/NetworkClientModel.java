@@ -23,7 +23,6 @@ import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.network.message.ClientMessage;
 import org.tetristowerwars.network.message.EventQueueMessage;
-import org.tetristowerwars.network.message.InputEventMessage;
 import org.tetristowerwars.network.message.Message;
 
 /**
@@ -122,6 +121,9 @@ public class NetworkClientModel implements NetworkMessageListener {
 
     public synchronized void setGameSettings(Settings settings) {
         this.gameSettings = settings;
+        for (NetworkClientListener networkClientListener : networkClientListeners) {
+            networkClientListener.onSettingsReceived(settings);
+        }
     }
 
     public synchronized void fireGameStartedEvent() {

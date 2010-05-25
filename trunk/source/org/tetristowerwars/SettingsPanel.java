@@ -153,12 +153,12 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         powerupCheckBox.setText("Powerups");
 
-        secondsBetweenPowerupsSlider.setMajorTickSpacing(20);
-        secondsBetweenPowerupsSlider.setMaximum(210);
-        secondsBetweenPowerupsSlider.setMinimum(1);
+        secondsBetweenPowerupsSlider.setMajorTickSpacing(30);
+        secondsBetweenPowerupsSlider.setMaximum(180);
         secondsBetweenPowerupsSlider.setMinorTickSpacing(10);
         secondsBetweenPowerupsSlider.setPaintLabels(true);
         secondsBetweenPowerupsSlider.setPaintTicks(true);
+        secondsBetweenPowerupsSlider.setValue(30);
         secondsBetweenPowerupsSlider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel10.setText("Seconds between:");
@@ -186,7 +186,7 @@ public class SettingsPanel extends javax.swing.JPanel {
                     .addComponent(worldHeightField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                     .addComponent(playerAreaField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                     .addComponent(groundHeightField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                    .addComponent(secondsBetweenPowerupsSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(secondsBetweenPowerupsSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
