@@ -11,6 +11,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import org.jbox2d.common.Vec2;
 import org.tetristowerwars.control.Controller;
@@ -52,123 +53,7 @@ public class NetworkGameLogic {
     private final SoundPlayer soundPlayer;
     private final NetworkClient networkClient;
     private final NetworkServer networkServer;
-
-    public static void main(String[] args) {
-
-
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-
-                String hostname = JOptionPane.showInputDialog(null, "Enter hostname, leave empty for server", "Network test", JOptionPane.QUESTION_MESSAGE);
-                if (hostname != null) {
-
-                    final boolean server = hostname.isEmpty();
-                    final MainFrame mainFrame = new MainFrame();
-                    final NetworkServer networkServer = server ? new NetworkServer(25001) : null;
-                    if (server) {
-                        try {
-                            networkServer.start();
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(NetworkGameLogic.class.getName()).log(Level.SEVERE, null, ex);
-                            return;
-                        }
-                    }
-                    final NetworkClient networkClient = new NetworkClient("Player", hostname, 25001);
-
-
-
-                    networkClient.addNetworkClientListener(new NetworkClientListener() {
-
-                        int numClientConnected = 0;
-
-                        @Override
-                        public void chatMessageReceive(ClientEntry clientEntry, String message) {
-                        }
-
-                        @Override
-                        public void clientConnected(ClientEntry clientEntry) {
-                            numClientConnected++;
-
-                            if (numClientConnected == 2 && server) {
-                                new Thread() {
-
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            Thread.sleep(1000); // To avoid racing when last client set player index.
-                                        } catch (InterruptedException ex) {
-                                        }
-                                        networkServer.startGame(mainFrame.getSettings());
-                                    }
-                                }.start();
-                            }
-                        }
-
-                        @Override
-                        public void onOwnClientIdSet(short ownClientId) {
-                            if (numClientConnected == 1) {
-                                networkClient.setPlayerIndex((short) 0);
-                            } else if (numClientConnected == 2) {
-                                networkClient.setPlayerIndex((short) 1);
-                            }
-                        }
-
-                        @Override
-                        public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
-                        }
-
-                        @Override
-                        public void spawnPowerUpBlock() {
-                        }
-
-                        @Override
-                        public void gameStarted() {
-                            new NetworkGameLogic(mainFrame, networkClient, networkServer);
-                        }
-
-                        @Override
-                        public void endOfFramePosted(int unprocessedFrames) {
-                        }
-
-                        @Override
-                        public void clientDisconnected(ClientEntry clientEntry) {
-                        }
-
-                        @Override
-                        public void onConnectionError(String message) {
-                        }
-
-                        @Override
-                        public void onConnectionClosed() {
-                        }
-
-                        @Override
-                        public void allClientsReady() {
-                        }
-
-                        @Override
-                        public void onClientPropertyChanged(ClientEntry clientEntry) {
-                        }
-
-                        @Override
-                        public void onSettingsReceived(Settings settings) {
-                        }
-
-
-                    });
-                    networkClient.start();
-
-                }
-
-
-            }
-        });
-
-    }
+    private final ProgressMonitor progressMonitor;
 
     public NetworkGameLogic(final MainFrame mainFrame, final NetworkClient networkClient, final NetworkServer networkServer) {
         this.mainFrame = mainFrame;
@@ -179,6 +64,10 @@ public class NetworkGameLogic {
 
         gameModel = new GameModel(networkSettings.getWorldWidth(), networkSettings.getWorldHeight(), networkSettings.getGroundHeight(), networkSettings.getBlockSize());
         renderer = new GLRenderer(gameModel, mainFrame);
+        this.progressMonitor = new ProgressMonitor(mainFrame.getJFrame(), "Starting game...", "Loading...", 0, 5);
+        progressMonitor.setMillisToPopup(1);
+        progressMonitor.setMillisToDecideToPopup(1);
+        progressMonitor.setProgress(1);
 
         soundPlayer = new SoundPlayer(personalSettings.isPlayMusicEnabled(), personalSettings.isPlaySoundEffectsEnabled(), personalSettings.getWorldTheme());
         gameModel.addGameModelListener(soundPlayer);
@@ -248,8 +137,29 @@ public class NetworkGameLogic {
             });
 
             try {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        progressMonitor.setProgress(2);
+                        progressMonitor.setNote("Loading graphics...");
+                    }
+                });
+
+                Thread.sleep(500);
                 renderer.renderFrame();
-                Thread.sleep(2000); // Let the resources get loaded and the JIT compiler do its work.
+
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        progressMonitor.setProgress(3);
+                        progressMonitor.setNote("Loading...");
+                    }
+                });
+
+                Thread.sleep(2000); // Let the resources get loaded since they might load in another thread
+
             } catch (InterruptedException ex) {
             }
             try {
@@ -261,6 +171,14 @@ public class NetworkGameLogic {
             }
 
             try {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        progressMonitor.setProgress(4);
+                        progressMonitor.setNote("Waiting for other players...");
+                    }
+                });
                 syncedStartSemaphore.acquire();
             } catch (InterruptedException ex) {
                 maybeGoBack("Failed when syncing the game start.");
@@ -277,7 +195,14 @@ public class NetworkGameLogic {
 
             final float constantStepTimeS = 1f / 60f;
             long lastStepTimeNano = System.nanoTime();
+            SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
+                public void run() {
+                    progressMonitor.close();
+                }
+            });
+            
             int loopCount = 0;
             while (alive) {
                 Thread.yield();
@@ -444,8 +369,6 @@ public class NetworkGameLogic {
         @Override
         public void onSettingsReceived(Settings settings) {
         }
-
-
 
         public synchronized void maybeGoBack(final String message) {
             if (alive) {
