@@ -177,6 +177,7 @@ public class TouchGameLogic {
                 });
 
                 tutorialTriggerBlock.setVisible(true);
+                glRenderer.renderFrame(); // load all textures before continuing
 
                 int loopCount = 0;
                 while (alive) {
