@@ -11,13 +11,23 @@
 package org.tetristowerwars;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ItemEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -40,6 +50,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private final NetworkServer networkServer;
     private final LinkedHashSet<ClientEntry> clients = new LinkedHashSet<ClientEntry>();
     private final Color textFieldForegroundColor;
+    private BufferedImage player1Image;
+    private BufferedImage player2Image;
 
     /** Creates new form NetworkLobby
      * @param mainFrame
@@ -53,6 +65,21 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         this.networkServer = networkServer;
         this.textFieldForegroundColor = timeLimitTextField.getForeground();
         final Settings settings = mainFrame.getSettings();
+        try {
+            int size = 100;
+            createIcon("res/gfx/THEME1/player1.png", sovietLabel, size, size);
+            createIcon("res/gfx/THEME1/player2.png", usaLabel, size, size);
+
+            //sovietLabel.setText(null);
+            //usaLabel.setText(null);
+            sovietLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+            usaLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkLobby.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
 
         if (networkServer == null) {
             timeLimitCheckBox.setEnabled(false);
@@ -313,6 +340,22 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         conditionComboBox1.setSelectedIndex(allConditions ? 1 : 0);
     }
 
+    private void createIcon(String path, JLabel targetLabel, int width, int height) throws IOException {
+        BufferedImage tempImage = ImageIO.read(new File(path));
+        BufferedImage targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D g2 = targetImage.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g2.drawImage(tempImage, 0, 0, width, height, null);
+        g2.dispose();
+        ImageIcon icon = new ImageIcon(targetImage);
+
+        targetLabel.setIcon(icon);
+    }
+
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -323,8 +366,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        sovietLabel = new javax.swing.JLabel();
+        usaLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         team1List = new javax.swing.JList();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -350,9 +393,13 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Teams"));
 
-        jLabel1.setText("[SOVIET]");
+        sovietLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        sovietLabel.setText("Soviet");
+        sovietLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jLabel2.setText("[USA]");
+        usaLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        usaLabel.setText("USA");
+        usaLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         jScrollPane1.setViewportView(team1List);
 
@@ -380,12 +427,12 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                    .addComponent(sovietLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                     .addComponent(joinTeam1Button, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                    .addComponent(usaLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
                     .addComponent(joinTeam2Button, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -394,8 +441,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
+                    .addComponent(sovietLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(usaLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1, 0, 0, Short.MAX_VALUE)
@@ -500,6 +547,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
 
         chatHistoryTextArea.setColumns(20);
         chatHistoryTextArea.setEditable(false);
+        chatHistoryTextArea.setLineWrap(true);
         chatHistoryTextArea.setRows(5);
         chatHistoryTextArea.setWrapStyleWord(true);
         jScrollPane3.setViewportView(chatHistoryTextArea);
@@ -640,8 +688,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private javax.swing.JComboBox conditionComboBox1;
     private javax.swing.JCheckBox heightCheckBox;
     private javax.swing.JTextField heightTextField;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -654,10 +700,12 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     private javax.swing.JButton joinTeam2Button;
     private javax.swing.JButton sendMessageButton;
     private javax.swing.JButton settingsButton;
+    private javax.swing.JLabel sovietLabel;
     private javax.swing.JButton startGameButton;
     private javax.swing.JList team1List;
     private javax.swing.JList team2List;
     private javax.swing.JCheckBox timeLimitCheckBox;
     private javax.swing.JTextField timeLimitTextField;
+    private javax.swing.JLabel usaLabel;
     // End of variables declaration//GEN-END:variables
 }
