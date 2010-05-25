@@ -124,6 +124,11 @@ public class MessageRenderer {
 
         }
 
+        textRenderer.end3DRendering();
+    }
+
+    public void renderTriggerTexts(GL gl, GameModel gameModel) {
+        textRenderer.begin3DRendering();
         List<TextEntry> triggerTexts = new LinkedList<TextEntry>();
         textRenderer.setColor(0.7f, 0.7f, 0.7f, 0.8f);
         for (TriggerBlock triggerBlock : gameModel.getTriggerBlocks()) {
@@ -140,7 +145,6 @@ public class MessageRenderer {
                 triggerTexts.clear();
             }
         }
-
         textRenderer.end3DRendering();
     }
 
