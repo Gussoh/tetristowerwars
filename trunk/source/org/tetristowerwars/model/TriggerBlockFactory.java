@@ -66,4 +66,25 @@ public class TriggerBlockFactory {
         TriggerBlock triggerBlock = new TriggerBlock(body, text, triggerListener);
         gameModel.addTriggerBlock(triggerBlock);
     }
+
+    public TutorialTriggerBlock createTutorialTrigger(TriggerListener triggerListener) {
+        Vec2 pos = new Vec2(gameModel.getWorldBoundries().upperBound.x * 0.5f, gameModel.getGroundLevel());
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.allowSleep = true;
+        bodyDef.position.set(pos);
+
+        Body body = gameModel.getWorld().createBody(bodyDef);
+
+
+        CircleDef circleDef = new CircleDef();
+        circleDef.isSensor = true;
+        circleDef.radius = 2.5f * gameModel.getBlockSize();
+
+        body.createShape(circleDef);
+
+        TutorialTriggerBlock triggerBlock = new TutorialTriggerBlock(body, triggerListener);
+        gameModel.addTriggerBlock(triggerBlock);
+
+        return triggerBlock;
+    }
 }

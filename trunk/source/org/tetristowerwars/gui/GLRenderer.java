@@ -273,11 +273,12 @@ public class GLRenderer extends Renderer implements GLEventListener, GameModelLi
 
         backgroundRenderer.renderBottom(gl);
         avatarRenderer.render(gl, gameModel, lineWidthFactor);
-        triggerRenderer.render(gl, gameModel);
+        messageRenderer.render(drawable, gameModel, renderWorldHeight, elapsedTimeS);
+        triggerRenderer.render(gl, gameModel, renderWorldHeight);
 
+        messageRenderer.renderTriggerTexts(gl, gameModel);
         // Render the mouse/finger circles.
         pointerRenderer.render(gl, id2Pointers, elapsedTimeS);
-        messageRenderer.render(drawable, gameModel, renderWorldHeight, elapsedTimeS);
 
 
         winRenderer.render(gl, gameModel, elapsedTimeS, renderWorldHeight, useParticleEffects);

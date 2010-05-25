@@ -22,6 +22,7 @@ import org.tetristowerwars.model.Player;
 import org.tetristowerwars.model.CannonFactory;
 import org.tetristowerwars.model.TriggerBlock;
 import org.tetristowerwars.model.TriggerListener;
+import org.tetristowerwars.model.TutorialTriggerBlock;
 import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.BrickMaterial;
 import org.tetristowerwars.model.material.Material;
@@ -41,9 +42,7 @@ import org.tetristowerwars.util.MathUtil;
 public class TouchGameLogic {
 
     private boolean resetGame = false;
-    private boolean timedReset = true;
     private boolean alive = true;
-    private long resetTime = 0;
 
     public TouchGameLogic(final MainFrame mainFrame) {
 
@@ -161,6 +160,24 @@ public class TouchGameLogic {
                     }
                 });
 
+                TutorialTriggerBlock tutorialTriggerBlock = gameModel.getTriggerBlockFactory().createTutorialTrigger(new TriggerListener() {
+
+                    @Override
+                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                        triggerBlock.setVisible(false);
+                    }
+
+                    @Override
+                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                    }
+
+                    @Override
+                    public void onTriggerHold(TriggerBlock triggerBlock) {
+                    }
+                });
+
+                tutorialTriggerBlock.setVisible(true);
+
                 int loopCount = 0;
                 while (alive) {
                     Thread.yield();
@@ -178,8 +195,9 @@ public class TouchGameLogic {
                     while (stepTimeNano > (long) (constantStepTimeS * 1000000000.0f) && numTimesStepped < 2) {
                         mouseController.pumpEvents();
                         touchController.pumpEvents();
-
-                        gameModel.update();
+                        if (!tutorialTriggerBlock.isVisible()) {
+                            gameModel.update();
+                        }
                         numTimesStepped++;
                         stepTimeNano -= (long) (constantStepTimeS * 1000000000.0f);
 
@@ -187,7 +205,7 @@ public class TouchGameLogic {
                             restartTrigger.setVisible(false);
                             gameModel.reset();
                             resetGame = false;
-                            timedReset = true;
+                            tutorialTriggerBlock.setVisible(true);
                         }
 
                         if (gameModel.isGameOver() && !restartTrigger.isVisible()) {

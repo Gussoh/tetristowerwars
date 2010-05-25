@@ -45,7 +45,8 @@ public class EventTransmitter implements InputListener {
     }
 
     private void sendEventMessage(InputEvent event) {
-        InputEventMessage eventMessage = new InputEventMessage(ownClientId, event);
+        InputEvent newEvent = new InputEvent(event.getType(), event.getPosition(), event.getActionId() + ownClientId * 1000000);
+        InputEventMessage eventMessage = new InputEventMessage(ownClientId, newEvent);
         connection.send(eventMessage);
     }
 
