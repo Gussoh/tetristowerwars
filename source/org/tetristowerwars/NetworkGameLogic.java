@@ -153,6 +153,12 @@ public class NetworkGameLogic {
                         @Override
                         public void onClientPropertyChanged(ClientEntry clientEntry) {
                         }
+
+                        @Override
+                        public void onSettingsReceived(Settings settings) {
+                        }
+
+
                     });
                     networkClient.start();
 
@@ -434,6 +440,12 @@ public class NetworkGameLogic {
         @Override
         public void onClientPropertyChanged(ClientEntry clientEntry) {
         }
+
+        @Override
+        public void onSettingsReceived(Settings settings) {
+        }
+
+
 
         public synchronized void maybeGoBack(final String message) {
             if (alive) {

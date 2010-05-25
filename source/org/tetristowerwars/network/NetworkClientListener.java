@@ -6,6 +6,7 @@
 package org.tetristowerwars.network;
 
 import org.jbox2d.common.Vec2;
+import org.tetristowerwars.Settings;
 import org.tetristowerwars.model.material.Material;
 
 
@@ -38,4 +39,6 @@ public interface NetworkClientListener {
     public void onClientPropertyChanged(ClientEntry clientEntry);
 
     public void spawnPowerUpBlock();
+
+    public void onSettingsReceived(Settings settings);
 }

@@ -17,6 +17,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -61,11 +62,41 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             startGameButton.setEnabled(false);
             conditionComboBox1.setEnabled(false);
         } else {
+            setValuesFromSettings(settings);
 
-            timeLimitCheckBox.setSelected(settings.isTimeConditionEnabled());
-            timeLimitTextField.setText(settings.getTimeCondition() + "");
-            heightCheckBox.setSelected(settings.isHeightConditionEnabled());
-            heightTextField.setText(settings.getHeightCondition() + "");
+            timeLimitTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    changeValueForCondition(timeLimitTextField, Settings.KEY_TIME_CONDITION);
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    changeValueForCondition(timeLimitTextField, Settings.KEY_TIME_CONDITION);
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                }
+            });
+
+            heightTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    changeValueForCondition(heightTextField, Settings.KEY_HEIGHT_CONDITION);
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    changeValueForCondition(heightTextField, Settings.KEY_HEIGHT_CONDITION);
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                }
+            });
         }
 
         chatHistoryTextArea.getDocument().addDocumentListener(new DocumentListener() {
@@ -84,32 +115,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             }
         });
 
-        timeLimitTextField.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                try {
-                    int value = Integer.parseInt(timeLimitTextField.getText());
-                    if (value > 0) {
-                        settings.setProperty(Settings.KEY_TIME_CONDITION, timeLimitTextField.getText());
-                        timeLimitTextField.setForeground(textFieldForegroundColor);
-                    } else {
-                        timeLimitTextField.setForeground(Color.RED);
-                    }
-                } catch (NumberFormatException ex) {
-                    timeLimitTextField.setForeground(Color.RED);
-                }
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                System.out.println(timeLimitTextField.getText());
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-        });
     }
 
     private void updateTeamLists() {
@@ -156,6 +161,9 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
                 clients.add(clientEntry);
                 updateTeamLists();
                 addChatHistoryMessage("\n * " + clientEntry.getName() + " has joined the game.");
+                if (networkServer != null) {
+                    networkServer.sendSettings(mainFrame.getSettings());
+                }
             }
         });
     }
@@ -201,6 +209,10 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
                 if (mainFrame.getCurrentComponent() == NetworkLobby.this) {
                     JOptionPane.showMessageDialog(NetworkLobby.this, "Lost connection with the server.");
                     networkClient.removeNetworkClientListener(NetworkLobby.this);
+                    networkClient.stop();
+                    if (networkServer != null) {
+                        networkServer.stop();
+                    }
                     mainFrame.back();
                 }
             }
@@ -231,6 +243,20 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         });
     }
 
+    @Override
+    public void onSettingsReceived(final Settings settings) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (networkServer == null) {
+                    setValuesFromSettings(settings);
+                }
+            }
+        });
+
+    }
+
     private void sendChatMessage() {
         String message = chatMessageTextField.getText();
         if (message.length() > 0) {
@@ -249,12 +275,42 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     }
 
     private void changeSelectedCondition(ItemEvent evt, String settingsKey) {
-        Settings settings = mainFrame.getSettings();
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            settings.setProperty(settingsKey, Boolean.toString(true));
-        } else {
-            settings.setProperty(settingsKey, Boolean.toString(false));
+        if (networkServer != null) {
+            Settings settings = mainFrame.getSettings();
+            if (evt.getStateChange() == ItemEvent.SELECTED) {
+                settings.setProperty(settingsKey, Boolean.toString(true));
+            } else {
+                settings.setProperty(settingsKey, Boolean.toString(false));
+            }
+            networkServer.sendSettings(settings);
         }
+    }
+
+    private void changeValueForCondition(JTextField textField, String settingsKey) {
+        if (networkServer != null) {
+            Settings settings = mainFrame.getSettings();
+            try {
+                int value = Integer.parseInt(textField.getText());
+                if (value > 0) {
+                    settings.setProperty(settingsKey, textField.getText());
+                    textField.setForeground(textFieldForegroundColor);
+                    networkServer.sendSettings(settings);
+                } else {
+                    textField.setForeground(Color.RED);
+                }
+            } catch (NumberFormatException ex) {
+                textField.setForeground(Color.RED);
+            }
+        }
+    }
+
+    private void setValuesFromSettings(Settings settings) {
+        timeLimitCheckBox.setSelected(settings.isTimeConditionEnabled());
+        timeLimitTextField.setText(Integer.toString(settings.getTimeCondition()));
+        heightCheckBox.setSelected(settings.isHeightConditionEnabled());
+        heightTextField.setText(Integer.toString(settings.getHeightCondition()));
+        boolean allConditions = settings.mustAllWinningConditionsBeMet();
+        conditionComboBox1.setSelectedIndex(allConditions ? 1 : 0);
     }
 
     /** This method is called from within the constructor to
@@ -290,6 +346,7 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         chatHistoryTextArea = new javax.swing.JTextArea();
         chatMessageTextField = new javax.swing.JTextField();
         sendMessageButton = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Teams"));
 
@@ -359,12 +416,6 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             }
         });
 
-        timeLimitTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                timeLimitTextFieldKeyTyped(evt);
-            }
-        });
-
         heightCheckBox.setText("Height limit (meters)");
         heightCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -372,7 +423,12 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
             }
         });
 
-        conditionComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All selected conditions are fulfilled", "Any selected condition is fulfilled" }));
+        conditionComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Any selected condition is fulfilled", "All selected conditions are fulfilled" }));
+        conditionComboBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                conditionComboBox1ItemStateChanged(evt);
+            }
+        });
 
         jLabel3.setText("Game over conditions:");
 
@@ -478,13 +534,20 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chatMessageTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sendMessageButton))
                 .addContainerGap())
         );
+
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -494,10 +557,11 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(backButton))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -509,6 +573,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(backButton)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -545,9 +611,30 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         changeSelectedCondition(evt, Settings.KEY_USE_HEIGHT_CONDITION);
     }//GEN-LAST:event_heightCheckBoxItemStateChanged
 
-    private void timeLimitTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_timeLimitTextFieldKeyTyped
-    }//GEN-LAST:event_timeLimitTextFieldKeyTyped
+    private void conditionComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_conditionComboBox1ItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED && networkServer != null) {
+            Settings settings = mainFrame.getSettings();
+            if (conditionComboBox1.getSelectedIndex() == 0) {
+                // Any
+                settings.setProperty(Settings.KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, Boolean.toString(false));
+            } else {
+                settings.setProperty(Settings.KEY_MUST_ALL_WINNING_CONDITIONS_BE_MET, Boolean.toString(true));
+            }
+            networkServer.sendSettings(settings);
+        }
+    }//GEN-LAST:event_conditionComboBox1ItemStateChanged
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        networkClient.removeNetworkClientListener(this);
+        networkClient.stop();
+        if (networkServer != null) {
+            networkServer.stop();
+        }
+        mainFrame.back();
+    }//GEN-LAST:event_backButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
     private javax.swing.JTextArea chatHistoryTextArea;
     private javax.swing.JTextField chatMessageTextField;
     private javax.swing.JComboBox conditionComboBox1;
