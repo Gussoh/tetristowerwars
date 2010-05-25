@@ -16,6 +16,7 @@ import org.tetristowerwars.model.GameModel;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.network.message.EndOfFrameMessage;
 import org.tetristowerwars.network.message.SpawnBuildingBlockMessage;
+import org.tetristowerwars.network.message.SpawnPowerUpMessage;
 import org.tetristowerwars.util.MathUtil;
 
 /**
@@ -63,6 +64,11 @@ public class NetworkServer {
     public void sendEndOfFrame() {
         EndOfFrameMessage endOfFrameMessage = new EndOfFrameMessage();
         networkServerModel.distributeMessage(endOfFrameMessage);
+    }
+
+    public void createPowerUpBlock() {
+        SpawnPowerUpMessage powerUpMessage = new SpawnPowerUpMessage();
+        networkServerModel.distributeMessage(powerUpMessage);
     }
 
     private class ServerSocketThread extends Thread {

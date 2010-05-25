@@ -39,6 +39,7 @@ public abstract class Message {
         type2Class.add(SetPlayerIndexMessage.class);
         type2Class.add(SettingsMessage.class);
         type2Class.add(SpawnBuildingBlockMessage.class);
+        type2Class.add(SpawnPowerUpMessage.class);
         type2Class.add(StartGameMessage.class);
 
         for (short i = 0; i < type2Class.size(); i++) {

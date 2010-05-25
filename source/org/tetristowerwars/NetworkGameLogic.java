@@ -122,6 +122,10 @@ public class NetworkGameLogic {
                         }
 
                         @Override
+                        public void spawnPowerUpBlock() {
+                        }
+
+                        @Override
                         public void gameStarted() {
                             new NetworkGameLogic(mainFrame, networkClient, networkServer);
                         }
@@ -149,8 +153,6 @@ public class NetworkGameLogic {
                         @Override
                         public void onClientPropertyChanged(ClientEntry clientEntry) {
                         }
-
-
                     });
                     networkClient.start();
 
@@ -326,10 +328,9 @@ public class NetworkGameLogic {
                             }
                         }
 
-                        if (networkSettings.isPowerups() && loopCount % (networkSettings.getSecondsBetweenPowerups() * 60) == 0) {
-                            // TODO: Implement powerup message
-                            //     gameModel.getPowerupFactory().createPowerUp(player1, true);
-                            //    gameModel.getPowerupFactory().createPowerUp(player2, false);
+                        int powerUpInterval = (int) (networkSettings.getSecondsBetweenPowerups() / constantStepTimeS);
+                        if (networkSettings.isPowerups() && loopCount % powerUpInterval == powerUpInterval - 1) {
+                            networkServer.createPowerUpBlock();
                         }
                         networkServer.sendEndOfFrame();
                     }
@@ -402,6 +403,13 @@ public class NetworkGameLogic {
         }
 
         @Override
+        public void spawnPowerUpBlock() {
+            List<Player> players = gameModel.getPlayers();
+            gameModel.getPowerupFactory().createPowerUp(players.get(0), true);
+            gameModel.getPowerupFactory().createPowerUp(players.get(1), false);
+        }
+
+        @Override
         public void gameStarted() {
         }
 
@@ -426,8 +434,6 @@ public class NetworkGameLogic {
         @Override
         public void onClientPropertyChanged(ClientEntry clientEntry) {
         }
-
-
 
         public synchronized void maybeGoBack(final String message) {
             if (alive) {

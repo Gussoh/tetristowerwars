@@ -75,7 +75,14 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void clientConnected(ClientEntry clientEntry) {
-        mainFrame.openComponent(lobby, false);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                mainFrame.openComponent(lobby, false);
+            }
+        });
+        
     }
 
     @Override
@@ -100,14 +107,14 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
 
             @Override
             public void run() {
-                statusLabel.setText("Status: " + message);
+                statusLabel.setText(message);
                 statusLabel.setForeground(Color.RED);
                 createGameButton.setEnabled(true);
                 connectButton.setEnabled(true);
 
                 if (networkClient != null) {
                     if (lobby != null) {
-                        networkClient.removeNetworkClientListener(lobby);;
+                        networkClient.removeNetworkClientListener(lobby);
                         lobby = null;
                     }
                     networkClient.removeNetworkClientListener(NetworkPanel.this);
@@ -131,6 +138,10 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
 
     @Override
     public void spawnBuildingBlock(Vec2 position, Material material, short shape) {
+    }
+
+    @Override
+    public void spawnPowerUpBlock() {
     }
 
     @Override
@@ -215,6 +226,12 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Join game"));
 
         jLabel1.setText("Hostname:");
+
+        hostnameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hostnameTextFieldActionPerformed(evt);
+            }
+        });
 
         connectButton.setText("Connect");
         connectButton.addActionListener(new java.awt.event.ActionListener() {
@@ -323,6 +340,12 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
         saveSettings();
         tryConnect(null);
     }//GEN-LAST:event_connectButtonActionPerformed
+
+    private void hostnameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hostnameTextFieldActionPerformed
+        saveSettings();
+        tryConnect(null);
+    }//GEN-LAST:event_hostnameTextFieldActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton connectButton;
     private javax.swing.JButton createGameButton;
