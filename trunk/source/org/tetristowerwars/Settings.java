@@ -156,11 +156,11 @@ public class Settings {
     }
 
     public boolean isTimeConditionEnabled() {
-        return Boolean.parseBoolean(properties.getProperty(KEY_USE_TIME_CONDITION, "true"));
+        return Boolean.parseBoolean(properties.getProperty(KEY_USE_TIME_CONDITION, "false"));
     }
 
     public int getHeightCondition() {
-        return getIntProperty(KEY_HEIGHT_CONDITION, 80);
+        return getIntProperty(KEY_HEIGHT_CONDITION, 50);
     }
 
     public int getNumBlocksCondition() {
@@ -168,7 +168,7 @@ public class Settings {
     }
 
     public int getTimeCondition() {
-        return getIntProperty(KEY_TIME_CONDITION, 300);
+        return getIntProperty(KEY_TIME_CONDITION, 180);
     }
 
     public String getLeftTeamName() {
