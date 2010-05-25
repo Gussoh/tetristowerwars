@@ -65,13 +65,13 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="jScrollPane1" alignment="0" pref="140" max="32767" attributes="0"/>
-                      <Component id="jLabel1" alignment="0" pref="140" max="32767" attributes="0"/>
+                      <Component id="sovietLabel" alignment="0" pref="140" max="32767" attributes="0"/>
                       <Component id="joinTeam1Button" alignment="1" pref="140" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jScrollPane2" pref="157" max="32767" attributes="1"/>
-                      <Component id="jLabel2" alignment="0" pref="157" max="32767" attributes="1"/>
+                      <Component id="usaLabel" alignment="0" pref="157" max="32767" attributes="1"/>
                       <Component id="joinTeam2Button" alignment="0" pref="157" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -83,8 +83,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="jLabel1" alignment="0" max="32767" attributes="1"/>
-                      <Component id="jLabel2" alignment="0" pref="84" max="32767" attributes="1"/>
+                      <Component id="sovietLabel" alignment="0" max="32767" attributes="1"/>
+                      <Component id="usaLabel" alignment="0" pref="84" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -102,14 +102,18 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel1">
+        <Component class="javax.swing.JLabel" name="sovietLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="[SOVIET]"/>
+            <Property name="horizontalAlignment" type="int" value="0"/>
+            <Property name="text" type="java.lang.String" value="Soviet"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel2">
+        <Component class="javax.swing.JLabel" name="usaLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="[USA]"/>
+            <Property name="horizontalAlignment" type="int" value="0"/>
+            <Property name="text" type="java.lang.String" value="USA"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -344,6 +348,7 @@
               <Properties>
                 <Property name="columns" type="int" value="20"/>
                 <Property name="editable" type="boolean" value="false"/>
+                <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
                 <Property name="wrapStyleWord" type="boolean" value="true"/>
               </Properties>
