@@ -72,10 +72,10 @@ public class TriggerRenderer {
 
                 if (triggerBlock instanceof TutorialTriggerBlock) {
                     float width = gameModel.getWorldBoundries().upperBound.x;
-                    float height = renderHeight - gameModel.getGroundLevel();
+                    float height = renderHeight - (pos.y + 5.0f);
                     float halfSide = Math.min(width, height) * 0.45f;
                     float halfSideBg = halfSide * 1.1f;
-                    Vec2 centerPos = new Vec2(width * 0.5f, height * 0.5f + gameModel.getGroundLevel());
+                    Vec2 centerPos = new Vec2(width * 0.5f, height * 0.5f + pos.y + 5.0f);
 
                     vertexBuffer.put(new float[]{
                                 centerPos.x - halfSideBg, centerPos.y - halfSideBg,
