@@ -2,10 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.tetristowerwars.network;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class NetworkClientModel implements NetworkMessageListener {
     private Queue<EventQueueMessage> currentEventQueue = new LinkedList<EventQueueMessage>();
     private short ownClientId = -1;
     private Settings gameSettings;
+    private Controller ownController;
+    private boolean started = false;
 
     protected NetworkClientModel() {
     }
@@ -61,8 +64,6 @@ public class NetworkClientModel implements NetworkMessageListener {
             networkClientListener.onConnectionError(message);
         }
     }
-
-
 
     public synchronized void addNetworkClientListeners(NetworkClientListener listener) {
         networkClientListeners.add(listener);
@@ -89,7 +90,9 @@ public class NetworkClientModel implements NetworkMessageListener {
     }
 
     public synchronized void addEventQueueMessage(EventQueueMessage eventQueueMessage) {
-        currentEventQueue.offer(eventQueueMessage);
+        if (started) {
+            currentEventQueue.offer(eventQueueMessage);
+        }
     }
 
     public synchronized void endCurrentFrame() {
@@ -105,7 +108,7 @@ public class NetworkClientModel implements NetworkMessageListener {
         if (ownClientId != -1) {
             throw new IllegalStateException("Own client id already set.");
         }
-        
+
         this.ownClientId = clientId;
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.onOwnClientIdSet(ownClientId);
@@ -127,6 +130,9 @@ public class NetworkClientModel implements NetworkMessageListener {
     }
 
     public synchronized void fireGameStartedEvent() {
+        started = true;
+        eventQueues.clear();
+        currentEventQueue.clear();
         List<NetworkClientListener> copy = new ArrayList<NetworkClientListener>(networkClientListeners);
         for (NetworkClientListener networkClientListener : copy) {
             networkClientListener.gameStarted();
@@ -146,8 +152,12 @@ public class NetworkClientModel implements NetworkMessageListener {
         for (Map.Entry<Short, ClientEntry> entry : clients.entrySet()) {
             ClientEntry ce = entry.getValue();
             Player player = gameModel.getPlayers().get(ce.getPlayerIndex());
-            Controller controller = new PlayerRestrictedController(gameModel, ce.getNetworkClientInputManager(), renderer, player);
+            Controller controller = new PlayerRestrictedController(gameModel, renderer, player);
+            ce.getNetworkClientInputManager().addInputListener(controller);
             controllers.add(controller);
+            if (entry.getKey().shortValue() == ownClientId) {
+                ownController = controller;
+            }
         }
         return controllers;
     }
@@ -192,5 +202,24 @@ public class NetworkClientModel implements NetworkMessageListener {
         for (NetworkClientListener networkClientListener : networkClientListeners) {
             networkClientListener.spawnPowerUpBlock();
         }
+    }
+
+    public Controller getOwnController() {
+        return ownController;
+    }
+
+    public void fireGameStoppedEvent() {
+        started = false;
+
+        ArrayList<NetworkClientListener> copy = new ArrayList<NetworkClientListener>(networkClientListeners);
+
+        for (NetworkClientListener networkClientListener : copy) {
+            networkClientListener.gameStopped();
+        }
+        
+    }
+
+    Collection<ClientEntry> getClientEntries() {
+        return Collections.unmodifiableCollection(clients.values());
     }
 }

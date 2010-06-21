@@ -23,8 +23,8 @@ public class PlayerRestrictedController extends Controller implements GameModelL
 
     private final Player player;
 
-    public PlayerRestrictedController(GameModel dataModel, InputManager inputManager, Renderer renderer, Player player) {
-        super(dataModel, inputManager, renderer);
+    public PlayerRestrictedController(GameModel dataModel, Renderer renderer, Player player) {
+        super(dataModel, renderer);
         dataModel.addGameModelListener(this);
         this.player = player;
     }

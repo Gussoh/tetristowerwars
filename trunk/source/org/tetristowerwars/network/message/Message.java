@@ -41,6 +41,7 @@ public abstract class Message {
         type2Class.add(SpawnBuildingBlockMessage.class);
         type2Class.add(SpawnPowerUpMessage.class);
         type2Class.add(StartGameMessage.class);
+        type2Class.add(StopGameMessage.class);
 
         for (short i = 0; i < type2Class.size(); i++) {
             class2Type.put(type2Class.get(i), i);

@@ -5,15 +5,17 @@
 
 package org.tetristowerwars.model;
 
+import org.tetristowerwars.control.Controller;
+
 /**
  *
  * @author Administrator
  */
 public interface TriggerListener {
 
-    public void onTriggerPressed(TriggerBlock triggerBlock);
+    public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller);
 
-    public void onTriggerReleased(TriggerBlock triggerBlock);
+    public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller);
 
-    public void onTriggerHold(TriggerBlock triggerBlock);
+    public void onTriggerHold(TriggerBlock triggerBlock, Controller controller);
 }

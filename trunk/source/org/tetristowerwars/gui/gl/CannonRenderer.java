@@ -131,7 +131,6 @@ public class CannonRenderer {
                 }
 
                 if (ps == null) {
-                    System.out.println("WARNING: cannon did not contain a polygonShape");
                     continue;
                 }
                 Vec2[] vertices = ps.getVertices();

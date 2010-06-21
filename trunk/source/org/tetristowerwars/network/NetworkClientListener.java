@@ -41,4 +41,6 @@ public interface NetworkClientListener {
     public void spawnPowerUpBlock();
 
     public void onSettingsReceived(Settings settings);
+
+    public void gameStopped();
 }

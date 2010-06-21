@@ -67,8 +67,11 @@ public class TouchGameLogic {
         final Player player1 = gameModel.createPlayer(settings.getLeftTeamName(), 0, playerAreaWidth);
         final Player player2 = gameModel.createPlayer(settings.getRightTeamName(), settings.getWorldWidth() - playerAreaWidth, settings.getWorldWidth());
 
-        final Controller mouseController = new Controller(gameModel, mouseInputManager, glRenderer);
-        final Controller touchController = new Controller(gameModel, touchInputManager, glRenderer);
+        final Controller mouseController = new Controller(gameModel, glRenderer);
+        mouseInputManager.addInputListener(mouseController);
+
+        final Controller touchController = new Controller(gameModel, glRenderer);
+        touchInputManager.addInputListener(touchController);
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, settings.getGroundHeight()), false);
@@ -119,18 +122,18 @@ public class TouchGameLogic {
                     private long timePressed;
 
                     @Override
-                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                    public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller) {
                         timePressed = System.currentTimeMillis();
                         triggerBlock.setText("Hold");
                     }
 
                     @Override
-                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                    public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller) {
                         triggerBlock.setText("Exit");
                     }
 
                     @Override
-                    public void onTriggerHold(TriggerBlock triggerBlock) {
+                    public void onTriggerHold(TriggerBlock triggerBlock, Controller controller) {
                         if (timePressed + 2000 < System.currentTimeMillis()) {
                             alive = false;
                             SwingUtilities.invokeLater(new Runnable() {
@@ -147,32 +150,32 @@ public class TouchGameLogic {
                 TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(settings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
 
                     @Override
-                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                    public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller) {
                         resetGame = true;
                     }
 
                     @Override
-                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                    public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller) {
                     }
 
                     @Override
-                    public void onTriggerHold(TriggerBlock triggerBlock) {
+                    public void onTriggerHold(TriggerBlock triggerBlock, Controller controller) {
                     }
                 });
 
                 TutorialTriggerBlock tutorialTriggerBlock = gameModel.getTriggerBlockFactory().createTutorialTrigger(new TriggerListener() {
 
                     @Override
-                    public void onTriggerPressed(TriggerBlock triggerBlock) {
+                    public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller) {
                         triggerBlock.setVisible(false);
                     }
 
                     @Override
-                    public void onTriggerReleased(TriggerBlock triggerBlock) {
+                    public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller) {
                     }
 
                     @Override
-                    public void onTriggerHold(TriggerBlock triggerBlock) {
+                    public void onTriggerHold(TriggerBlock triggerBlock, Controller controller) {
                     }
                 });
 
