@@ -18,6 +18,7 @@ import org.tetristowerwars.network.message.EndOfFrameMessage;
 import org.tetristowerwars.network.message.SettingsMessage;
 import org.tetristowerwars.network.message.SpawnBuildingBlockMessage;
 import org.tetristowerwars.network.message.SpawnPowerUpMessage;
+import org.tetristowerwars.network.message.StopGameMessage;
 import org.tetristowerwars.util.MathUtil;
 
 /**
@@ -49,9 +50,15 @@ public class NetworkServer {
     public void startGame(Settings settings) {
         if (serverSocketThread != null) {
             serverSocketThread.close();
+            serverSocketThread = null;
         }
 
         networkServerModel.startGame(settings);
+    }
+
+    public void stopGame() {
+        start(); // Allow server to accept incoming connections.
+        networkServerModel.distributeMessage(new StopGameMessage());
     }
 
     public void createRandomBuildingBlock(float leftLimit, float rightLimit, float yPos) {

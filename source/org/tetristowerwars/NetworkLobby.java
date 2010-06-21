@@ -224,6 +224,10 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
     }
 
     @Override
+    public void gameStopped() {
+    }
+
+    @Override
     public void onConnectionClosed() {
     }
 

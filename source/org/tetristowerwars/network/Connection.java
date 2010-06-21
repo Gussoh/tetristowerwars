@@ -106,9 +106,6 @@ public class Connection {
                         message.write(dataOutputStream);
                         numMessagesSent++;
 
-                        if (numMessagesSent % 100 == 0) {
-                            System.out.println("Messages sent: " + numMessagesSent);
-                        }
                         if (alwaysFlush) {
                             dataOutputStream.flush();
                         } else if (sendQueue.isEmpty()) {
@@ -147,9 +144,7 @@ public class Connection {
                     Message message = Message.read(dataInputStream);
                     numMessagesReceived++;
                     messageListener.handleReceivedMessage(Connection.this, message);
-                    if (numMessagesReceived % 100 == 0) {
-                        System.out.println("Num messages received: " + numMessagesReceived);
-                    }
+                    
                 }
             } catch (IOException ex) {
                 synchronized (this) {

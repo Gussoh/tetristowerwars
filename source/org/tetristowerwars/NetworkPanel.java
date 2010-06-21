@@ -91,6 +91,10 @@ public class NetworkPanel extends javax.swing.JPanel implements NetworkClientLis
     }
 
     @Override
+    public void gameStopped() {
+    }
+
+    @Override
     public void onConnectionClosed() {
     }
 

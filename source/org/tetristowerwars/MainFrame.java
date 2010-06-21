@@ -27,7 +27,7 @@ import org.tetristowerwars.control.TouchInputManager;
  *
  * @author Andreas
  */
-public class MainFrame {
+public final class MainFrame {
 
     private JFrame frame = new JFrame("Tetris Tower Wars");
     private final Deque<Component> componentStack = new ArrayDeque<Component>();

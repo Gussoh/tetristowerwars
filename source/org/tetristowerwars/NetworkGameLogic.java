@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -29,7 +30,6 @@ import org.tetristowerwars.model.WinningCondition;
 import org.tetristowerwars.model.material.Material;
 import org.tetristowerwars.model.winningcondition.CompoundWinningCondition;
 import org.tetristowerwars.model.winningcondition.HeightWinningCondition;
-import org.tetristowerwars.model.winningcondition.LimitedBlocksWinningCondition;
 import org.tetristowerwars.model.winningcondition.TimedWinningCondition;
 import org.tetristowerwars.network.ClientEntry;
 import org.tetristowerwars.network.NetworkClient;
@@ -75,8 +75,27 @@ public class NetworkGameLogic {
 
         playerAreaWidth = networkSettings.getWorldWidth() * (networkSettings.getPlayerArea() * 0.005f);
 
-        final Player player1 = gameModel.createPlayer(networkSettings.getLeftTeamName(), 0, playerAreaWidth);
-        final Player player2 = gameModel.createPlayer(networkSettings.getRightTeamName(), networkSettings.getWorldWidth() - playerAreaWidth, networkSettings.getWorldWidth());
+        StringBuilder player1Names = new StringBuilder();
+        StringBuilder player2Names = new StringBuilder();
+
+        for (ClientEntry clientEntry : networkClient.getClientEntries()) {
+            if (clientEntry.getPlayerIndex() == 0) {
+                if (player1Names.length() == 0) {
+                    player1Names.append(clientEntry.getName());
+                } else {
+                    player1Names.append(", ").append(clientEntry.getName());
+                }
+            } else {
+                if (player2Names.length() == 0) {
+                    player2Names.append(clientEntry.getName());
+                } else {
+                    player2Names.append(", ").append(clientEntry.getName());
+                }
+            }
+        }
+
+        final Player player1 = gameModel.createPlayer(player1Names.toString(), 0, playerAreaWidth);
+        final Player player2 = gameModel.createPlayer(player2Names.toString(), networkSettings.getWorldWidth() - playerAreaWidth, networkSettings.getWorldWidth());
 
         CannonFactory cannonFactory = gameModel.getCannonFactory();
         cannonFactory.createBasicCannon(player1, new Vec2(playerAreaWidth, networkSettings.getGroundHeight()), false);
@@ -91,6 +110,7 @@ public class NetworkGameLogic {
         private boolean alive = true;
         private Semaphore syncedStartSemaphore = new Semaphore(0);
         private int numBlockSpawning = 0;
+        private InGameChatService chatService;
 
         public GameLoop() {
             networkClient.addNetworkClientListener(this);
@@ -101,14 +121,19 @@ public class NetworkGameLogic {
             final Settings networkSettings = networkClient.getSettings();
             final List<Controller> controllers = networkClient.createControllers(gameModel, renderer);
 
+            chatService = new InGameChatService(networkClient, renderer);
+            chatService.startChatService();
+
+
             final LinkedList<WinningCondition> winningConditions = new LinkedList<WinningCondition>();
             if (networkSettings.isHeightConditionEnabled()) {
                 winningConditions.add(new HeightWinningCondition(gameModel, networkSettings.getHeightCondition(), 16));
             }
 
-            if (networkSettings.isNumBlocksConditionEnabled()) {
-                winningConditions.add(new LimitedBlocksWinningCondition(gameModel, networkSettings.getNumBlocksCondition(), 16));
-            }
+            // NOT USED 
+            /*if (networkSettings.isNumBlocksConditionEnabled()) {
+            winningConditions.add(new LimitedBlocksWinningCondition(gameModel, networkSettings.getNumBlocksCondition(), 16));
+            }*/
 
             if (networkSettings.isTimeConditionEnabled()) {
                 winningConditions.add(new TimedWinningCondition(gameModel, networkSettings.getTimeCondition(), 16));
@@ -119,20 +144,44 @@ public class NetworkGameLogic {
             cwc.setWinningCondition();
 
 
+            TriggerBlock exitTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(networkSettings.getWorldWidth() / 2.0f, 0), 15, "Exit", new TriggerListener() {
+
+                private long timePressed;
+
+                @Override
+                public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller) {
+                    timePressed = System.currentTimeMillis();
+                    triggerBlock.setText("Hold");
+                }
+
+                @Override
+                public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller) {
+                    triggerBlock.setText("Exit");
+                }
+
+                @Override
+                public void onTriggerHold(TriggerBlock triggerBlock, Controller controller) {
+                    if (timePressed + 2000 < System.currentTimeMillis() && networkClient.getOwnController() == controller) {
+                        maybeGoBack(null);
+                    }
+                }
+            });
+
+
 
             TriggerBlock restartTrigger = gameModel.getTriggerBlockFactory().createRoundTrigger(new Vec2(networkSettings.getWorldWidth() / 2.0f, gameModel.getGroundLevel() * 4.0f), 25.0f, "Restart", new TriggerListener() {
 
                 @Override
-                public void onTriggerPressed(TriggerBlock triggerBlock) {
+                public void onTriggerPressed(TriggerBlock triggerBlock, Controller controller) {
                     resetGame = true;
                 }
 
                 @Override
-                public void onTriggerReleased(TriggerBlock triggerBlock) {
+                public void onTriggerReleased(TriggerBlock triggerBlock, Controller controller) {
                 }
 
                 @Override
-                public void onTriggerHold(TriggerBlock triggerBlock) {
+                public void onTriggerHold(TriggerBlock triggerBlock, Controller controller) {
                 }
             });
 
@@ -162,6 +211,12 @@ public class NetworkGameLogic {
 
             } catch (InterruptedException ex) {
             }
+
+            if (progressMonitor.isCanceled()) {
+                maybeGoBack(null);
+                return;
+            }
+
             try {
                 networkClient.ready();
             } catch (IOException ex) {
@@ -179,7 +234,14 @@ public class NetworkGameLogic {
                         progressMonitor.setNote("Waiting for other players...");
                     }
                 });
-                syncedStartSemaphore.acquire();
+                // TODO: Need another mechanism to support cancelation.
+                while (!syncedStartSemaphore.tryAcquire(1, TimeUnit.SECONDS)) {
+                    if (progressMonitor.isCanceled()) {
+                        maybeGoBack(null);
+                        return;
+                    }
+                }
+
             } catch (InterruptedException ex) {
                 maybeGoBack("Failed when syncing the game start.");
                 return;
@@ -202,8 +264,15 @@ public class NetworkGameLogic {
                     progressMonitor.close();
                 }
             });
-            
+
+            if (progressMonitor.isCanceled()) {
+                maybeGoBack(null);
+                return;
+            }
+
             int loopCount = 0;
+            exitTrigger.setVisible(true);
+
             while (alive) {
                 Thread.yield();
 
@@ -211,10 +280,11 @@ public class NetworkGameLogic {
                 long stepTimeNano = currentTimeNano - lastStepTimeNano;
                 int numTimesStepped = 0;
                 // This should hopefully make the client run smoothly
-                while (networkClient.getNumUnprocessedFrames() == 0) {
+                while (networkClient.getNumUnprocessedFrames() == 0 && alive) {
                     Thread.yield();
                     currentTimeNano = System.nanoTime();
                 }
+
 
                 if (networkClient.getNumUnprocessedFrames() > MAX_NUM_UNPROCESSED_FRAMES) {
                     stepTimeNano += (long) (constantStepTimeS * NANO_FACTOR);
@@ -282,12 +352,12 @@ public class NetworkGameLogic {
 
         @Override
         public void allClientsReady() {
-            System.out.println("semaphore released!");
             syncedStartSemaphore.release();
         }
 
         @Override
         public void chatMessageReceive(ClientEntry clientEntry, String message) {
+            System.out.println(clientEntry.getName() + ": " + message);
         }
 
         @Override
@@ -345,6 +415,12 @@ public class NetworkGameLogic {
         }
 
         @Override
+        public void gameStopped() {
+            System.out.println("Game stopped!");
+            maybeGoBack("The server stopped the game.");
+        }
+
+        @Override
         public void endOfFramePosted(int unprocessedFrames) {
         }
 
@@ -373,12 +449,15 @@ public class NetworkGameLogic {
         public synchronized void maybeGoBack(final String message) {
             if (alive) {
                 alive = false;
+                progressMonitor.close();
+                chatService.stopChatService();
                 soundPlayer.stopAllMusic();
                 soundPlayer.unloadAllSounds();
+                networkClient.removeNetworkClientListener(this);
                 if (networkServer != null) {
-                    networkServer.stop();
+                    networkServer.stopGame();
                 }
-                networkClient.stop();
+                networkClient.stopSendingUserInput();
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -393,4 +472,3 @@ public class NetworkGameLogic {
         }
     }
 }
-

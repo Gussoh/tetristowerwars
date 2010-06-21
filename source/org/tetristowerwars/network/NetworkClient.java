@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -122,4 +123,13 @@ public class NetworkClient {
     public void sendChatMessage(String message) {
         connection.send(new ChatMessage(clientModel.getOwnClientId(), message));
     }
+
+    public Controller getOwnController() {
+        return clientModel.getOwnController();
+    }
+
+    public Collection<ClientEntry> getClientEntries() {
+        return clientModel.getClientEntries();
+    }
+
 }

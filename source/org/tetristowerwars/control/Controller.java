@@ -27,18 +27,15 @@ import org.tetristowerwars.model.TriggerBlock;
 public class Controller implements InputListener {
 
     protected final GameModel gameModel;
-    private final InputManager inputManager;
     private final Renderer renderer;
     protected final Map<Integer, BuildingBlockJoint> actionIdToJoint = new HashMap<Integer, BuildingBlockJoint>();
     private final Map<Integer, TriggerBlock> actionIdToTrigger = new HashMap<Integer, TriggerBlock>();
     private final Queue<InputEvent> eventQueue = new LinkedList<InputEvent>();
     private final Map<Integer, Vec2> currentCursorPositions = new LinkedHashMap<Integer, Vec2>();
 
-    public Controller(GameModel dataModel, InputManager inputManager, Renderer renderer) {
+    public Controller(GameModel dataModel, Renderer renderer) {
         this.gameModel = dataModel;
-        this.inputManager = inputManager;
         this.renderer = renderer;
-        inputManager.addInputListener(this);
     }
 
     @Override
@@ -89,7 +86,7 @@ public class Controller implements InputListener {
         } else if (selectedBlock instanceof TriggerBlock) {
             TriggerBlock triggerBlock = (TriggerBlock) selectedBlock;
             if (triggerBlock.isVisible() && !actionIdToTrigger.containsKey(actionId)) {
-                triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock);
+                triggerBlock.getTriggerListener().onTriggerPressed(triggerBlock, this);
                 actionIdToTrigger.put(actionId, triggerBlock);
             }
         }
@@ -118,7 +115,7 @@ public class Controller implements InputListener {
         } else {
             TriggerBlock triggerBlock = actionIdToTrigger.remove(actionId);
             if (triggerBlock != null) {
-                triggerBlock.getTriggerListener().onTriggerReleased(triggerBlock);
+                triggerBlock.getTriggerListener().onTriggerReleased(triggerBlock, this);
             }
         }
     }
@@ -184,7 +181,7 @@ public class Controller implements InputListener {
         }
 
         for (TriggerBlock triggerBlock : actionIdToTrigger.values()) {
-            triggerBlock.getTriggerListener().onTriggerHold(triggerBlock);
+            triggerBlock.getTriggerListener().onTriggerHold(triggerBlock, this);
         }
     }
 }
