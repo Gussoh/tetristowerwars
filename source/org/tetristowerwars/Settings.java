@@ -100,7 +100,7 @@ public class Settings {
     }
 
     public float getWorldWidth() {
-        return getFloatProperty(KEY_WORLD_WIDTH, 300);
+        return getFloatProperty(KEY_WORLD_WIDTH, 250);
     }
 
     public float getWorldHeight() {
@@ -144,7 +144,7 @@ public class Settings {
     }
 
     public boolean isAntiAliasingEnabled() {
-        return Boolean.parseBoolean(properties.getProperty(KEY_ANTI_ALIASING, "true"));
+        return Boolean.parseBoolean(properties.getProperty(KEY_ANTI_ALIASING, "false"));
     }
 
     public boolean isHeightConditionEnabled() {

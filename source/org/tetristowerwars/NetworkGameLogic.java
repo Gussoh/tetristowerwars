@@ -44,7 +44,7 @@ import org.tetristowerwars.sound.SoundPlayer;
  */
 public class NetworkGameLogic {
 
-    private final static int MAX_NUM_UNPROCESSED_FRAMES = 10;
+    private final static int MAX_NUM_UNPROCESSED_FRAMES = 12;
     private final static float NANO_FACTOR = 1000000000.0f;
     private final MainFrame mainFrame;
     private final float playerAreaWidth;
@@ -252,6 +252,7 @@ public class NetworkGameLogic {
             networkClient.startSendingUserInput(mouseInputManager);
 
             if (networkServer != null) {
+                networkServer.sendEndOfFrame();
                 networkServer.sendEndOfFrame();
             }
 

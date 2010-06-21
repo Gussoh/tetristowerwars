@@ -4,11 +4,9 @@
  */
 package org.tetristowerwars.network;
 
-import java.io.DataOutputStream;
 import org.tetristowerwars.control.InputEvent;
 import org.tetristowerwars.control.InputListener;
 import org.tetristowerwars.control.InputManager;
-import org.tetristowerwars.gui.Renderer;
 import org.tetristowerwars.network.message.InputEventMessage;
 
 /**
@@ -20,6 +18,8 @@ public class EventTransmitter implements InputListener {
     private final Connection connection;
     private final InputManager inputManager;
     private final short ownClientId;
+    private long lastEventMessageTimeStamp;
+    private static final long MIN_MS_BETWEEN_EVENTS = (long) ((1f / 50f) * 1000f);
 
     public EventTransmitter(Connection connection, InputManager inputManager, short ownClientId) {
         this.connection = connection;
@@ -31,17 +31,22 @@ public class EventTransmitter implements InputListener {
 
     @Override
     public void onInputDevicePressed(InputEvent event) {
+        lastEventMessageTimeStamp = System.currentTimeMillis();
         sendEventMessage(event);
     }
 
     @Override
     public void onInputDeviceReleased(InputEvent event) {
+        lastEventMessageTimeStamp = System.currentTimeMillis();
         sendEventMessage(event);
     }
 
     @Override
     public void onInputDeviceDragged(InputEvent event) {
-        sendEventMessage(event);
+        if (System.currentTimeMillis() - lastEventMessageTimeStamp >= MIN_MS_BETWEEN_EVENTS) {
+            lastEventMessageTimeStamp = System.currentTimeMillis();
+            sendEventMessage(event);
+        }
     }
 
     private void sendEventMessage(InputEvent event) {
