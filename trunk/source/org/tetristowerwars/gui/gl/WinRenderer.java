@@ -47,10 +47,10 @@ public class WinRenderer {
     public WinRenderer(GL gl, GameModel gameModel) throws IOException {
         flagTextures = new Texture[gameModel.getPlayers().size()];
         for (Player player : gameModel.getPlayers()) {
-            flagTextures[player.getPlayerIndex()] = TextureIO.newTexture(new File("res/gfx/THEME" + (player.getPlayerIndex() + 1) + "/win.png"), true);
+            flagTextures[player.getPlayerIndex()] = TextureIO.newTexture(new File("../../res/gfx/THEME" + (player.getPlayerIndex() + 1) + "/win.png"), true);
             GLUtil.fixTextureParameters(flagTextures[player.getPlayerIndex()]);
         }
-        particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
+        particleTexture = TextureIO.newTexture(new File("../../res/gfx/particle.png"), true);
         widthHeightRatio = flagTextures[1].getWidth() / (float) flagTextures[1].getHeight();
 
         vertexBuffer = BufferUtil.newFloatBuffer(NUM_VERTICES_PER_OBJECT * 2);

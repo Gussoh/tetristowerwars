@@ -30,7 +30,7 @@ public class BackgroundRenderer {
     private static final float bottomShrinkFactor = 10.0f;
 
     public BackgroundRenderer(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel, float horizontLevel, int themeIndex) throws IOException {
-        String texturePath = "res/gfx/THEME" + themeIndex + "/";
+        String texturePath = "../../res/gfx/THEME" + themeIndex + "/";
         skyTexture = TextureIO.newTexture(new File(texturePath + "sky.png"), true);
         cityTexture = TextureIO.newTexture(new File(texturePath + "citysilhuette.png"), true);
         groundTexture = TextureIO.newTexture(new File(texturePath + "ground.png"), true);

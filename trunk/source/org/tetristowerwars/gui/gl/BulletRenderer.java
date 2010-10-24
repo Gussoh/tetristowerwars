@@ -45,7 +45,7 @@ public class BulletRenderer {
     private final Map<Class<? extends Material>, Texture> textures = new HashMap<Class<? extends Material>, Texture>();
 
     public BulletRenderer(GL gl, boolean lightingEffects) throws IOException {
-        String basePath = "res/gfx/bullets/";
+        String basePath = "../../res/gfx/bullets/";
         textures.put(WoodMaterial.class, TextureIO.newTexture(new File(basePath + "wood.png"), true));
         textures.put(BrickMaterial.class, TextureIO.newTexture(new File(basePath + "brick.png"), true));
         textures.put(SteelMaterial.class, TextureIO.newTexture(new File(basePath + "steel.png"), true));

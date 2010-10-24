@@ -35,7 +35,7 @@ public class BackgroundAnimationRenderer {
     public final static int NUM_VERTICES_PER_ANIMATION = 4;
 
     public BackgroundAnimationRenderer(GL gl, int themeIndex) throws IOException {
-        String texturePath = "res/gfx/THEME" + themeIndex + "/";
+        String texturePath = "../../res/gfx/THEME" + themeIndex + "/";
         textures.put(GROUNDVEHICLE1, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle1.png"), true), true));
         textures.put(GROUNDVEHICLE2, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle2.png"), true), true));
         textures.put(GROUNDVEHICLE3, new TextureEntry(TextureIO.newTexture(new File(texturePath + "groundvehicle3.png"), true), true));

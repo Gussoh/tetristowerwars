@@ -74,7 +74,7 @@ public class EffectRenderer {
         particleTexCoordBuffer = BufferUtil.newFloatBuffer(40 * NUM_VERTICES_PER_PARTICLE * 2);
         particleColorBuffer = BufferUtil.newFloatBuffer(40 * NUM_VERTICES_PER_PARTICLE * 4);
 
-        particleTexture = TextureIO.newTexture(new File("res/gfx/particle.png"), true);
+        particleTexture = TextureIO.newTexture(new File("../../res/gfx/particle.png"), true);
 
         explosionParticleEngine = new PointSourceParticleEngine();
         explosionParticleEngine.setTimeToLive(2.5f, 3.0f);
