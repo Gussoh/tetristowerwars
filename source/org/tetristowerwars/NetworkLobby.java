@@ -67,8 +67,8 @@ public class NetworkLobby extends javax.swing.JPanel implements NetworkClientLis
         final Settings settings = mainFrame.getSettings();
         try {
             int size = 100;
-            createIcon("res/gfx/THEME1/player1.png", sovietLabel, size, size);
-            createIcon("res/gfx/THEME1/player2.png", usaLabel, size, size);
+            createIcon("../../res/gfx/THEME1/player1.png", sovietLabel, size, size);
+            createIcon("../../res/gfx/THEME1/player2.png", usaLabel, size, size);
 
             //sovietLabel.setText(null);
             //usaLabel.setText(null);

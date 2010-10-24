@@ -38,10 +38,10 @@ public class PointerRenderer {
     public PointerRenderer(GL gl, GameModel gameModel) throws IOException {
         this.gameModel = gameModel;
 
-        texture = TextureIO.newTexture(new File("res/gfx/marker.png"), true);
+        texture = TextureIO.newTexture(new File("../../res/gfx/marker.png"), true);
         GLUtil.fixTextureParameters(texture);
 
-        disabledTexture = TextureIO.newTexture(new File("res/gfx/marker-disabled.png"), true);
+        disabledTexture = TextureIO.newTexture(new File("../../res/gfx/marker-disabled.png"), true);
         GLUtil.fixTextureParameters(disabledTexture);
 
         vertexBuffer = BufferUtil.newFloatBuffer(4 * NUM_VERTICES_PER_POINTER * 2);

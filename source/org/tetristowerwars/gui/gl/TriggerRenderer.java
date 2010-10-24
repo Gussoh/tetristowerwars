@@ -36,8 +36,8 @@ public class TriggerRenderer {
     private final float[] tutorialBackground = {0.8f, 0.8f, 0.8f, 0.9f};
 
     public TriggerRenderer(GL gl) throws IOException {
-        roundTexture = TextureIO.newTexture(new File("res/gfx/exit_button.png"), true);
-        tutorialTexture = TextureIO.newTexture(new File("res/gfx/tutorial/tutorial.png"), true);
+        roundTexture = TextureIO.newTexture(new File("../../res/gfx/exit_button.png"), true);
+        tutorialTexture = TextureIO.newTexture(new File("../../res/gfx/tutorial/tutorial.png"), true);
         GLUtil.fixTextureParameters(roundTexture);
         GLUtil.fixTextureParameters(tutorialTexture);
 

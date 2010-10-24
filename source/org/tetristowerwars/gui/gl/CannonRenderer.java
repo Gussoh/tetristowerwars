@@ -53,9 +53,9 @@ public class CannonRenderer {
     //private final float[] specular = {0.0f, 0.0f, 0.0f, 1.0f};
 
     public CannonRenderer(GL gl, float blockSize, boolean lightingEffects) throws IOException {
-        baseTexture = TextureIO.newTexture(new File("res/gfx/cannon_base.png"), true);
-        topTexture = TextureIO.newTexture(new File("res/gfx/cannon_top.png"), true);
-        pipeTexture = TextureIO.newTexture(new File("res/gfx/cannon_pipe.png"), true);
+        baseTexture = TextureIO.newTexture(new File("../../res/gfx/cannon_base.png"), true);
+        topTexture = TextureIO.newTexture(new File("../../res/gfx/cannon_top.png"), true);
+        pipeTexture = TextureIO.newTexture(new File("../../res/gfx/cannon_pipe.png"), true);
 
         GLUtil.fixTextureParameters(baseTexture);
         GLUtil.fixTextureParameters(topTexture);

@@ -42,8 +42,8 @@ public class SoundPlayer implements GameModelListener {
 
     private final Map<String, List<Clip>> clipDB = new HashMap<String, List<Clip>>();
     private final Map<String, AudioData> audioDataDB = new HashMap<String, AudioData>();
-    private String soundLocation = "res/sound/";
-    private String musicLocation = "res/sound/";
+    private String soundLocation = "../../res/sound/";
+    private String musicLocation = "../../res/sound/";
     private Mixer.Info mixer = null;
     private static final int MAX_CLIPS = 4;
     private static final String[] collisionSounds = new String[]{"collision1.wav"};
