@@ -48,7 +48,7 @@ public class TouchGameLogic {
 
 
 
-        DisplayMode displayMode = mainFrame.getJFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
+        DisplayMode displayMode = mainFrame.getRootPanel().getGraphicsConfiguration().getDevice().getDisplayMode();
         Dimension screenDimensions = new Dimension(displayMode.getWidth(), displayMode.getHeight());
         final Settings settings = mainFrame.getSettings();
 

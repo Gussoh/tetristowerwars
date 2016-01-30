@@ -16,30 +16,41 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Application;
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.tetristowerwars.control.TouchInputManager;
+import org.tetristowerwars.gui.JavaFXWindow;
 
 /**
  *
  * @author Andreas
  */
-public final class MainFrame {
+public final class MainFrame extends Application {
 
-    private JFrame frame = new JFrame("Tetris Tower Wars");
+    //private JFrame frame = new JFrame("Tetris Tower Wars");
     private final Deque<Component> componentStack = new ArrayDeque<Component>();
     private final Settings settings;
     private final TuioClient tuioClient = new TuioClient();
     private MouseEmulator emulator;
     private boolean isFullscreen = false;
+    private JComponent rootPanel = new JPanel();
+    SwingNode swingNode;
 
     public MainFrame() {
         tuioClient.connect();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationByPlatform(true);
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.setLocationByPlatform(true);
         settings = new Settings();
         try {
             settings.load();
@@ -47,7 +58,27 @@ public final class MainFrame {
             JOptionPane.showMessageDialog(componentStack.peek(), "Unable to load settings file: " + Settings.SETTINGS_FILE + "\nReason: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         openComponent(new StartPanel(this), false);
-        frame.setVisible(true);
+        //frame.setVisible(true);
+    }
+    
+    @Override
+    public void start(Stage stage) throws Exception {
+        swingNode = new SwingNode();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                swingNode.setContent(rootPanel);
+            }
+        });
+        
+        StackPane pane = new StackPane();
+        pane.getChildren().add(swingNode);
+
+        stage.setTitle("Swing in JavaFX");
+        stage.setScene(new Scene(pane, 1250, 1150));
+        stage.show();
+        System.out.println("Is it me?");
     }
 
     public TuioClient getTuioClient() {
@@ -55,52 +86,45 @@ public final class MainFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
+        
 
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                new MainFrame();
-            }
-        });
-
+        launch(args);
     }
 
     public void openComponent(Component component, boolean fullscreen) {
         Component currentComponent = componentStack.peek();
 
         if (currentComponent != null) {
-            frame.remove(currentComponent);
+            //frame.remove(currentComponent);
+            rootPanel.remove(currentComponent);
         }
+        
+        
+        
         if(fullscreen) {
-            isFullscreen = true;
+            
+            /*isFullscreen = true;
             frame.dispose();
-            frame = new JFrame();
+            frame = new JFrame("uni Tetris Tower Wars");
             frame.setUndecorated(true);
             frame.setVisible(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             GraphicsDevice gDev = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             int width = gDev.getDisplayMode().getWidth();
             int height = gDev.getDisplayMode().getHeight();
+*/
             componentStack.push(component);
-            frame.add(component);
-            frame.setSize(width, height);
+            rootPanel.add(component);
+            //frame.add(component);
+            //frame.setSize(width, height);
         }
         else {
             componentStack.push(component);
-            frame.add(component);
-            frame.pack();
+            rootPanel.add(component);
+            //frame.add(component);
+            //frame.pack();
         }
+        rootPanel.validate();
 
         if (settings.isMouseEmulationEnabled()) {
             enableMouseEmulation();
@@ -109,25 +133,29 @@ public final class MainFrame {
         }
     }
 
-    public JFrame getJFrame() {
-        return frame;
+    public JComponent getRootPanel() {
+        return rootPanel;
     }
 
     public void back() {
         if (isFullscreen) {
-            isFullscreen = false;
+            /*isFullscreen = false;
             frame.dispose();
             frame = new JFrame("Tetris Tower Wars");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLocationByPlatform(true);
             frame.setVisible(true);
+            */
+
             componentStack.pop();
         }
         else {
-            frame.remove(componentStack.pop());
+            //frame.remove(componentStack.pop());
+            rootPanel.remove(componentStack.pop());
         }
-        frame.add(componentStack.peek());
-        frame.pack();
+        //frame.add(componentStack.peek());
+        //frame.pack();
+        rootPanel.add(componentStack.peek());
 
         if (settings.isMouseEmulationEnabled()) {
             enableMouseEmulation();
@@ -147,7 +175,7 @@ public final class MainFrame {
     }
 
     public void enableMouseEmulation() {
-        if (emulator == null) {
+        /*if (emulator == null) {
             DisplayMode displayMode = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
             Dimension dimension = new Dimension(displayMode.getWidth(), displayMode.getHeight());
             try {
@@ -156,7 +184,7 @@ public final class MainFrame {
             } catch (AWTException ex) {
                 JOptionPane.showMessageDialog(frame, "Unable to emulate mouse.\nReason: " + ex.getMessage());
             }
-        }
+        }*/
     }
 
     public void disableMouseEmulation() {

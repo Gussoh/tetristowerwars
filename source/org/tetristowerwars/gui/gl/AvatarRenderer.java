@@ -29,7 +29,7 @@ public class AvatarRenderer {
 
 
     public AvatarRenderer(GL gl, int themeId) throws IOException {
-        String basePath = "../../res/gfx/THEME" + themeId + "/";
+        String basePath = "res/gfx/THEME" + themeId + "/";
 
         player1Texture = TextureIO.newTexture(new File(basePath + "player1.png"), true);
         player2Texture = TextureIO.newTexture(new File(basePath + "player2.png"), true);

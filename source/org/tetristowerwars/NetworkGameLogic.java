@@ -64,7 +64,7 @@ public class NetworkGameLogic {
 
         gameModel = new GameModel(networkSettings.getWorldWidth(), networkSettings.getWorldHeight(), networkSettings.getGroundHeight(), networkSettings.getBlockSize());
         renderer = new GLRenderer(gameModel, mainFrame);
-        this.progressMonitor = new ProgressMonitor(mainFrame.getJFrame(), "Starting game...", "Loading...", 0, 5);
+        this.progressMonitor = new ProgressMonitor(mainFrame.getRootPanel(), "Starting game...", "Loading...", 0, 5);
         progressMonitor.setMillisToPopup(1);
         progressMonitor.setMillisToDecideToPopup(1);
         progressMonitor.setProgress(1);
@@ -465,7 +465,7 @@ public class NetworkGameLogic {
                     public void run() {
                         mainFrame.back();
                         if (message != null) {
-                            JOptionPane.showMessageDialog(mainFrame.getJFrame(), message);
+                            JOptionPane.showMessageDialog(mainFrame.getRootPanel(), message);
                         }
                     }
                 });

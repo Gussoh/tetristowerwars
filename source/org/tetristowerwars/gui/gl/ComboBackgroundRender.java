@@ -36,8 +36,8 @@ public class ComboBackgroundRender {
     private static final float groundShrinkFactor = 10.0f;
 
     public ComboBackgroundRender(GL gl, float renderWorldWidth, float renderWorldHeight, float groundLevel, float horizontLevel, int leftThemeIndex, int rightThemeIndex) throws IOException {
-        String leftTexturePath = "../../res/gfx/THEME" + leftThemeIndex + "/";
-        String rightTexturePath = "../../res/gfx/THEME" + rightThemeIndex + "/";
+        String leftTexturePath = "res/gfx/THEME" + leftThemeIndex + "/";
+        String rightTexturePath = "res/gfx/THEME" + rightThemeIndex + "/";
         skyLeftTexture = TextureIO.newTexture(new File(leftTexturePath + "sky.png"), true);
         skyRightTexture = TextureIO.newTexture(new File(rightTexturePath + "sky.png"), true);
         cityLeftTexture = TextureIO.newTexture(new File(leftTexturePath + "citysilhuette.png"), true);

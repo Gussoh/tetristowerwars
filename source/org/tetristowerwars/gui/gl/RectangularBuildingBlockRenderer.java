@@ -71,13 +71,13 @@ public class RectangularBuildingBlockRenderer {
         }
 
         float color = 0.9f;
-        createBufferEntry(WoodMaterial.class, "../../res/gfx/textures/wood2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
-        createBufferEntry(SteelMaterial.class, "../../res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
-        createBufferEntry(BrickMaterial.class, "../../res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
-        createBufferEntry(PowerupMaterial.class, "../../res/gfx/textures/powerup.png", new float[]{color, color, color, 1.0f}, 0.0f, true);
-        createBufferEntry(RubberMaterial.class, "../../res/gfx/textures/rubber.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
-        createBufferEntry(GhostMaterial.class, "../../res/gfx/textures/ghost.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
-        createBufferEntry(InvulnerableMaterial.class, "../../res/gfx/textures/invulnerable.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(WoodMaterial.class, "res/gfx/textures/wood2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(SteelMaterial.class, "res/gfx/textures/steel2.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(BrickMaterial.class, "res/gfx/textures/brick1.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(PowerupMaterial.class, "res/gfx/textures/powerup.png", new float[]{color, color, color, 1.0f}, 0.0f, true);
+        createBufferEntry(RubberMaterial.class, "res/gfx/textures/rubber.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(GhostMaterial.class, "res/gfx/textures/ghost.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
+        createBufferEntry(InvulnerableMaterial.class, "res/gfx/textures/invulnerable.png", new float[]{color, color, color, 1.0f}, 0.0f, false);
 
         lineVertexBuffer = BufferUtil.newFloatBuffer(100);
         lineColorBuffer = BufferUtil.newFloatBuffer(200);
